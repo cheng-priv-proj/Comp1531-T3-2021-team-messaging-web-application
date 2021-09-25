@@ -1,6 +1,5 @@
 import pytest
 
-from src.echo import echo
 from src.error import InputError
 
 
