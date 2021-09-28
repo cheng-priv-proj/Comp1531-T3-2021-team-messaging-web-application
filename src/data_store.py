@@ -54,6 +54,10 @@ class Datastore:
     def get_u_id_dict(self):
         return self.initial_object['u_id']
 
+    def get_user_info_from_auth_id(self, auth_id):
+        u_id = self.initial_object['auth_user_id'].get(auth_id)
+        return self.initial_object['u_id'].get(u_id)
+
     def update_value(dict_key, key, value):
         self.initial_object[dict_key][key] = value
 
