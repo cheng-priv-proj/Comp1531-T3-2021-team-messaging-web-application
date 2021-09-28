@@ -58,6 +58,13 @@ class Datastore:
         u_id = self.initial_object['auth_user_id'].get(auth_id)
         return self.initial_object['u_id'].get(u_id)
 
+    def check_user_is_member_of_channel(self, channel_id, u_id):
+        channel_details = self.get_channel_id_dict().get(channel_id)
+        if not any (member['u_id'] == u_id for member in channel_details['all_members']):
+            return False
+        
+        return True
+
     def update_value(dict_key, key, value):
         self.initial_object[dict_key][key] = value
 
