@@ -26,7 +26,10 @@ Example usage:
 
 ## YOU SHOULD MODIFY THIS OBJECT BELOW
 initial_object = {
-    'users': [],
+    'login': {},
+    'auth_to_user': {},
+    'channel_id_to_channel_details': {},
+    'uid_to_user': {}
 }
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
 
@@ -36,6 +39,21 @@ class Datastore:
 
     def get(self):
         return self.__store
+
+    def get_email_dict(self):
+        return self.initial_object['email']
+
+    def get_auth_user_id_dict(self):
+        return self.initial_object['auth_user_id']
+    
+    def get_channel_id_dict(self):
+        return self.initial_object['channel_id']
+
+    def get_u_id_dict(self):
+        return self.initial_object['u_id']
+
+    def update_value(dict_key, key, value):
+        self.initial_object[dict_key][key] = value
 
     def set(self, store):
         if not isinstance(store, dict):
