@@ -1,6 +1,8 @@
 def channel_invite_v1(auth_user_id, channel_id, u_id):
+
     return {
     }
+
 
 def channel_details_v1(auth_user_id, channel_id):
     return {
