@@ -12,10 +12,17 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
         raise TypeError('U_id must be an integer')
 
     invitee_user_info = data_store.get_u_id_dict().get(u_id)
+<<<<<<< HEAD
 
     if invitee_user_info is None or data_store.check_user_is_member_of_channel(channel_id, u_id):
         raise InputError
 
+=======
+
+    if invitee_user_info is None:
+        raise InputError
+
+>>>>>>> 29f569d (temp)
     
     return {
     }
