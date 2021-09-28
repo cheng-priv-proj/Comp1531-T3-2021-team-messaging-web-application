@@ -2,7 +2,7 @@ from data_store import data_store
 from error import InputError
 from error import AccessError
 
-def channel_invite_v1(auth_user_id, channel_id, u_id):
+def channel_invite_v1(inviter_auth_user_id, channel_id, invitee_u_id):
     # Checking valid input types: (ASSUMPTION: Returns nothing)
     if type(auth_user_id) != int:
         raise TypeError('Auth_user_id must be an integer')
@@ -11,11 +11,24 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     if type(u_id) != int:
         raise TypeError('U_id must be an integer')
 
-    invitee_user_info = data_store.get_u_id_dict().get(u_id)
+    invitee_user_info = data_store.get_u_id_dict().get(invitee_u_id)
+    inviter_u_id = data_store.get_auth_user_id_dict().get(inviter_auth_user_id)
+    channel_details = data_store.get_channel_id_dict().get(channel_id)
 
-    if invitee_user_info is None or data_store.check_user_is_member_of_channel(channel_id, u_id):
+    # Checking if invitee_u_id is valid or invitee is already a member of channel
+    if invitee_user_info is None or data_store.check_user_is_member_of_channel(channel_id, invitee_u_id):
         raise InputError
-
+    # Checking if channel_id is valid
+    if channel_details is None:
+        raise InputError
+    # Checking if inviter_auth_id is valid
+    if inviter_u_id is None:
+        raise InputError
+    # Checks whether invitor is a member of channel
+    if data_store.check_user_is_member_of_channel(channel_id, inviter_u_id):
+        raise AccessError
+    
+    channel_details['all_members'].append(invitee_user_info)
     
     return {
     }
