@@ -3,7 +3,20 @@ from error import InputError
 from error import AccessError
 
 def channel_invite_v1(auth_user_id, channel_id, u_id):
+    # Checking valid input types: (ASSUMPTION: Returns nothing)
+    if type(auth_user_id) != int:
+        raise TypeError('Auth_user_id must be an integer')
+    if type(channel_id) != int:
+        raise TypeError('Channel_id must be an integer')
+    if type(u_id) != int:
+        raise TypeError('U_id must be an integer')
 
+    invitee_user_info = data_store.get_u_id_dict().get(u_id)
+
+    if invitee_user_info is None or data_store.check_user_is_member_of_channel(channel_id, u_id):
+        raise InputError
+
+    
     return {
     }
 
@@ -57,7 +70,7 @@ def channel_join_v1(auth_user_id, channel_id):
         raise(InputError)
 
     # Checking if valid channel_id or if user already in channel_details
-    if channel_details == None or auth_user_id in channel_details['all_members']:
+    if channel_details == None or data_store.check_user_is_member_of_channel(channel_id, u_id):
         raise(InputError)
 
     u_id = data_store.get_auth_user_id_dict().get(auth_user_id)
