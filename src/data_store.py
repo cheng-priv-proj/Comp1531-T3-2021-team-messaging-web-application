@@ -55,9 +55,10 @@ class Datastore:
         return self.__store['users']
 
     def get_user_info_from_auth_id(self, auth_id):
-        u_id = self.__store['auth_user_id'].get(auth_id)
-        return self.__store['u_id'].get(u_id)
+        u_id = self.__store['u_id'].get(auth_id)
+        return self.__store['users'].get(u_id['u_id'])
 
+    # Assumes valid input
     def check_user_is_member_of_channel(self, channel_id, u_id):
         channel_details = self.get_channels_from_channel_id_dict().get(channel_id)
         if not any (member['u_id'] == u_id for member in channel_details['all_members']):
@@ -65,8 +66,15 @@ class Datastore:
         
         return True
     
+    def isValid_auth_user_id(self, auth_user_id):
+        u_id_dict = self.get_u_id_from_auth_dict()
+        if auth_user_id not in u_id_dict:
+            return False
+        
+        return True
+    
     def insert_u_id(self, u_id, auth_id):
-        self.get_u_id_from_auth_dict[auth_id] = {
+        self.get_u_id_from_auth_dict()[auth_id] = {
             'u_id': u_id
         }
 
@@ -91,7 +99,8 @@ class Datastore:
             'is_public': is_public,
             'owner_members': owner_members,
             'all_members': all_members,
-            'messages': messages}
+            'messages': messages
+        }
 
 
     def update_value(self, dict_key, key, value):
