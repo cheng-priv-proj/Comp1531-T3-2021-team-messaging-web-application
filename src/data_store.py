@@ -2,11 +2,7 @@
 #   Key: Email
 #   Value: Dictionary {
 #          Password, 
-<<<<<<< HEAD
-#          Auth_id}
-=======
 #          Auth_id } 
->>>>>>> 29f569d (temp)
 # Dict 2:
 #   Key: Auth_id
 #   Value: Dictionary { 
