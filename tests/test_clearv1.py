@@ -1,16 +1,18 @@
 import pytest
-import ???
 
-from src.error import InputError
-from src.error import AccessError
-from data_store import data_store
-from data_store import Datastore
+from src.other import clear_v1
+from src.channel import channel_create_v1
+from src.auth import auth_register_v1
+import src.data_store as data_store
 
 # assumes that the data store is initially empty
 def test_clearv1_functionality():
+    clear_v1()
     empty_data_store = data_store.Datastore()
-    auth_user_id = auth_register_v1('test@gmail.com', 123, 'first', 'last')
+    auth_user_id = auth_register_v1('test@gmail.com', 1234567, 'first', 'last')
+    auth_user_id2 = auth_register_v1('test2@gmail.com', 1234567, 'first', 'last')
     channel_id = channel_create_v1(auth_user_id, 'name', True)
+    channel_id2 = channel_create_v1(auth_user_id2, 'name', True)
     clear_v1()
     
     assert empty_data_store == data_store
