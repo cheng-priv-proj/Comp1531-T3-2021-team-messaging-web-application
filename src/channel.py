@@ -1,6 +1,6 @@
-from data_store import data_store
-from error import InputError
-from error import AccessError
+from src.data_store import data_store
+from src.error import InputError
+from src.error import AccessError
 
 def channel_invite_v1(inviter_auth_user_id, channel_id, invitee_u_id):
     # Checking valid input types: (ASSUMPTION: Returns nothing)
@@ -15,8 +15,11 @@ def channel_invite_v1(inviter_auth_user_id, channel_id, invitee_u_id):
     inviter_u_id = data_store.get_auth_user_id_dict().get(inviter_auth_user_id)
     channel_details = data_store.get_channel_id_dict().get(channel_id)
 
-    # Checking if invitee_u_id is valid or invitee is already a member of channel
-    if invitee_user_info is None or data_store.check_user_is_member_of_channel(channel_id, invitee_u_id):
+    # Checking if invitee_u_id is valid 
+    if invitee_user_info is None:
+        raise InputError
+    # Checking if invitee is already a member of channel
+    if data_store.check_user_is_member_of_channel(channel_id, invitee_u_id):
         raise InputError
     # Checking if channel_id is valid
     if channel_details is None:

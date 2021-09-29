@@ -43,20 +43,20 @@ class Datastore:
         return self.__store
 
     def get_email_dict(self):
-        return self.initial_object['email']
+        return self.__store['email']
 
     def get_auth_user_id_dict(self):
-        return self.initial_object['auth_user_id']
+        return self.__store['auth_user_id']
     
     def get_channel_id_dict(self):
-        return self.initial_object['channel_id']
+        return self.__store['channel_id']
 
     def get_u_id_dict(self):
-        return self.initial_object['u_id']
+        return self.__store['u_id']
 
     def get_user_info_from_auth_id(self, auth_id):
-        u_id = self.initial_object['auth_user_id'].get(auth_id)
-        return self.initial_object['u_id'].get(u_id)
+        u_id = self.__store['auth_user_id'].get(auth_id)
+        return self.__store['u_id'].get(u_id)
 
     def check_user_is_member_of_channel(self, channel_id, u_id):
         channel_details = self.get_channel_id_dict().get(channel_id)
@@ -65,8 +65,8 @@ class Datastore:
         
         return True
 
-    def update_value(dict_key, key, value):
-        self.initial_object[dict_key][key] = value
+    def update_value(self, dict_key, key, value):
+        self.__store[dict_key][key] = value
 
     def set(self, store):
         if not isinstance(store, dict):
