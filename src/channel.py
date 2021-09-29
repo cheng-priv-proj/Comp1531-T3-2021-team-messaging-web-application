@@ -15,6 +15,9 @@ def channel_invite_v1(inviter_auth_user_id, channel_id, invitee_u_id):
     inviter_u_id = data_store.get_auth_user_id_dict().get(inviter_auth_user_id)
     channel_details = data_store.get_channel_id_dict().get(channel_id)
 
+    # Checking if inviter_auth_id is valid
+    if inviter_u_id is None:
+        raise AccessError
     # Checking if invitee_u_id is valid 
     if invitee_user_info is None:
         raise InputError
@@ -23,9 +26,6 @@ def channel_invite_v1(inviter_auth_user_id, channel_id, invitee_u_id):
         raise InputError
     # Checking if channel_id is valid
     if channel_details is None:
-        raise InputError
-    # Checking if inviter_auth_id is valid
-    if inviter_u_id is None:
         raise InputError
     # Checks whether invitor is a member of channel
     if data_store.check_user_is_member_of_channel(channel_id, inviter_u_id):

@@ -100,7 +100,7 @@ def test_invalid_auth_id(clear, register, extract_user, extract_channel):
     channel_id = extract_channel(register)
     friend_user_id = extract_user(auth_register_v1('friend@test.com', 'password', 'friend', 'one'))
 
-    with pytest.raises(InputError):
+    with pytest.raises(AccessError):
         channel_invite_v1(invalid_auth_user_id, channel_id, friend_user_id)
 
 def test_invalid_uid(clear, register, extract_user, extract_channel):
