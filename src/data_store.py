@@ -1,13 +1,13 @@
-# Dict 1:
+# Login:
 #   Key: Email
 #   Value: Dictionary {
 #          Password, 
 #          Auth_id } 
-# Dict 2:
+# U_id:
 #   Key: Auth_id
 #   Value: Dictionary { 
 #          u_id }
-# Dict 3:
+# Channels:
 #   Key: Channel_id:
 #   Value: Dictionary {
 #          Channel Name
@@ -15,7 +15,7 @@
 #          Messages
 #          owner_members
 #          all_members }
-# Dict 4: 
+# Users: 
 #   (Matches ‘user’ type)
 #   Key: u_id:
 #   Value: Dictionary {
@@ -28,10 +28,10 @@
 
 ## YOU SHOULD MODIFY THIS OBJECT BELOW
 initial_object = {
-    'email': {},
-    'auth_user_id': {},
-    'channel_id': {},
-    'u_id': {}
+    'login': {},
+    'u_id': {},
+    'channels': {},
+    'users': {}
 }
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
 
@@ -42,28 +42,66 @@ class Datastore:
     def get(self):
         return self.__store
 
-    def get_email_dict(self):
-        return self.__store['email']
+    def get_login_from_email_dict(self):
+        return self.__store['login']
 
-    def get_auth_user_id_dict(self):
-        return self.__store['auth_user_id']
-    
-    def get_channel_id_dict(self):
-        return self.__store['channel_id']
-
-    def get_u_id_dict(self):
+    def get_u_id_from_auth_dict(self):
         return self.__store['u_id']
+    
+    def get_channels_from_channel_id_dict(self):
+        return self.__store['channels']
+
+    def get_users_from_u_id_dict(self):
+        return self.__store['users']
 
     def get_user_info_from_auth_id(self, auth_id):
-        u_id = self.__store['auth_user_id'].get(auth_id)
-        return self.__store['u_id'].get(u_id)
+        u_id = self.__store['u_id'].get(auth_id)
+        return self.__store['users'].get(u_id['u_id'])
 
+    # Assumes valid input
     def check_user_is_member_of_channel(self, channel_id, u_id):
-        channel_details = self.get_channel_id_dict().get(channel_id)
+        channel_details = self.get_channels_from_channel_id_dict().get(channel_id)
         if not any (member['u_id'] == u_id for member in channel_details['all_members']):
             return False
         
         return True
+    
+    def isValid_auth_user_id(self, auth_user_id):
+        u_id_dict = self.get_u_id_from_auth_dict()
+        if auth_user_id not in u_id_dict:
+            return False
+        
+        return True
+    
+    def insert_u_id(self, u_id, auth_id):
+        self.get_u_id_from_auth_dict()[auth_id] = {
+            'u_id': u_id
+        }
+
+    def insert_login(self, email, password, auth_id):
+        self.get_login_from_email_dict()[email] = {
+            'password': password,
+            'auth_id': auth_id
+        }
+
+    def insert_user_info(self, u_id, email, name_first, name_last, handle_str):
+        self.get_users_from_u_id_dict()[u_id] = {
+            'u_id': u_id,
+            'email': email,
+            'name_first': name_first,
+            'name_last': name_last,
+            'handle_str': handle_str
+        }
+
+    def insert_channel(self, channel_id, channel_name, is_public, messages, owner_members, all_members):
+        self.get_channels_from_channel_id_dict()[channel_id] = {
+            'name': channel_name,
+            'is_public': is_public,
+            'owner_members': owner_members,
+            'all_members': all_members,
+            'messages': messages
+        }
+
 
     def update_value(self, dict_key, key, value):
         self.__store[dict_key][key] = value
