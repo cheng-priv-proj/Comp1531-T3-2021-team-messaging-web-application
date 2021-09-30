@@ -3,10 +3,32 @@ from src.error import InputError
 from src.other import handle_str_generation
 import re
 
+# returns a users auth_id
 def auth_login_v1(email, password):
+
+    # checking for types
+    if type(email) != str:
+        raise InputError
+
+    if type(password) != str:
+        raise InputError    
+
+    email_dict = data_store.get_login_from_email_dict()
+    
+    # input error if email doesn't belong to a user
+    if email not in email_dict:
+        raise InputError
+    
+    # input error if password is wrong
+    if password != email_dict.get(email).get("password"):
+        raise InputError
+
+    auth_id = email_dict.get(email).get("auth_id")
+
     return {
-        'auth_user_id': 1,
+        'auth_user_id': auth_id,
     }
+
 
 
 def auth_register_v1(email, password, name_first, name_last):
