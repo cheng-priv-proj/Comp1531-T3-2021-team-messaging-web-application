@@ -19,10 +19,6 @@ def test_standard(clear):
 
     output = auth_register_v1("Example@EmaiL.orG.au", "pAssW0rd", "John", "Smith")
     assert isinstance(output["auth_user_id"], int)
-
-    # Sus test
-    #output = auth_register_v1("Examp1e-of_email.address@EmaiL.C0m", "pas./s_wor-d", "j0hn", "sm1t\h")
-    #assert isinstance(output["auth_user_id"], int)
     
     output = auth_register_v1("emailPerson@mailchimp.potato", "9d-P<vBy9qmk/4C", "john", "smith")
     assert isinstance(output["auth_user_id"], int)
