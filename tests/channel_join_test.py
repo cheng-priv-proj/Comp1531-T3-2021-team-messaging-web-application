@@ -36,7 +36,6 @@ def register():
     channel_id_dict = channels_create_v1(owner_user_id, 'test channel', True)
     return {**owner_id_dict, **channel_id_dict}
 
-@pytest.mark.skip("channel_list required") 
 def test_valid_id(clear, register, extract_user, extract_channel):
     auth_user_id = extract_user(auth_register_v1('member@test.com', 'password', 'member', 'one'))
     channel_id = extract_channel(register)
@@ -52,7 +51,6 @@ def test_valid_id(clear, register, extract_user, extract_channel):
         ],
     }
 
-@pytest.mark.skip("channel_list required")
 def test_multiple_servers(clear, register, extract_user, extract_channel):
     channel1_id = extract_channel(register)
     owner2_auth_user_id = extract_user(auth_register_v1('owner2@test.com', 'password', 'owner', 'two'))
