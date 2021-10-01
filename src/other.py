@@ -35,6 +35,7 @@ def handle_str_generation(firstname, lastname):
     return base_handle_str
 
 # TypeError checking helper function
-def check_type(var, type):
-    if type(var) != type:
+def check_type(var, var_type):
+    
+    if type(var) != var_type:
         raise TypeError
