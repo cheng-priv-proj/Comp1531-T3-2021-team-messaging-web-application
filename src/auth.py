@@ -1,27 +1,28 @@
 from src.data_store import data_store
 from src.error import InputError
-from src.other import handle_str_generation
+from src.other import *
 import re
 
 '''
-Returns a users auth_id
+Given the email and password of a registered user, returns the corresponding
+auth_id.
 Arguments:
-    email (string) - users email
-    password (string) - users password
+    email       (string)   - users email
+    password    (string)   - users password
+
 Exceptions:
-    Type error - occurs when email or password given are not strings
-    Input error - occurs when email does not belong to a user
-    Input error - occurs when password is not correct
+    TypeError  - occurs when email or password given are not strings
+    InputError - occurs when email does not belong to a user
+    InputError - occurs when password is not correct
+
 Return value:
-    Returns auth_id
+    Returns auth_id on success
 '''
 def auth_login_v1(email, password):
-    # checking for types
-    if type(email) != str:
-        raise TypeError
 
-    if type(password) != str:
-        raise TypeError    
+    # check for valid input types
+    check_type(email, str)
+    check_type(password, str)
 
     email_dict = data_store.get_login_from_email_dict()
     
@@ -30,52 +31,51 @@ def auth_login_v1(email, password):
         raise InputError
     
     # input error if password is wrong
-    if password != email_dict.get(email).get("password"):
+    if password != email_dict.get(email).get('password'):
         raise InputError
 
     auth_id = email_dict.get(email).get("auth_id")
 
-    return {
-        'auth_user_id': auth_id,
-    }
+    return { 'auth_user_id': auth_id }
 
 
 '''
-Updates data store for a new user
+Updates data store with a new user's information
 Generates a u_id, auth_id and handle_str
-Aguments:
-    email (string) - users email
-    password (string) - users password
-    name_first (string) - users first name
-    name_last (string) - users last name
+
+Arguments:
+    email       (string)    - users email
+    password    (string)    - users password
+    name_first  (string)    - users first name
+    name_last   (string)    - users last name
+
 Exceptions:
-    Type error - occurs when email, password, name_first or name_last are not strings
-    Input error - occurs when email entered is not a valid email
-    Input error - occurs when email is already being used by another user
-    Input error - occurs when password is less than 6 characters
-    Input error - occurs when name_first is less than 1 character or more than 50
-    Input error - occurs when name_last is less than 1 character or more than 50
+    TypeError   - occurs when email, password, name_first or name_last
+                  are not strings
+    InputError  - occurs when email is not a valid email
+    InputError  - occurs when email is already being used by another user
+    InputError  - occurs when password is less than 6 characters
+    InputError  - occurs when name_first is less than 1 character
+                  or more than 50
+    InputError  - occurs when name_last is less than 1 character
+                  or more than 50
+
 Return value:
-    Returns auth_id
+    Returns auth_id on success
 '''
 def auth_register_v1(email, password, name_first, name_last):
-    # checking for types
-    if type(email) != str:
-        raise TypeError
-    if type(password) != str:
-        raise TypeError
-    if type(name_first) != str:
-        raise TypeError
-    if type(name_last) != str:
-        raise TypeError
 
-    # input errors
-    if re.fullmatch(r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$', email):
-        pass
-    else:
+    # checking for valid input types
+    check_type(email, str)
+    check_type(password, str)
+    check_type(name_first, str)
+    check_type(name_last, str)
+
+    # check for valid email format
+    if not re.fullmatch(r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$', email):
         raise InputError
 
-    
+    # check for valid password, name_first and name_last lengths
     if len(password) < 6:
         raise InputError
     if len(name_first) < 1 or len(name_first) > 50:
@@ -83,15 +83,13 @@ def auth_register_v1(email, password, name_first, name_last):
     if len(name_last) < 1 or len(name_last) > 50:
         raise InputError
     
-    #check if email is already being used
+    # check if email is already being used
     email_dict = data_store.get_login_from_email_dict()
     if email in email_dict:
         raise InputError
 
-    # generate u_id, auth_id and handle_str
-    u_id_dict = data_store.get_users_from_u_id_dict()
-    num_keys = len(u_id_dict)
-    auth_id = num_keys
+    # generate a unique u_id and auth_id
+    auth_id = len(data_store.get_users_from_u_id_dict())
     u_id = -1 * auth_id
 
     handle_str = handle_str_generation(name_first, name_last)
@@ -101,7 +99,4 @@ def auth_register_v1(email, password, name_first, name_last):
     data_store.insert_u_id(u_id, auth_id)
     data_store.insert_login(email, password, auth_id)
 
-
-    return {
-        'auth_user_id': auth_id
-    }
+    return { 'auth_user_id': auth_id }
