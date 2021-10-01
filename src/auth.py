@@ -3,15 +3,25 @@ from src.error import InputError
 from src.other import handle_str_generation
 import re
 
-# returns a users auth_id
+'''
+Returns a users auth_id
+Arguments:
+    email (string) - users email
+    password (string) - users password
+Exceptions:
+    Type error - occurs when email or password given are not strings
+    Input error - occurs when email does not belong to a user
+    Input error - occurs when password is not correct
+Return value:
+    Returns auth_id
+'''
 def auth_login_v1(email, password):
-
     # checking for types
     if type(email) != str:
-        raise InputError
+        raise TypeError
 
     if type(password) != str:
-        raise InputError    
+        raise TypeError    
 
     email_dict = data_store.get_login_from_email_dict()
     
@@ -30,11 +40,25 @@ def auth_login_v1(email, password):
     }
 
 
-
+'''
+Updates data store for a new user
+Generates a u_id, auth_id and handle_str
+Aguments:
+    email (string) - users email
+    password (string) - users password
+    name_first (string) - users first name
+    name_last (string) - users last name
+Exceptions:
+    Type error - occurs when email, password, name_first or name_last are not strings
+    Input error - occurs when email entered is not a valid email
+    Input error - occurs when email is already being used by another user
+    Input error - occurs when password is less than 6 characters
+    Input error - occurs when name_first is less than 1 character or more than 50
+    Input error - occurs when name_last is less than 1 character or more than 50
+Return value:
+    Returns auth_id
+'''
 def auth_register_v1(email, password, name_first, name_last):
-    # Updates dict 1, 2, 4 with new entries
-    # Generates u_id (negative), auth_id (positive), handle_str, checking for duplicate handles
-    
     # checking for types
     if type(email) != str:
         raise TypeError
