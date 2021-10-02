@@ -5,6 +5,7 @@ from src.channel import channel_join_v1
 from src.auth import auth_register_v1
 from src.channels import channels_create_v1
 from src.channels import channels_listall_v1
+from src.channels import channels_list_v1
 
 from src.other import clear_v1
 from src.error import InputError
@@ -45,8 +46,8 @@ def test_valid_id(clear, register, extract_user, extract_channel):
     assert channels_listall_v1(auth_user_id) == {
         'channels': [
         	{
-            'channel_id': channel_id, 
-            'name': 'test channel'
+                'channel_id': channel_id, 
+                'name': 'test channel'
             }
         ],
     }
@@ -64,12 +65,12 @@ def test_multiple_servers(clear, register, extract_user, extract_channel):
     assert channels_listall_v1(auth_user_id) == {
         'channels': [
         	{
-            'channel_id': channel1_id, 
-            'name': 'test channel'
+                'channel_id': channel1_id, 
+                'name': 'test channel'
             },
             {
-            'channel_id': channel2_id, 
-            'name': 'test channel2'
+                'channel_id': channel2_id, 
+                'name': 'test channel2'
             }
         ],
     }
@@ -113,4 +114,25 @@ def test_private_not_owner(clear, extract_user, extract_channel):
     with pytest.raises(AccessError):
         channel_join_v1(auth_user_id, channel_id)
 
-# def test_global_owner
+def test_global_owner(clear, extract_user, extract_channel):
+    owner_auth_user_id = extract_user(auth_register_v1('owner@test.com', 'password', 'owner', 'one'))
+    auth_id_1 = extract_user(auth_register_v1('user1@test.com', 'password1', 'userasd', 'oneee'))
+    auth_id_2 = extract_user(auth_register_v1('user2@test.com', 'password2', 'userrr', 'twooo'))
+
+    channel_id = extract_channel(channels_create_v1(auth_id_1, 'testing_channel3', False))
+    channel_join_v1(owner_auth_user_id, channel_id)
+
+    channel_list = (channels_list_v1(owner_auth_user_id))
+
+    assert(channel_list == { 
+        'channels': [
+            {
+                'channel_id': channel_id, 
+                'name': 'testing_channel3'
+            }
+        ]
+    })
+
+    with pytest.raises(AccessError):
+        channel_join_v1(auth_id_2, channel_id)
+
