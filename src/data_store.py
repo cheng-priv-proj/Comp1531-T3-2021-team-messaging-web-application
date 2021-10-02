@@ -1,3 +1,5 @@
+from other import *
+
 # Login:
 #   Key: email
 #   Value: Dictionary {
@@ -83,7 +85,7 @@ class Datastore:
         return True
     
     def isStreamOwner(self, u_id):
-        return self.get_user_perms_from_u_id_dict().get(u_id) == 1
+        return self.get_user_perms_from_u_id_dict().get(u_id) == streamOwner
 
     def isValid_auth_user_id(self, auth_user_id):
         u_id_dict = self.get_u_id_from_auth_dict()

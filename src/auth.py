@@ -95,6 +95,8 @@ def auth_register_v1(email, password, name_first, name_last):
     handle_str = handle_str_generation(name_first, name_last)
 
     # insert new data into dicts
+    perm = streamOwner if len(auth_id) == 0 else perm == streamMember
+    data_store.insert_user_perm(u_id, perm)
     data_store.insert_user_info(u_id, email, name_first, name_last, handle_str)
     data_store.insert_u_id(u_id, auth_id)
     data_store.insert_login(email, password, auth_id)
