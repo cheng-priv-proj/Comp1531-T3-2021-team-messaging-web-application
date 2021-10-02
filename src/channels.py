@@ -1,6 +1,7 @@
-from src.data_store import *
-from src.error import *
-from src.other import *
+from src.data_store import data_store
+from src.error import InputError
+from src.error import AccessError
+from src.other import check_type
 
 '''
 Returns a list of channels that the authorised user is apart of.
