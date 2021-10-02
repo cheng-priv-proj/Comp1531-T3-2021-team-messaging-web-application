@@ -76,7 +76,7 @@ Exceptions:
                   not a member of the channel
 
 Return value:
-    Returns nothing on success
+    Returns {name, is_public, owner_members, all_members} on success
 '''
 def channel_details_v1(auth_user_id, channel_id):
 
