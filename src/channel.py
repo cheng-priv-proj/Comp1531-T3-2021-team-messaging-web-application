@@ -216,7 +216,7 @@ def channel_join_v1(auth_user_id, channel_id):
         raise InputError
 
     # Checking if channel is public
-    if not channel.get('is_public') and data_store.isStreamOwner(u_id):
+    if not channel.get('is_public') and not data_store.isStreamOwner(u_id):
         raise AccessError
 
     user = data_store.get_user_info_from_auth_id(auth_user_id)
