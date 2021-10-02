@@ -2,8 +2,8 @@ from src.data_store import data_store
 from src.error import InputError
 from src.other import check_type
 from src.other import handle_str_generation
-from src.other import streamOwner
-from src.other import streamMember
+from src.other import stream_owner
+from src.other import stream_member
 import re
 
 '''
@@ -98,7 +98,7 @@ def auth_register_v1(email, password, name_first, name_last):
     handle_str = handle_str_generation(name_first, name_last)
 
     # insert new data into dicts
-    perm = streamOwner if len(email_dict) == 0 else streamMember
+    perm = stream_owner if len(email_dict) == 0 else stream_member
     data_store.insert_user_perm(u_id, perm)
     data_store.insert_user_info(u_id, email, name_first, name_last, handle_str)
     data_store.insert_u_id(u_id, auth_id)

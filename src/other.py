@@ -54,5 +54,5 @@ def check_type(var, var_type):
     if type(var) != var_type:
         raise TypeError
 
-streamOwner = 1
-streamMember = 2
+stream_owner = 1
+stream_member = 2
