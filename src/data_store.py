@@ -60,8 +60,9 @@ class Datastore:
 
     # Assumes valid input
     def check_user_is_member_of_channel(self, channel_id, u_id):
+
         channel_details = self.get_channels_from_channel_id_dict().get(channel_id)
-        if not any (member['u_id'] == u_id for member in channel_details['all_members']):
+        if channel_id != None and not any (member['u_id'] == u_id for member in channel_details['all_members']):
             return False
         
         return True

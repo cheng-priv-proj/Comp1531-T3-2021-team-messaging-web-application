@@ -46,22 +46,20 @@ def channel_details_v1(auth_user_id, channel_id):
     if type(auth_user_id) != int or type(channel_id) != int:
         raise TypeError
 
-    channels = data_store.get_channels_from_channel_id_dict()
-    
-    if channel_id not in channels:
-        raise InputError
-    
-    channel = channels.get(channel_id)
-
-    u_ids = data_store.get_u_id_from_auth_dict()
-
     if not data_store.isValid_auth_user_id(auth_user_id):
         raise AccessError
         
+    channels = data_store.get_channels_from_channel_id_dict()
+    if channel_id not in channels:
+        raise InputError
+
+    u_ids = data_store.get_u_id_from_auth_dict()
     u_id = u_ids.get(auth_user_id)['u_id']
     
     if not data_store.check_user_is_member_of_channel(channel_id, u_id):
         raise AccessError
+
+    channel = channels.get(channel_id)
 
     # the 'messages' key value pair is not part of the function output
     channel_details = deepcopy(channel)
@@ -106,20 +104,6 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     message_dict = {'messages' : found_channel['messages'], 'start': start, 'end' : no_of_messages}
 
     return message_dict
-    '''
-    {
-        'messages': [
-            {
-                'message_id': 1,
-                'u_id': 1,
-                'message': 'Hello world',
-                'time_created': 1582426789,
-            }
-        ],
-        'start': 0,
-        'end': 50,
-    }
-    '''
 
 def channel_join_v1(auth_user_id, channel_id):
     # CHecking valid input types: (ASSUMPTION: Type Error)
