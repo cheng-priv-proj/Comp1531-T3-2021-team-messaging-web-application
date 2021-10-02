@@ -72,7 +72,8 @@ Exceptions:
     TypeError   - occurs when auth_user_id, channel_id are not ints
     AccessError - occurs when auth_id is invalid
     InputError  - occurs when channel_id is invalid
-    InputError  - 
+    AccessError - occurs when channel_id is valid but the authorised user is
+                  not a member of the channel
 
 Return value:
     Returns nothing on success
@@ -81,9 +82,6 @@ def channel_details_v1(auth_user_id, channel_id):
 
     check_type(auth_user_id, int)
     check_type(channel_id, int)
-
-    if not data_store.isValid_auth_user_id(auth_user_id):
-        raise AccessError
 
     if not data_store.isValid_auth_user_id(auth_user_id):
         raise AccessError
@@ -210,7 +208,7 @@ def channel_join_v1(auth_user_id, channel_id):
         raise InputError
 
     # Checking if channel is public
-    if not channel.get('is_public'):
+    if not channel.get('is_public') and not data_store.isStreamOwner(u_id):
         raise AccessError
 
     user = data_store.get_user_info_from_auth_id(auth_user_id)

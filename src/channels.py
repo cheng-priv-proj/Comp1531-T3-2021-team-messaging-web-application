@@ -102,11 +102,11 @@ def channels_create_v1(auth_user_id, name, is_public):
     check_type(name, str)
     check_type(is_public, bool)
 
-    if len(name) < 1 or len(name) > 20 :
-        raise InputError
-    
     if not data_store.isValid_auth_user_id(auth_user_id):
         raise AccessError
+
+    if len(name) < 1 or len(name) > 20 :
+        raise InputError
 
     owner = data_store.get_user_info_from_auth_id(auth_user_id)
 
