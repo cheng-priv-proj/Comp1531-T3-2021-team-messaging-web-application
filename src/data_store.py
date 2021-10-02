@@ -111,9 +111,7 @@ class Datastore:
         }
     
     def insert_user_perm(self, u_id, global_id):
-        self.get_user_perms_from_u_id_dict()[u_id] = {
-            'global_id' : global_id
-        }
+        self.get_user_perms_from_u_id_dict()[u_id] = global_id
     
     def insert_channel(self, channel_id, channel_name, is_public, messages, owner_members, all_members):
         self.get_channels_from_channel_id_dict()[channel_id] = {
