@@ -22,5 +22,5 @@ def test_clearv1_functionality():
  
     assert sys.getsizeof(empty_data_store) == sys.getsizeof(data_store)
  
-def test_clearv1_returns_nothing():
-    assert clear_v1() == None
+def test_clearv1_returns_empty_dict():
+    assert clear_v1() == {}
