@@ -44,6 +44,12 @@ def test_start_greater_than_messages(clear_and_register):
     with pytest.raises(InputError):
         channel_messages_v1(auth_user_id, channel_id, 10000)
 
+def test_start_greater_than_messages_and_invalid_auth_id(clear_and_register):
+    invalid_auth_user_id = 100
+    channel_id = clear_and_register[1]
+    with pytest.raises(AccessError):
+        channel_messages_v1(invalid_auth_user_id, channel_id, 10000)
+
 def test_invalid_channel_id_and_unauthorized_user(clear_and_register):
     with pytest.raises(AccessError):
         channel_messages_v1(123123123, 12312312345, 0)

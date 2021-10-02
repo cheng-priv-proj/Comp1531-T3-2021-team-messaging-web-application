@@ -180,6 +180,14 @@ def test_invalid_uid(clear, register, extract_user, extract_channel):
     with pytest.raises(InputError):
         channel_invite_v1(owner_user_id, channel_id, invalid_friend_user_id)
 
+def test_invalid_auth_id_and_u_id(clear, register, extract_user, extract_channel):
+    invalid_auth_user_id = 100
+    channel_id = extract_channel(register)
+    invalid_u_id = -100
+
+    with pytest.raises(AccessError):
+        channel_invite_v1(invalid_auth_user_id, channel_id, invalid_u_id)
+
 def test_invalid_channel_id(clear, register, extract_user, extract_u_id):
     owner_user_id = extract_user(register)
     invalid_channel_id = 100
