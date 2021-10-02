@@ -89,6 +89,13 @@ def test_invalid_user_id(clear, register, extract_user, extract_channel):
     with pytest.raises(AccessError):
         channel_join_v1(invalid_auth_user_id, channel_id)
 
+def test_invalid_user_id_and_invalid_channel_id(clear, register, extract_user, extract_channel):
+    invalid_auth_user_id = 100
+    invalid_channel_id = 100
+
+    with pytest.raises(AccessError):
+        channel_join_v1(invalid_auth_user_id, invalid_channel_id)
+
 def test_already_member(clear, register, extract_user, extract_channel):
     auth_user_id = extract_user(auth_register_v1('member@test.com', 'password', 'member', 'one'))
     channel_id = extract_channel(register)
