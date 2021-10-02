@@ -41,7 +41,6 @@ def auth_login_v1(email, password):
 
     return { 'auth_user_id': auth_id }
 
-
 '''
 Updates data store with a new user's information
 Generates a u_id, auth_id and handle_str.
