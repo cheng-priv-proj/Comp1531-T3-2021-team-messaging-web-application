@@ -209,14 +209,14 @@ def channel_join_v1(auth_user_id, channel_id):
 
     channel = channels.get(channel_id)
 
-    u_ids = data_store.get_u_id_from_auth_dict().get(auth_user_id)
-
+    u_id = data_store.get_u_id_from_auth_dict().get(auth_user_id).get('u_id')
+    
     # Checking if user exists in all members
-    if data_store.check_user_is_member_of_channel(channel_id, u_ids.get('u_id')):
+    if data_store.check_user_is_member_of_channel(channel_id, u_id):
         raise InputError
 
     # Checking if channel is public
-    if not channel.get('is_public'):
+    if not channel.get('is_public') and data_store.isStreamOwner(u_id):
         raise AccessError
 
     user = data_store.get_user_info_from_auth_id(auth_user_id)
