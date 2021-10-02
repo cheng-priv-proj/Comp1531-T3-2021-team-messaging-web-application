@@ -19,6 +19,8 @@ def clear_v1():
     for element in store:
         store[element] = {}
     data_store.set(store)
+    
+    return {}
 
 # helper function to generate handles for auth_register
 def handle_str_generation(firstname, lastname):
