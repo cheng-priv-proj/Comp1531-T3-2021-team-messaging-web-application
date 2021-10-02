@@ -44,7 +44,7 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
         raise InputError
 
     # Checks whether invitor is a member of channel
-    inviter_u_id = data_store.get_u_id_from_auth_dict().get(auth_user_id).get('u_id')
+    inviter_u_id = data_store.get_u_id_from_auth_dict().get(auth_user_id)
     if not data_store.check_user_is_member_of_channel(channel_id, inviter_u_id):
         raise AccessError
 
@@ -94,10 +94,8 @@ def channel_details_v1(auth_user_id, channel_id):
     
     channel = channels.get(channel_id)
         
-    u_ids = data_store.get_u_id_from_auth_dict()
+    u_id = data_store.get_u_id_from_auth_dict().get(auth_user_id)
 
-    u_id = u_ids.get(auth_user_id).get('u_id')
-    
     if not data_store.check_user_is_member_of_channel(channel_id, u_id):
         raise AccessError
 
@@ -151,7 +149,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     channel = channels.get(channel_id)
 
     # Checking that auth_id exists in channel
-    u_id_from_auth = data_store.get_user_info_from_auth_id(auth_user_id).get('u_id')
+    u_id_from_auth = data_store.get_u_id_from_auth_dict().get(auth_user_id)
     if not data_store.check_user_is_member_of_channel(channel_id, u_id_from_auth):
         raise AccessError('the authorised user is not a member of the channel')
 
@@ -205,10 +203,10 @@ def channel_join_v1(auth_user_id, channel_id):
 
     channel = channels.get(channel_id)
 
-    u_ids = data_store.get_u_id_from_auth_dict().get(auth_user_id)
+    u_id = data_store.get_u_id_from_auth_dict().get(auth_user_id)
 
     # Checking if user exists in all members
-    if data_store.check_user_is_member_of_channel(channel_id, u_ids.get('u_id')):
+    if data_store.check_user_is_member_of_channel(channel_id, u_id):
         raise InputError
 
     # Checking if channel is public
