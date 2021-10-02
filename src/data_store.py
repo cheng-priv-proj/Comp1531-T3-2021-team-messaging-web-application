@@ -68,7 +68,7 @@ class Datastore:
 
     def get_user_info_from_auth_id(self, auth_id):
         u_id = self.__store['u_id'].get(auth_id)
-        return self.__store['users'].get(u_id['u_id'])
+        return self.__store['users'].get(u_id)
 
     def get_user_perms_from_u_id_dict(self):
         return self.__store['perms']
@@ -82,6 +82,9 @@ class Datastore:
         
         return True
     
+    def isStreamOwner(self, u_id):
+        return self.get_user_perms_from_u_id_dict().get(u_id) == 1
+
     def isValid_auth_user_id(self, auth_user_id):
         u_id_dict = self.get_u_id_from_auth_dict()
         if auth_user_id not in u_id_dict:
@@ -90,9 +93,7 @@ class Datastore:
         return True
     
     def insert_u_id(self, u_id, auth_id):
-        self.get_u_id_from_auth_dict()[auth_id] = {
-            'u_id': u_id
-        }
+        self.get_u_id_from_auth_dict()[auth_id] = u_id
 
     def insert_login(self, email, password, auth_id):
         self.get_login_from_email_dict()[email] = {
@@ -121,11 +122,8 @@ class Datastore:
             'is_public': is_public,
             'owner_members': owner_members,
             'all_members': all_members,
-            'messages': messages # remove this
         }
-        # note that messages is a list of dicts, pls ensure channel_messages accounts for this
-        # uncomment this replacement code
-        # self.get_messages_from_channel_id_dict()[channel_id] = messages
+        self.get_messages_from_channel_id_dict()[channel_id] = messages
 
     def update_value(self, dict_key, key, value):
         self.__store[dict_key][key] = value

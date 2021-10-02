@@ -16,7 +16,7 @@ Return value:
     Returns channels on success
 '''
 def channels_list_v1(auth_user_id):
-    u_id = data_store.get_u_id_from_auth_dict().get(auth_user_id).get('u_id')
+    u_id = data_store.get_u_id_from_auth_dict().get(auth_user_id)
 
     check_type(auth_user_id, int)
 
@@ -102,11 +102,11 @@ def channels_create_v1(auth_user_id, name, is_public):
     check_type(name, str)
     check_type(is_public, bool)
 
-    if len(name) < 1 or len(name) > 20 :
-        raise InputError
-    
     if not data_store.isValid_auth_user_id(auth_user_id):
-        raise AccessError
+        raise AccessError ('auth_id is invalid')
+
+    if len(name) < 1 or len(name) > 20 :
+        raise InputError ('name is not between 1 and 20 characters')
 
     owner = data_store.get_user_info_from_auth_id(auth_user_id)
 

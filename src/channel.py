@@ -2,7 +2,6 @@ from src.data_store import data_store
 from src.error import InputError
 from src.error import AccessError
 from src.other import *
-from copy import deepcopy
 
 '''
 Adds another user to a channel that the auth_user is a member of.
@@ -42,21 +41,21 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
 
     # Checking if channel_id is valid
     if channel_id not in channels:
-        raise InputError
+        raise InputError ('channel_id is invalid')
 
     # Checks whether invitor is a member of channel
-    inviter_u_id = data_store.get_u_id_from_auth_dict().get(auth_user_id).get('u_id')
+    inviter_u_id = data_store.get_u_id_from_auth_dict().get(auth_user_id)
     if not data_store.check_user_is_member_of_channel(channel_id, inviter_u_id):
-        raise AccessError
+        raise AccessError ('channel_id is valid but the authorised user is not a member of the channel')
 
     # Checking if invitee_u_id is valid 
     users = data_store.get_users_from_u_id_dict()
     if u_id not in users:
-        raise InputError
+        raise InputError ('u_id is invalid')
     
     # checking if invitee is already a member of channel
     if data_store.check_user_is_member_of_channel(channel_id, u_id):
-        raise InputError
+        raise InputError ('u_id refers to a user who is already a member of the channel')
     
     channel_details.get('all_members').append(users.get(u_id))
 
@@ -73,7 +72,8 @@ Exceptions:
     TypeError   - occurs when auth_user_id, channel_id are not ints
     AccessError - occurs when auth_id is invalid
     InputError  - occurs when channel_id is invalid
-    InputError  - 
+    AccessError - occurs when channel_id is valid but the authorised user is
+                  not a member of the channel
 
 Return value:
     Returns nothing on success
@@ -84,31 +84,22 @@ def channel_details_v1(auth_user_id, channel_id):
     check_type(channel_id, int)
 
     if not data_store.isValid_auth_user_id(auth_user_id):
-        raise AccessError
-
-    if not data_store.isValid_auth_user_id(auth_user_id):
-        raise AccessError
+        raise AccessError ('auth_id is invalid')
         
     channels = data_store.get_channels_from_channel_id_dict()
     if channel_id not in channels:
-        raise InputError
+        raise InputError (' channel_id is invalid')
     
     channel = channels.get(channel_id)
         
-    u_ids = data_store.get_u_id_from_auth_dict()
+    u_id = data_store.get_u_id_from_auth_dict().get(auth_user_id)
 
-    u_id = u_ids.get(auth_user_id).get('u_id')
-    
     if not data_store.check_user_is_member_of_channel(channel_id, u_id):
-        raise AccessError
+        raise AccessError ('u_id is not part of the channel')
 
     channel = channels.get(channel_id)
 
-    # the 'messages' key value pair is not part of the function output
-    channel_details = deepcopy(channel)
-    channel_details.pop('messages')
-
-    return channel_details
+    return channel
 
 '''
 Returns a list of messages between index 'start' and up to 'start' + 50 from a
@@ -141,7 +132,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     check_type(start, int)
 
     if not data_store.isValid_auth_user_id(auth_user_id):
-        raise AccessError
+        raise AccessError ('auth_id is invalid')
 
     # ASSUMPTION: negative start index causes an InputError exception
     if start < 0:
@@ -156,11 +147,12 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     channel = channels.get(channel_id)
 
     # Checking that auth_id exists in channel
-    u_id_from_auth = data_store.get_user_info_from_auth_id(auth_user_id).get('u_id')
+    u_id_from_auth = data_store.get_u_id_from_auth_dict().get(auth_user_id)
     if not data_store.check_user_is_member_of_channel(channel_id, u_id_from_auth):
         raise AccessError('the authorised user is not a member of the channel')
 
-    no_of_messages = len(channel.get('messages'))
+    messages = data_store.get_messages_from_channel_id_dict().get(channel_id)
+    no_of_messages = len(messages)
 
     end = start + 50
 
@@ -172,7 +164,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         end = -1
     
     return {
-        'messages' : channel.get('messages')[start:end],
+        'messages' : messages,
         'start': start,
         'end' : end
         }
@@ -189,7 +181,7 @@ Exceptions:
     AccessError - occurs when auth_id is invalid
     InputError  - occurs when channel_id is invalid
     AccessError - occurs when channel is not public
-    InputError  - occurs when user
+    InputError  - occurs when user is already part of the channel
 
 Return value:
     Returns nothing on success
@@ -200,24 +192,24 @@ def channel_join_v1(auth_user_id, channel_id):
     check_type(channel_id, int)
 
     if not data_store.isValid_auth_user_id(auth_user_id):
-        raise AccessError
+        raise AccessError (' auth_id is invalid')
 
     channels = data_store.get_channels_from_channel_id_dict()
 
     if channel_id not in channels:
-        raise InputError
+        raise InputError ('channel_id is invalid')
 
     channel = channels.get(channel_id)
 
-    u_ids = data_store.get_u_id_from_auth_dict().get(auth_user_id)
+    u_id = data_store.get_u_id_from_auth_dict().get(auth_user_id)
 
     # Checking if user exists in all members
-    if data_store.check_user_is_member_of_channel(channel_id, u_ids.get('u_id')):
-        raise InputError
+    if data_store.check_user_is_member_of_channel(channel_id, u_id):
+        raise InputError ('user is already part of the channel')
 
     # Checking if channel is public
-    if not channel.get('is_public'):
-        raise AccessError
+    if not channel.get('is_public') and not data_store.isStreamOwner(u_id):
+        raise AccessError ('channel is not public')
 
     user = data_store.get_user_info_from_auth_id(auth_user_id)
     channel.get('all_members').append(user)
