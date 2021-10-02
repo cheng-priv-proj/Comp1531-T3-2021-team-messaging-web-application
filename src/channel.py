@@ -167,7 +167,6 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     elif  start + 50 >= no_of_messages:
         end = -1
     
-    messages
     return {
         'messages' : messages,
         'start': start,
