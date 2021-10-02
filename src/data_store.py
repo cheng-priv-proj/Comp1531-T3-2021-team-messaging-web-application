@@ -115,7 +115,6 @@ class Datastore:
             'global_id' : global_id
         }
     
-    # TODO: change this after using new function below
     def insert_channel(self, channel_id, channel_name, is_public, messages, owner_members, all_members):
         self.get_channels_from_channel_id_dict()[channel_id] = {
             'name': channel_name,
