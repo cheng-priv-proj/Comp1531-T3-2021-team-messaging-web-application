@@ -85,9 +85,6 @@ def channel_details_v1(auth_user_id, channel_id):
 
     if not data_store.isValid_auth_user_id(auth_user_id):
         raise AccessError
-
-    if not data_store.isValid_auth_user_id(auth_user_id):
-        raise AccessError
         
     channels = data_store.get_channels_from_channel_id_dict()
     if channel_id not in channels:
