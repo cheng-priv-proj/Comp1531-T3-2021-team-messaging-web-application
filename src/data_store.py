@@ -124,11 +124,9 @@ class Datastore:
             'is_public': is_public,
             'owner_members': owner_members,
             'all_members': all_members,
-            'messages': messages # remove this
         }
         # note that messages is a list of dicts, pls ensure channel_messages accounts for this
-        # uncomment this replacement code
-        # self.get_messages_from_channel_id_dict()[channel_id] = messages
+        self.get_messages_from_channel_id_dict()[channel_id] = messages
 
     def update_value(self, dict_key, key, value):
         self.__store[dict_key][key] = value

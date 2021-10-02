@@ -2,7 +2,6 @@ from src.data_store import data_store
 from src.error import InputError
 from src.error import AccessError
 from src.other import *
-from copy import deepcopy
 
 '''
 Adds another user to a channel that the auth_user is a member of.
@@ -101,11 +100,7 @@ def channel_details_v1(auth_user_id, channel_id):
 
     channel = channels.get(channel_id)
 
-    # the 'messages' key value pair is not part of the function output
-    channel_details = deepcopy(channel)
-    channel_details.pop('messages')
-
-    return channel_details
+    return channel
 
 '''
 Returns a list of messages between index 'start' and up to 'start' + 50 from a
@@ -157,7 +152,8 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     if not data_store.check_user_is_member_of_channel(channel_id, u_id_from_auth):
         raise AccessError('the authorised user is not a member of the channel')
 
-    no_of_messages = len(channel.get('messages'))
+    messages = data_store.get_messages_from_channel_id_dict().get(channel_id)
+    no_of_messages = len(messages)
 
     end = start + 50
 
@@ -169,7 +165,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         end = -1
     
     return {
-        'messages' : channel.get('messages')[start:end],
+        'messages' : messages,
         'start': start,
         'end' : end
         }
