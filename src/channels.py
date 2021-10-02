@@ -16,7 +16,7 @@ Return value:
     Returns channels on success
 '''
 def channels_list_v1(auth_user_id):
-    u_id = data_store.get_u_id_from_auth_dict().get(auth_user_id).get('u_id')
+    u_id = data_store.get_u_id_from_auth_dict().get(auth_user_id)
 
     check_type(auth_user_id, int)
 
