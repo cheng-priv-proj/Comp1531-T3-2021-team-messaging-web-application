@@ -61,6 +61,7 @@ def test_invalid_user_id(clear):
     with pytest.raises(AccessError):
         channels_create_v1(auth_user_id, "name", False)
 
+
 def test_unique_channel_id(clear, register, extract_user, extract_channel):
     auth_user_id = extract_user(register)
     channel_1 = extract_channel(register)
@@ -94,6 +95,11 @@ def test_long_channel_name(clear, register, extract_user):
     with pytest.raises(InputError):
         channels_create_v1(auth_user_id, "reallylongname1234567eallylongname12345671234567", False)
 
+def test_invalid_user_id_and_invalid_name(clear):
+    auth_user_id = 100000
+    
+    with pytest.raises(AccessError):
+        channels_create_v1(auth_user_id, "reallylongname1234567eallylongname12345671234567", False)
 
 
 
