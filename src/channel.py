@@ -1,7 +1,7 @@
 from src.data_store import data_store
 from src.error import InputError
 from src.error import AccessError
-from src.other import *
+from src.other import check_type
 
 '''
 Adds another user to a channel that the auth_user is a member of.

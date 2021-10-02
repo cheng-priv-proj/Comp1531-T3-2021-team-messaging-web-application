@@ -1,6 +1,7 @@
 from src.data_store import data_store
 from src.error import InputError
-from src.other import *
+from src.other import check_type
+from src.other import handle_str_generation
 import re
 
 '''
