@@ -12,6 +12,7 @@ from src.channels import channels_create_v1
 
 from src.channel import channel_join_v1
 
+from src.error import AccessError
 from src.other import clear_v1
 
 @pytest.fixture
@@ -88,3 +89,8 @@ def test_channel_list_all_public_private(clear, get_user1, get_user2, get_user3,
     assert(channel_list == { 'channels': [{'channel_id': channel_id1, 'name': 'testing_channel3'}, {'channel_id': channel_id2, 'name': 'testing_channel4'}, {'channel_id': channel_id3, 'name': 'testing_channel5'}]}), "channel_list_all: Failed to return all channels that exist"
     assert(channel_list2 == { 'channels': [{'channel_id': channel_id1, 'name': 'testing_channel3'}, {'channel_id': channel_id2, 'name': 'testing_channel4'}, {'channel_id': channel_id3, 'name': 'testing_channel5'}]}), "channel_list_all: Failed to return all channels that exist"
     assert(channel_list3 == { 'channels': [{'channel_id': channel_id1, 'name': 'testing_channel3'}, {'channel_id': channel_id2, 'name': 'testing_channel4'}, {'channel_id': channel_id3, 'name': 'testing_channel5'}]}), "channel_list_all: Failed to return all channels that exist"
+
+def test_invalid_auth_id(clear):
+    invalid_auth_user_id = 1000
+    with pytest.raises(AccessError):
+        channels_listall_v1(invalid_auth_user_id)

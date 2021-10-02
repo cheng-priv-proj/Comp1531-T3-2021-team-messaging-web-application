@@ -112,3 +112,5 @@ def test_private_not_owner(clear, extract_user, extract_channel):
 
     with pytest.raises(AccessError):
         channel_join_v1(auth_user_id, channel_id)
+
+# def test_global_owner

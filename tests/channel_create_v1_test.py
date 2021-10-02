@@ -40,23 +40,18 @@ def test_channel_id_type(register, extract_channel, extract_user):
     auth_user_id = extract_user(register)
     channel_dict = channels_create_v1(auth_user_id, 'test', True)
     assert isinstance(channel_dict, dict) == True
-
     
 def test_public_channel(clear, register, extract_user, extract_channel):
     auth_user_id = extract_user(register)
     channel_1 = extract_channel(register)
     
-    #look in database and check if channel with that id is public
     details = channel_details_v1(auth_user_id, channel_1)
-    print(details)
     assert details["is_public"] == True
-    
 
 def test_private_channel(clear, register, extract_user, extract_channel):
     auth_user_id = extract_user(register)
     channel_id = extract_channel(channels_create_v1(auth_user_id, "name", False))
     
-    #look in database and check if channel with that id is public
     details = channel_details_v1(auth_user_id, channel_id)
     assert details["is_public"] == False
 
@@ -73,24 +68,19 @@ def test_unique_channel_id(clear, register, extract_user, extract_channel):
 
     assert channel_1 != channel_2
 
-
 def test_creator_joins_channel(clear, register, extract_user, extract_channel):
     auth_user_id = extract_user(register)
     channel_1 = extract_channel(register)
     
-    #look in database and check if channel with that id is public
     details = channel_details_v1(auth_user_id, channel_1)
     assert details["all_members"][auth_user_id]["email"] == "owner@test.com"
-
 
 def test_becomes_owner(clear, register, extract_user, extract_channel):
     auth_user_id = extract_user(register)
     channel_1 = extract_channel(register)
     
-    #look in database and check if channel with that id is public
     details = channel_details_v1(auth_user_id, channel_1)
     assert details["owner_members"][auth_user_id]["email"] == "owner@test.com"
-
 
 def test_short_channel_name(clear, register, extract_user):
     auth_user_id = extract_user(register)
@@ -98,12 +88,11 @@ def test_short_channel_name(clear, register, extract_user):
     with pytest.raises(InputError):
         channels_create_v1(auth_user_id, "", False)
 
-
 def test_long_channel_name(clear, register, extract_user):
     auth_user_id = extract_user(register)
     
     with pytest.raises(InputError):
-        channels_create_v1(auth_user_id, "reallylongname1234567eallylongname1234567", False)
+        channels_create_v1(auth_user_id, "reallylongname1234567eallylongname12345671234567", False)
 
 
 

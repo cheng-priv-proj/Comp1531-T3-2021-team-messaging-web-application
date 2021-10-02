@@ -13,19 +13,15 @@ def auth_id(clear):
     return auth_register_v1("example@email.com", "potato", "john", "smith")
     
 def test_standard(clear, auth_id):
-
     output = auth_login_v1("example@email.com", "potato")
     assert isinstance(output["auth_user_id"], int)
     assert output["auth_user_id"] == auth_id['auth_user_id']
     
-
 def test_incorrect_password(clear, auth_id):
     with pytest.raises(InputError):
         auth_login_v1("example@email.com", "notpotato")
 
-
 def test_email_does_not_exist(clear, auth_id):
-
     with pytest.raises(InputError):
         auth_login_v1("invalid@gmail.com", "password")
 

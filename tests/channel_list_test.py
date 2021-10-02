@@ -9,6 +9,7 @@ from src.channels import channels_create_v1
 
 from src.channel import channel_join_v1
 
+from src.error import AccessError
 from src.other import clear_v1
 
 #### ASSUMES THAT ALL AUTH ID GIVEN IS A VALID AUTH ID ####
@@ -86,4 +87,7 @@ def test_channel_list_after_newjoin_test(clear, get_user1, get_user2, extract_ch
     channel_list = (channels_list_v1(get_user2))
     assert(channel_list == { 'channels': [{'channel_id': channel_id1, 'name': 'testing_channel3'}]}), "channels_list: incorrect channel_list after the user joins a new channel "
     
-
+def test_invalid_auth_id(clear):
+    invalid_auth_user_id = 1000
+    with pytest.raises(AccessError):
+        channels_list_v1(invalid_auth_user_id)

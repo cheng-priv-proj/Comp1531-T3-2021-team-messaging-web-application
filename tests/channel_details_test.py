@@ -46,7 +46,6 @@ def test_user_with_no_access_to_channel(clear, register, extract_channel, extrac
     with pytest.raises(AccessError):
         channel_details_v1(auth_user_id_invalid, channel_1)
 
-
 def test__invalid_types(clear, register, extract_channel, extract_user):
     with pytest.raises(TypeError):
         channel_details_v1({}, {})
@@ -57,6 +56,13 @@ def test_invalid_channel_id(clear, register, extract_user):
 
     with pytest.raises(InputError):
         channel_details_v1(auth_user_id, 10000)
+
+def test_invalid_auth_id(clear, register, extract_channel):
+    #input error
+    channel_id = extract_channel(register)
+
+    with pytest.raises(AccessError):
+        channel_details_v1(10000, channel_id)
 
 
 def test_returns_all_info(clear, register, extract_user, extract_channel):
