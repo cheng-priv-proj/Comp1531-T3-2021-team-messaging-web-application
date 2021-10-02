@@ -17,7 +17,7 @@ Return value:
 def clear_v1():
     store = data_store.get()
     for element in store:
-        store.get(element) = {}
+        store[element] = {}
     data_store.set(store)
 
 # helper function to generate handles for auth_register
