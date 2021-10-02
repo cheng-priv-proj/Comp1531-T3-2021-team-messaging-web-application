@@ -1,4 +1,4 @@
-from other import *
+from src.other import *
 
 # Login:
 #   Key: email
