@@ -72,7 +72,8 @@ Exceptions:
     TypeError   - occurs when auth_user_id, channel_id are not ints
     AccessError - occurs when auth_id is invalid
     InputError  - occurs when channel_id is invalid
-    InputError  - 
+    AccessError - occurs when channel_id is valid but the authorised user is
+                  not a member of the channel
 
 Return value:
     Returns nothing on success
