@@ -51,7 +51,7 @@ Exceptions:
     AccessError - occurs when auth_id is invalid
 
 Return value:
-    Returns messages on success
+    Returns channels on success
 '''
 def channels_listall_v1(auth_user_id):
     
