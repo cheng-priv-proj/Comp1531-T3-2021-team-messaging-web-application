@@ -86,7 +86,7 @@ def test_member_invite(clear, register, extract_user, extract_channel, extract_u
         ],
     }
 
-# Testing that steam owner is able to have unrestricted permissions.
+# Testing that owner has correct permissions.
 def test_owner_invite(clear, register, extract_user, extract_channel, extract_u_id_and_channel):
     owner_user_id = extract_user(register)
     channel_id = extract_channel(register)
