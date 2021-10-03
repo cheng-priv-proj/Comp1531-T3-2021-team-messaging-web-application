@@ -20,10 +20,8 @@ def channels_list_v1(auth_user_id):
 
     check_type(auth_user_id, int)
 
-    if not data_store.isValid_auth_user_id(auth_user_id):
+    if data_store.is_invalid_user_id(auth_user_id):
         raise AccessError("Invalid auth_user_id")
-
-    u_id = data_store.get_u_id_from_auth_dict().get(auth_user_id)
 
     # Setup Dictionary
     channel_list = { 'channels': [] }
@@ -33,7 +31,7 @@ def channels_list_v1(auth_user_id):
 
     # Returns a dictionary of dictionaries. Loop through each key and append
     for channel_id in channels:
-        if data_store.check_user_is_member_of_channel(channel_id, u_id):
+        if data_store.is_user_member_of_channel(channel_id, auth_user_id):
             channel_list.get('channels').append( 
                 {
                     'channel_id': channel_id,
@@ -43,24 +41,24 @@ def channels_list_v1(auth_user_id):
             
     return channel_list
 
-'''
-Returns a list of all channels, including private channels.
-
-Arguments:
-    auth_user_id    (int)   - authorised user id
-
-Exceptions:
-    TypeError   - occurs when auth_user_id is not an int
-    AccessError - occurs when auth_id is invalid
-
-Return value:
-    Returns channels on success
-'''
 def channels_listall_v1(auth_user_id):
+    '''
+    Returns a list of all channels, including private channels.
+
+    Arguments:
+        auth_user_id    (int)   - authorised user id
+
+    Exceptions:
+        TypeError   - occurs when auth_user_id is not an int
+        AccessError - occurs when auth_id is invalid
+
+    Return value:
+        Returns channels on success
+    '''
     
     check_type(auth_user_id, int)
 
-    if not data_store.isValid_auth_user_id(auth_user_id):
+    if data_store.is_invalid_user_id(auth_user_id):
         raise AccessError("Invalid auth_user_id")
 
     # Setup Dictionary
@@ -105,13 +103,13 @@ def channels_create_v1(auth_user_id, name, is_public):
     check_type(name, str)
     check_type(is_public, bool)
 
-    if not data_store.isValid_auth_user_id(auth_user_id):
-        raise AccessError ('auth_id is invalid')
+    if data_store.is_invalid_user_id(auth_user_id):
+        raise AccessError ('Invalid auth_user_id')
 
     if len(name) < 1 or len(name) > 20 :
         raise InputError ('name is not between 1 and 20 characters')
 
-    owner = data_store.get_user_info_from_auth_id(auth_user_id)
+    owner = data_store.get_user_from_u_id(auth_user_id)
 
     # ASSUMPTION: channel_id starts from 0
     channels = data_store.get_channels_from_channel_id_dict()
