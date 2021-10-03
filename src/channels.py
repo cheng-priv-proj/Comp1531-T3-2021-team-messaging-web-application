@@ -77,26 +77,26 @@ def channels_listall_v1(auth_user_id):
 
     return all_channel_list
 
-'''
-Creates a new channel, generating a channel_id and storing the information in
-the datastore. Returns the channel_id.
-
-Arguments:
-    auth_user_id    (int)   - authorised user id
-    name            (str)   - channel name
-    is_public       (bool)  - public/private status
-
-Exceptions:
-    TypeError   - occurs when auth_user_id is not an int
-    TypeError   - occurs when name is not a string
-    TypeError   - occurs when is_public is not a bool
-    AccessError - occurs when auth_id is invalid
-    InputError  - occurs when name is not between 1 and 20 characters
-
-Return value:
-    Returns channel_id on success
-'''
 def channels_create_v1(auth_user_id, name, is_public):
+    '''
+    Creates a new channel, generating a channel_id and storing the information in
+    the datastore. Returns the channel_id.
+
+    Arguments:
+        auth_user_id    (int)   - authorised user id
+        name            (str)   - channel name
+        is_public       (bool)  - public/private status
+
+    Exceptions:
+        TypeError   - occurs when auth_user_id is not an int
+        TypeError   - occurs when name is not a string
+        TypeError   - occurs when is_public is not a bool
+        AccessError - occurs when auth_id is invalid
+        InputError  - occurs when name is not between 1 and 20 characters
+
+    Return value:
+        Returns channel_id on success
+    '''
 
     # check for correct input types
     check_type(auth_user_id, int)

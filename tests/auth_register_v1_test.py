@@ -13,21 +13,42 @@ from src.channels import channels_create_v1
 def clear():
     clear_v1()
 
-def test_standard(clear):
-    output = auth_register_v1("example@email.com", "password", "john", "smith")
-    assert isinstance(output["auth_user_id"], int)
-    login = auth_login_v1("example@email.com", "password")
-    assert output["auth_user_id"] == login["auth_user_id"]
+# Extracts the auth_user_id from a given dictionary.
+@pytest.fixture
+def extract_user():
+    def extract_user_id_function(auth_user_id_dict):
+        return auth_user_id_dict['auth_user_id']
+    return extract_user_id_function
 
-    output = auth_register_v1("Example@EmaiL.orG.au", "pAssW0rd", "John", "Smith")
-    assert isinstance(output["auth_user_id"], int)
-    login = auth_login_v1("Example@EmaiL.orG.au", "pAssW0rd")
-    assert output["auth_user_id"] == login["auth_user_id"]
+# Extracts the channel from a given dictionary.
+@pytest.fixture
+def extract_channel():
+    def extract_channel_id_function(channel_id_dict):
+        return channel_id_dict['channel_id']
+    return extract_channel_id_function
+
+# Extracts the handle from a given dictionary.
+@pytest.fixture
+def extract_handle():
+    def extract_handle_function(channel_details_dict):
+        return channel_details_dict['owner_members'][0]['handle_str']
+    return extract_handle_function
+
+def test_standard(clear, extract_user):
+    auth_user_id = extract_user(auth_register_v1("example@email.com", "password", "john", "smith"))
+    assert isinstance(auth_user_id, int)
+    login_user_id = extract_user(auth_login_v1("example@email.com", "password"))
+    assert auth_user_id == login_user_id
+
+    auth_user_id = extract_user(auth_register_v1("Example@EmaiL.orG.au", "pAssW0rd", "John", "Smith"))
+    assert isinstance(auth_user_id, int)
+    login_user_id = extract_user(auth_login_v1("Example@EmaiL.orG.au", "pAssW0rd"))
+    assert auth_user_id == login_user_id
     
-    output = auth_register_v1("emailPerson@mailchimp.potato", "9d-P<vBy9qmk/4C", "john", "smith")
-    assert isinstance(output["auth_user_id"], int)
-    login = auth_login_v1("emailPerson@mailchimp.potato", "9d-P<vBy9qmk/4C")
-    assert output["auth_user_id"] == login["auth_user_id"]
+    auth_user_id = extract_user(auth_register_v1("emailPerson@mailchimp.potato", "9d-P<vBy9qmk/4C", "john", "smith"))
+    assert isinstance(auth_user_id, int)
+    login_user_id = extract_user(auth_login_v1("emailPerson@mailchimp.potato", "9d-P<vBy9qmk/4C"))
+    assert auth_user_id == login_user_id
 
 def test_invalid_email(clear):
     with pytest.raises(InputError):
@@ -53,8 +74,7 @@ def test_invalid_first_name(clear):
     with pytest.raises(InputError):
         auth_register_v1("example@email.com", "password", "", "smith")
 
-    word = "password"
-    too_long = word * 50
+    too_long = "password" * 50
 
     with pytest.raises(InputError):
         auth_register_v1("example@email.com", "no", too_long, "smith")
@@ -70,26 +90,26 @@ def test_invalid_last_name(clear):
         auth_register_v1("example@email.com", "no", "john", too_long)
 
 # A test that checks if handle genneration has been correctly generated. 
-def test_appended_handle_number(clear):
+def test_appended_handle_number(clear, extract_user, extract_handle, extract_channel):
     auth_register_v1("example@email.com", "password", "john", "smith")
-    output2 = auth_register_v1("example2@email.com", "password", "john", "smith")
+    auth1_user_id = extract_user(auth_register_v1("example2@email.com", "password", "john", "smith"))
 
-    channel_id = channels_create_v1(output2['auth_user_id'], 'test_channel', True)
-    channel_details = channel_details_v1(output2['auth_user_id'], channel_id['channel_id'])
-    assert channel_details['owner_members'][0]['handle_str'] == 'johnsmith0'
+    channel1_id = extract_channel(channels_create_v1(auth1_user_id, 'test_channel', True))
+    handle = extract_handle(channel_details_v1(auth1_user_id, channel1_id))
+    assert handle == 'johnsmith0'
 
-    output3 = auth_register_v1("example3@email.com", "password", "john", "smith")
-    channel_id2 = channels_create_v1(output3['auth_user_id'], 'test_channel', True)
-    channel_details2 = channel_details_v1(output3['auth_user_id'], channel_id2['channel_id'])
-    assert channel_details2['owner_members'][0]['handle_str'] == 'johnsmith1'
+    auth2_user_id = extract_user(auth_register_v1("example3@email.com", "password", "john", "smith"))
+    channel2_id = extract_channel(channels_create_v1(auth2_user_id, 'test_channel', True))
+    handle = extract_handle(channel_details_v1(auth2_user_id, channel2_id))
+    assert handle == 'johnsmith1'
 
-    output4 = auth_register_v1("example4@email.com", "password", "john", "smith")
-    channel_id3 = channels_create_v1(output4['auth_user_id'], 'test_channel', True)
-    channel_details3 = channel_details_v1(output4['auth_user_id'], channel_id3['channel_id'])
-    assert channel_details3['owner_members'][0]['handle_str'] == 'johnsmith2'
+    auth3_user_id = extract_user(auth_register_v1("example4@email.com", "password", "john", "smith"))
+    channel_id3 = extract_channel(channels_create_v1(auth3_user_id, 'test_channel', True))
+    handle = extract_handle(channel_details_v1(auth3_user_id, channel_id3))
+    assert handle == 'johnsmith2'
 
-def test_concatenated_length(clear):
+def test_concatenated_length(clear, extract_handle):
     auth_user_id = auth_register_v1("example@email.com", "password", "johnsmithjohnsmithjohnsmithjohnsmithssmsmsmsmsms", "smith")
     channel_id = channels_create_v1(auth_user_id['auth_user_id'], 'test_channel', True)
-    channel_details = channel_details_v1(auth_user_id['auth_user_id'], channel_id['channel_id'])
-    assert len(channel_details['owner_members'][0]['handle_str']) <= 20
+    handle = extract_handle(channel_details_v1(auth_user_id['auth_user_id'], channel_id['channel_id']))
+    assert len(handle) <= 20

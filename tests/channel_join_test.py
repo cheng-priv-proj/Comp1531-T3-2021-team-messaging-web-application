@@ -130,16 +130,16 @@ def test_global_owner(clear, extract_user, extract_channel):
     channel_id = extract_channel(channels_create_v1(auth_id_1, 'testing_channel3', False))
     channel_join_v1(owner_auth_user_id, channel_id)
 
-    channel_list = (channels_list_v1(owner_auth_user_id))
+    channel_list = channels_list_v1(owner_auth_user_id)
 
-    assert(channel_list == { 
+    assert channel_list == { 
         'channels': [
             {
                 'channel_id': channel_id, 
                 'name': 'testing_channel3'
             }
         ]
-    })
+    }
 
     with pytest.raises(AccessError):
         channel_join_v1(auth_id_2, channel_id)

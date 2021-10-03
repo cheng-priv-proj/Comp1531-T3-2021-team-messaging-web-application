@@ -19,8 +19,8 @@ def test_clearv1_functionality():
     auth_user_id2 = auth_register_v1('test2@gmail.com', '1234567', 'first', 'last')
     auth_id = auth_user_id['auth_user_id']
     auth_id2 = auth_user_id2['auth_user_id']
-    channel_id = channels_create_v1(auth_id, 'name', True)
-    channel_id2 = channels_create_v1(auth_id2, 'name', True)
+    channels_create_v1(auth_id, 'name', True)
+    channels_create_v1(auth_id2, 'name', True)
     clear_v1()
  
     assert sys.getsizeof(empty_data_store) == sys.getsizeof(data_store)
