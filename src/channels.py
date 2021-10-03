@@ -17,7 +17,9 @@ Return value:
     Returns channels on success
 '''
 def channels_list_v1(auth_user_id):
+
     check_type(auth_user_id, int)
+
     if not data_store.isValid_auth_user_id(auth_user_id):
         raise AccessError("Invalid auth_user_id")
 
@@ -38,6 +40,7 @@ def channels_list_v1(auth_user_id):
                     'name': channels.get(channel_id).get('name')
                 }
             )
+            
     return channel_list
 
 '''
