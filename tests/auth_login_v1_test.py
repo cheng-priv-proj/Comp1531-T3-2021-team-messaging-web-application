@@ -23,7 +23,7 @@ def test_incorrect_password(clear, auth_id):
     with pytest.raises(InputError):
         auth_login_v1("example@email.com", "notpotato")
 
-# Test that expects an input error when given an invalid email.
+# Test that expects an input error when given a non-existant email.
 def test_email_does_not_exist(clear, auth_id):
     with pytest.raises(InputError):
         auth_login_v1("invalid@gmail.com", "password")
