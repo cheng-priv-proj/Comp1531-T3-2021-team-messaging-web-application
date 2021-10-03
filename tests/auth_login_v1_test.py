@@ -9,15 +9,22 @@ from src.other import clear_v1
 def clear():
     clear_v1()
 
+# Extracts the auth_user_id from a given dictionary.
+@pytest.fixture
+def extract_user():
+    def extract_user_id_function(auth_user_id_dict):
+        return auth_user_id_dict['auth_user_id']
+    return extract_user_id_function
+
 # Fixture that registers a valid user.
 @pytest.fixture
 def auth_id(clear):
     return auth_register_v1("example@email.com", "potato", "john", "smith")
     
-def test_standard(clear, auth_id):
-    output = auth_login_v1("example@email.com", "potato")
-    assert isinstance(output["auth_user_id"], int)
-    assert output["auth_user_id"] == auth_id['auth_user_id']
+def test_standard(clear, auth_id, extract_user):
+    auth_login_id = extract_user(auth_login_v1("example@email.com", "potato"))
+    assert isinstance(auth_login_id, int)
+    assert auth_login_id == extract_user(auth_id)
 
 def test_incorrect_password(clear, auth_id):
     with pytest.raises(InputError):
