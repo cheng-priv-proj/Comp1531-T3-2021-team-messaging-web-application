@@ -92,7 +92,7 @@ def auth_register_v1(email, password, name_first, name_last):
 
     # generate a unique u_id and auth_id
     auth_id = len(data_store.get_users_from_u_id_dict())
-    u_id = -1 * auth_id
+    u_id = auth_id
 
     handle_str = handle_str_generation(name_first, name_last)
 
