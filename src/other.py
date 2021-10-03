@@ -24,8 +24,9 @@ def clear_v1():
 
 # helper function to generate handles for auth_register
 def handle_str_generation(firstname, lastname):
-    if type(firstname) != str or type(lastname) != str:
-        raise TypeError
+
+    check_type(firstname, str)
+    check_type(lastname, str)
 
     base_handle_str = base_handle_str_generation(firstname, lastname)
     
