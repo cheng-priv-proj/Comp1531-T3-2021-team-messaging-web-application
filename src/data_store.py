@@ -3,10 +3,6 @@
 #   Value: Dictionary {
 #          password, 
 #          auth_id } 
-# U_id:
-#   Key: auth_id
-#   Value: Dictionary { 
-#          u_id }
 # Channels:
 #   Key: channel_id:
 #   Value: Dictionary {
@@ -36,7 +32,6 @@
 ## YOU SHOULD MODIFY THIS OBJECT BELOW
 initial_object = {
     'login': {},
-    'u_id': {},
     'channels': {},
     'messages' : {},
     'users': {},
@@ -48,60 +43,94 @@ class Datastore:
     def __init__(self):
         self.__store = initial_object
 
+
+    # Get Functions
+
     def get(self):
         return self.__store
 
-    def get_login_from_email_dict(self):
+    def get_logins_from_email_dict(self):
         return self.__store['login']
-
-    def get_u_id_from_auth_dict(self):
-        return self.__store['u_id']
+    
+    def get_login_from_email(self, email):
+        return self.get_logins_from_email_dict().get(email)
     
     def get_channels_from_channel_id_dict(self):
         return self.__store['channels']
 
+    def get_channel_from_channel_id(self, channel_id):
+        return self.get_channels_from_channel_id_dict().get(channel_id)
+
     def get_messages_from_channel_id_dict(self):
         return self.__store['messages']
+
+    def get_message_from_channel_id(self, channel_id):
+        return self.get_messages_from_channel_id_dict().get(channel_id)
 
     def get_users_from_u_id_dict(self):
         return self.__store['users']
 
-    def get_user_info_from_auth_id(self, auth_id):
-        u_id = self.__store['u_id'].get(auth_id)
-        return self.__store['users'].get(u_id)
+    def get_user_from_u_id(self, u_id):
+        return self.get_users_from_u_id_dict().get(u_id)
 
     def get_user_perms_from_u_id_dict(self):
         return self.__store['perms']
 
-    # Assumes valid input
-    def check_user_is_member_of_channel(self, channel_id, u_id):
+    def get_user_perms_from_u_id(self, u_id):
+        return self.get_user_perms_from_u_id_dict().get(u_id)
 
-        channel_details = self.get_channels_from_channel_id_dict().get(channel_id)
-        if channel_id != None and not any (member['u_id'] == u_id for member in channel_details['all_members']):
+
+    # Check functions
+
+    def is_user_member_of_channel(self, channel_id, u_id):
+
+        channels = self.get_channels_from_channel_id_dict().get(channel_id)
+        if not any (member['u_id'] == u_id for member in channels['all_members']):
             return False
         
         return True
     
-    def isStreamOwner(self, u_id):
+    def is_stream_owner(self, u_id):
         return self.get_user_perms_from_u_id_dict().get(u_id) == 1
 
-    def isValid_auth_user_id(self, auth_user_id):
-        u_id_dict = self.get_u_id_from_auth_dict()
-        if auth_user_id not in u_id_dict:
-            return False
+    def is_invalid_email(self, email):
+        emails = self.get_logins_from_email_dict()
+        if email not in emails:
+            return True
         
-        return True
-    
-    def insert_u_id(self, u_id, auth_id):
-        self.get_u_id_from_auth_dict()[auth_id] = u_id
+        return False
+
+    def is_duplicate_email(self, email):
+        emails = self.get_logins_from_email_dict()
+        if email in emails:
+            return True
+        
+        return False
+
+    def is_invalid_user_id(self, u_id):
+        users = self.get_users_from_u_id_dict()
+        if u_id not in users:
+            return True
+        
+        return False
+
+    def is_invalid_channel_id(self, channel_id):
+        channels = self.get_channels_from_channel_id_dict()
+        if channel_id not in channels:
+            return True
+        
+        return False
+
+
+    # Insertion functions
 
     def insert_login(self, email, password, auth_id):
-        self.get_login_from_email_dict()[email] = {
+        self.get_logins_from_email_dict()[email] = {
             'password': password,
             'auth_id': auth_id
         }
 
-    def insert_user_info(self, u_id, email, name_first, name_last, handle_str):
+    def insert_user(self, u_id, email, name_first, name_last, handle_str):
         self.get_users_from_u_id_dict()[u_id] = {
             'u_id': u_id,
             'email': email,
@@ -124,6 +153,9 @@ class Datastore:
 
     def update_value(self, dict_key, key, value):
         self.__store[dict_key][key] = value
+
+
+    # Other
 
     def set(self, store):
         if not isinstance(store, dict):
