@@ -4,7 +4,6 @@ from src.other import clear_v1
 from src.channel import channel_details_v1
 from src.auth import auth_register_v1
 
-
 from src.error import InputError
 from src.error import AccessError
 
