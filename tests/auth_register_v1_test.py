@@ -8,12 +8,12 @@ from src.other import clear_v1
 from src.channel import channel_details_v1
 from src.channels import channels_create_v1
 
+# Fixture to reset data store before every test
 @pytest.fixture
 def clear():
     clear_v1()
 
 def test_standard(clear):
-    
     output = auth_register_v1("example@email.com", "password", "john", "smith")
     assert isinstance(output["auth_user_id"], int)
     login = auth_login_v1("example@email.com", "password")
@@ -39,7 +39,7 @@ def test_invalid_email(clear):
     with pytest.raises(InputError):
         auth_register_v1("in/v$alid@gm@il.com", "password", "john", "smith")
 
-
+# A test that expects a InputError when the email given already exists.
 def test_duplicate_email(clear):
     auth_register_v1("example@email.com", "password", "john", "smith")
     with pytest.raises(InputError):
@@ -69,8 +69,9 @@ def test_invalid_last_name(clear):
     with pytest.raises(InputError):
         auth_register_v1("example@email.com", "no", "john", too_long)
 
+# A test that checks if handle genneration has been correctly generated. 
 def test_appended_handle_number(clear):
-    output1 = auth_register_v1("example@email.com", "password", "john", "smith")
+    auth_register_v1("example@email.com", "password", "john", "smith")
     output2 = auth_register_v1("example2@email.com", "password", "john", "smith")
 
     channel_id = channels_create_v1(output2['auth_user_id'], 'test_channel', True)
