@@ -10,14 +10,14 @@ from src.other import clear_v1
 from src.error import InputError
 from src.error import AccessError
 
-# Returns only the value and not the dict
+# Extracts the auth_user_id from a given dictionary.
 @pytest.fixture
 def extract_user():
     def extract_user_id_function(auth_user_id_dict):
         return auth_user_id_dict['auth_user_id']
     return extract_user_id_function
 
-# Returns only the value and not the dict
+# Extracts the channel from a given dictionary.
 @pytest.fixture
 def extract_channel():
     def extract_channel_id_function(channel_id_dict):
@@ -88,6 +88,7 @@ def test_invalid_user_id(clear, register, extract_user, extract_channel):
     with pytest.raises(AccessError):
         channel_join_v1(invalid_auth_user_id, channel_id)
 
+# Test expecting prority to AccessError when an invalid auth_id and channel_id are given.
 def test_invalid_user_id_and_invalid_channel_id(clear, register, extract_user, extract_channel):
     invalid_auth_user_id = 100
     invalid_channel_id = 100
@@ -120,6 +121,7 @@ def test_private_not_owner(clear, extract_user, extract_channel):
     with pytest.raises(AccessError):
         channel_join_v1(auth_user_id, channel_id)
 
+# Testing that global owner has the correct permissions.
 def test_global_owner(clear, extract_user, extract_channel):
     owner_auth_user_id = extract_user(auth_register_v1('owner@test.com', 'password', 'owner', 'one'))
     auth_id_1 = extract_user(auth_register_v1('user1@test.com', 'password1', 'userasd', 'oneee'))
