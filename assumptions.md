@@ -11,8 +11,5 @@
   possible
 - If channel_list_v1 and channel_list_all_v1 cannot find any channels the user
   is a part of (or in general for channel_lsit_all_v1) it will return an empty
-  list rather than an empty dictionary
-- auth_register_v1 is always able create a handle, ie first_name and last_name
-  at least contain one alphanumeric character
-- channel_list_v1 checks whether a user is in all_members of a channel to
-  determine if it is "a part of" the channel
+  list
+- lists including all_members and owner_members have an arbitrary order of items.
