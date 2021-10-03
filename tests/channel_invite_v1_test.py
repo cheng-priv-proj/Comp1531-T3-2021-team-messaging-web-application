@@ -4,7 +4,7 @@ from src.channel import channel_details_v1, channel_invite_v1
 
 from src.auth import auth_register_v1
 from src.channels import channels_create_v1
-from src.channels import channels_listall_v1
+from src.channels import channels_list_v1
 from src.channel import channel_join_v1
 
 from src.other import clear_v1
@@ -75,7 +75,7 @@ def test_member_invite(clear, register, extract_user, extract_channel, extract_u
     channel_join_v1(member_user_id, channel_id)
     channel_invite_v1(member_user_id, channel_id, friend_u_id)
 
-    assert channels_listall_v1(friend_auth_id) == {
+    assert channels_list_v1(friend_auth_id) == {
         'channels': [
         	{
                 'channel_id': channel_id,
@@ -98,7 +98,7 @@ def test_owner_invite(clear, register, extract_user, extract_channel, extract_u_
 
     channel_invite_v1(owner_user_id, channel_id, friend_u_id)
 
-    assert channels_listall_v1(friend_auth_id) == {
+    assert channels_list_v1(friend_auth_id) == {
         'channels': [
         	{
                 'channel_id': channel_id,
@@ -124,7 +124,7 @@ def test_invite_multiple(clear, register, extract_user, extract_channel, extract
     channel_invite_v1(owner1_user_id, channel1_id, friend_u_id)
     channel_invite_v1(owner2_user_id, channel2_id, friend_u_id)
 
-    assert channels_listall_v1(friend_auth_id) == {
+    assert channels_list_v1(friend_auth_id) == {
         'channels': [
             {
                 'channel_id': channel1_id,
@@ -150,7 +150,7 @@ def test_private_invite(clear, extract_user, extract_channel, extract_u_id_and_c
 
     channel_invite_v1(owner_user_id, channel_id, friend_u_id)
 
-    assert channels_listall_v1(friend_auth_id) == {
+    assert channels_list_v1(friend_auth_id) == {
         'channels': [
         	{
                 'channel_id': channel_id,

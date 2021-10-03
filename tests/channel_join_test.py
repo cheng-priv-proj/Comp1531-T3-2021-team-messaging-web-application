@@ -4,7 +4,6 @@ from src.channel import channel_join_v1
 
 from src.auth import auth_register_v1
 from src.channels import channels_create_v1
-from src.channels import channels_listall_v1
 from src.channels import channels_list_v1
 
 from src.other import clear_v1
@@ -43,7 +42,7 @@ def test_valid_id(clear, register, extract_user, extract_channel):
 
     channel_join_v1(auth_user_id, channel_id)
 
-    assert channels_listall_v1(auth_user_id) == {
+    assert channels_list_v1(auth_user_id) == {
         'channels': [
         	{
                 'channel_id': channel_id, 
@@ -62,7 +61,7 @@ def test_multiple_servers(clear, register, extract_user, extract_channel):
     channel_join_v1(auth_user_id, channel1_id)
     channel_join_v1(auth_user_id, channel2_id)
 
-    assert channels_listall_v1(auth_user_id) == {
+    assert channels_list_v1(auth_user_id) == {
         'channels': [
         	{
                 'channel_id': channel1_id, 
