@@ -25,33 +25,6 @@ def extract_channel():
         return channel_id_dict['channel_id']
     return extract_channel_id_function
 
-@pytest.fixture 
-def extract_u_id():
-    def extract_u_id_function(auth_user_id):
-        channel_id_dict = channels_create_v1(auth_user_id, 'u_id_extraction', True)
-        channel_id = channel_id_dict['channel_id']
-        details = channel_details_v1(auth_user_id, channel_id)
-        return details['owner_members'][0]['u_id']
-    return extract_u_id_function
-
-@pytest.fixture 
-def extract_u_id_and_channel():
-    def extract_u_id_function(auth_user_id):
-        channel_id_dict = channels_create_v1(auth_user_id, 'u_id_extraction', True)
-        channel_id = channel_id_dict['channel_id']
-        details = channel_details_v1(auth_user_id, channel_id)
-        return {"u_id": details['owner_members'][0]['u_id'], "channel_id":channel_id}
-    return extract_u_id_function
-
-@pytest.fixture 
-def extract_u_id_with_channel():
-    def extract_u_id_function(register):
-        auth_user_id = register['auth_user_id']
-        channel_id = register['channel_id']
-        details = channel_details_v1(auth_user_id, channel_id)
-        return details['owner_members'][0]['u_id']
-    return extract_u_id_function
-
 @pytest.fixture
 def clear():
     clear_v1()
