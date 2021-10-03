@@ -1,16 +1,9 @@
-### ASSUMES THAT ALL AUTH ID GIVEN IS A VALID AUTH ID ####
-#### NEED TO IMPLEMENT ADDIDTIONAL TESTS OR ADD ASSUPTIONS TO COVER THIS SCENARIO ##
-
 import pytest
 
-from src.auth import auth_login_v1
 from src.auth import auth_register_v1
 
-from src.channels import channels_list_v1
 from src.channels import channels_listall_v1
 from src.channels import channels_create_v1
-
-from src.channel import channel_join_v1
 
 from src.error import AccessError
 from src.other import clear_v1
@@ -40,11 +33,7 @@ def extract_channel():
         return channel_id_dict['channel_id']
     return extract_channel_id_function
 
-
-#### ASSUMES THAT ALL AUTH ID GIVEN IS A VALID AUTH ID ####
-#### NEED TO IMPLEMENT ADDIDTIONAL TESTS OR ADD ASSUPTIONS TO COVER THIS SCENARIO ##
-
-# testing that when an auth user creates 1 then 2 channels, that they will show up
+# Testing the standard valid case.
 def test_channel_list_all_valid(clear, get_user1, extract_channel):
     
     channel_id1 = extract_channel(channels_create_v1(get_user1, 'testing_channel', True))
@@ -57,7 +46,7 @@ def test_channel_list_all_valid(clear, get_user1, extract_channel):
     
     assert(channel_list == { 'channels': [{'channel_id': channel_id1, 'name': 'testing_channel'}, {'channel_id': channel_id2, 'name': 'testing_channel_2'}]}), "channel_list_all: Failed standard valid case (two channels)"
 
-# testing the case where there are no channels 
+# Testing the case where there are no channels 
 def test_channel_list_all_nochannels(clear, get_user1):
 
     channel_list_all = (channels_listall_v1(get_user1))
@@ -76,7 +65,7 @@ def test_channel_list_all_other_owners(clear, get_user1, get_user2, extract_chan
 
     assert(channel_list2 == { 'channels': [{'channel_id': channel_id1, 'name': 'testing_channel3'}, {'channel_id': channel_id2, 'name': 'testing_channel4'}]}), "channel_list_all: Failed to return all channels that exist"
     
-# testing that whether a channel is public or private has no effect on the returning list
+# Testing that whether a channel is public or private has no effect on the returning list
 def test_channel_list_all_public_private(clear, get_user1, get_user2, get_user3,extract_channel):
     channel_id1 = extract_channel(channels_create_v1(get_user1, 'testing_channel3', False))
     channel_id2 = extract_channel(channels_create_v1(get_user2, 'testing_channel4', True))
