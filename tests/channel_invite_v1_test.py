@@ -11,16 +11,14 @@ from src.other import clear_v1
 from src.error import InputError
 from src.error import AccessError
 
-## Refactor this someday
-
-# Returns only the value and not the dict
+# Extracts the auth_user_id from a given dictionary.
 @pytest.fixture
 def extract_user():
     def extract_user_id_function(auth_user_id_dict):
         return auth_user_id_dict['auth_user_id']
     return extract_user_id_function
 
-# Returns only the value and not the dict
+# Extracts the channel from a given dictionary.
 @pytest.fixture
 def extract_channel():
     def extract_channel_id_function(channel_id_dict):
@@ -88,6 +86,7 @@ def test_member_invite(clear, register, extract_user, extract_channel, extract_u
         ],
     }
 
+# Testing that steam owner is able to have unrestricted permissions.
 def test_owner_invite(clear, register, extract_user, extract_channel, extract_u_id_and_channel):
     owner_user_id = extract_user(register)
     channel_id = extract_channel(register)
@@ -223,6 +222,7 @@ def test_unauthorised_invite(clear, register, extract_user, extract_channel, ext
     with pytest.raises(AccessError):
         channel_invite_v1(notmember_user_id, channel_id, friend_u_id)
 
+# Test that checks channel details to comfirm successful invite.
 def test_is_added(clear, register, extract_user, extract_channel, extract_u_id):
     owner_user_id = extract_user(register)
     channel_id = extract_channel(register)
