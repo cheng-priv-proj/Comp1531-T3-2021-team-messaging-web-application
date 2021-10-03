@@ -2,13 +2,16 @@ import pytest
 import sys
  
 from src.other import clear_v1
-from src.channels import channels_create_v1
-from src.auth import auth_register_v1
-import src.data_store as data_store_file
-from src.data_store import data_store
 
-# assumes that the data store is initially empty: Testing whether database is empty by comparing the
-# bit size with the bit size of an empty dict
+from src.channels import channels_create_v1
+
+from src.auth import auth_register_v1
+
+from src.data_store import data_store
+import src.data_store as data_store_file
+
+# Assumes that the data store is initially empty.
+# Testing if database is empty by comparing bit size with the bit size of an empty dict.
 def test_clearv1_functionality():
     clear_v1()
     empty_data_store = data_store_file.Datastore()
