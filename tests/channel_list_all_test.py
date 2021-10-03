@@ -12,6 +12,7 @@ from src.other import clear_v1
 def clear():
     clear_v1()
 
+# Registers a user and returns numeric auth_id.
 @pytest.fixture
 def get_user1():
     auth_user_id_dict = auth_register_v1('validemail100@gmail.com', 'validpassword', 'Randomname', 'Randomsurname')
@@ -27,6 +28,7 @@ def get_user3():
     auth_user_id_dict = auth_register_v1('validemail300@gmail.com', 'Validpassworddd', 'Randomnameee', 'Randomsurnameee')
     return auth_user_id_dict['auth_user_id']
 
+# Extracts the channel_id from a given dictionary.
 @pytest.fixture
 def extract_channel():
     def extract_channel_id_function(channel_id_dict):
