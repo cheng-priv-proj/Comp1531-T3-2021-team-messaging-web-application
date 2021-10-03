@@ -6,7 +6,6 @@ from src.auth import auth_register_v1
 
 from src.error import AccessError, InputError
 
-
 # Extracts the auth_user_id from a given dictionary.
 @pytest.fixture
 def extract_user():
