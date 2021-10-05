@@ -1,3 +1,5 @@
+import json
+
 # Login:
 #   Key: email
 #   Value: Dictionary {
@@ -41,8 +43,30 @@ initial_object = {
 
 class Datastore:
     def __init__(self):
-        self.__store = initial_object
+        with open('json_dump/data_store.txt', 'r') as FILE:
+            self.__store = json.load(FILE)
 
+    def hard_reset(self):
+
+        # replace json dump with a fresh copy of datastore
+        with open('json_dump/data_store.txt', 'w') as FILE:
+            json.dump(
+            {
+                'login': {},
+                'channels': {},
+                'messages' : {},
+                'users': {},
+                'perms' : {}
+            }, 
+            FILE
+            )
+
+        # re initialise the datastore
+        self.__init__()
+
+    def update_json(self):
+        with open('json_dump/data_store.txt', 'w') as FILE:
+            json.dump(self.__store, FILE)
 
     # Get Functions
 
@@ -129,6 +153,7 @@ class Datastore:
             'password': password,
             'auth_id': auth_id
         }
+        self.update_json()
 
     def insert_user(self, u_id, email, name_first, name_last, handle_str):
         self.get_users_from_u_id_dict()[u_id] = {
@@ -138,9 +163,11 @@ class Datastore:
             'name_last': name_last,
             'handle_str': handle_str
         }
+        self.update_json()
     
     def insert_user_perm(self, u_id, global_id):
         self.get_user_perms_from_u_id_dict()[u_id] = global_id
+        self.update_json()
     
     def insert_channel(self, channel_id, channel_name, is_public, messages, owner_members, all_members):
         self.get_channels_from_channel_id_dict()[channel_id] = {
@@ -150,10 +177,11 @@ class Datastore:
             'all_members': all_members,
         }
         self.get_messages_from_channel_id_dict()[channel_id] = messages
+        self.update_json()
 
     def update_value(self, dict_key, key, value):
         self.__store[dict_key][key] = value
-
+        self.update_json()
 
     # Other
 
