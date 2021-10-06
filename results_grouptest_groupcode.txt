@@ -80,4 +80,4 @@ tests/test_clear_v1.py::test_clearv1_returns_empty_dict PASSED           [100%]
 ====== Marks recorded: 70.00 ======
 
 
-============================== 70 passed in 0.35s ==============================
+============================== 70 passed in 0.34s ==============================
