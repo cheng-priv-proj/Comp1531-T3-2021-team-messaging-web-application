@@ -11,15 +11,33 @@ Arguments:
 Exceptions:
     none
 
-Return value:
-    Returns nothing on success
-'''
-def clear_v1():
-    data_store.hard_reset()
+    Exceptions:
+        none
+
+    Return value:
+        Returns nothing on success
+    '''
+    store = data_store.get()
+    for element in store:
+        store[element] = {}
+    data_store.set(store)
+    
     return {}
 
 # helper function to generate handles for auth_register
 def handle_str_generation(firstname, lastname):
+    '''
+    Generates a handle string given a first name and last name
+
+    Arguments:
+        firstname (str), lastname (str)
+    
+    Exceptions:
+        none
+
+    Return value:
+        Returns an unique handle string
+    '''
 
     check_type(firstname, str)
     check_type(lastname, str)
