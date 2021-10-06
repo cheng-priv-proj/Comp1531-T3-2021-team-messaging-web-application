@@ -43,7 +43,7 @@ def handle_prevent_duplicates(base_handle_str):
     while duplicate_exists:
         duplicate_exists = False
         for user_info in data_store.get_users_from_u_id_dict().values():
-            if handle_str == user_info.get('han'):
+            if handle_str == user_info.get('handle_str'):
                 duplicate_count += 1
                 duplicate_exists = True
                 break
