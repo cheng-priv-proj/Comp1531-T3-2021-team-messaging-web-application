@@ -1,20 +1,21 @@
 from src.data_store import data_store
 import re
 
-'''
-Resets the internal data of the application to its initial state, clearing the
-datastore
 
-Arguments:
-    none
-
-Exceptions:
-    none
-
-Return value:
-    Returns nothing on success
-'''
 def clear_v1():
+    '''
+    Resets the internal data of the application to its initial state, clearing the
+    datastore
+
+    Arguments:
+        none
+
+    Exceptions:
+        none
+
+    Return value:
+        Returns nothing on success
+    '''
     store = data_store.get()
     for element in store:
         store[element] = {}
@@ -29,15 +30,28 @@ def handle_str_generation(firstname, lastname):
     check_type(lastname, str)
 
     base_handle_str = base_handle_str_generation(firstname, lastname)
-    
+    handle_str = handle_prevent_duplicates(base_handle_str)
+    print(handle_str)
+    return handle_str
+
+# Returns a nonduplicate handle_str
+def handle_prevent_duplicates(base_handle_str):
     duplicate_count = -1
-    for user_info in data_store.get_users_from_u_id_dict().values():
-        potential_duplicate_handle = base_handle_str_generation(user_info.get('name_first'), user_info.get('name_last'))
-        if base_handle_str == potential_duplicate_handle:
-            duplicate_count += 1
+    duplicate_exists = True
+    handle_str = base_handle_str
+
+    while duplicate_exists:
+        duplicate_exists = False
+        for user_info in data_store.get_users_from_u_id_dict().values():
+            if handle_str == user_info.get('han'):
+                duplicate_count += 1
+                duplicate_exists = True
+                break
+        
+        handle_str = base_handle_str + str(duplicate_count)
 
     if duplicate_count > -1:
-        base_handle_str = base_handle_str + str(duplicate_count)
+        base_handle_str += str(duplicate_count)
     
     return base_handle_str
 
