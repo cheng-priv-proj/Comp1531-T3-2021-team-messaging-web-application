@@ -15,11 +15,7 @@ Return value:
     Returns nothing on success
 '''
 def clear_v1():
-    store = data_store.get()
-    for element in store:
-        store[element] = {}
-    data_store.set(store)
-    
+    data_store.hard_reset()
     return {}
 
 # helper function to generate handles for auth_register
