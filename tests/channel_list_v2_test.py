@@ -15,14 +15,14 @@ def clear():
 
 # Generates the first user
 @pytest.fixture
-def first_register(extract_token, extract_channel):
+def first_register():
     user_details = {
         'email': 'globalowner@test.com',
         'password': 'password', 
         'name_first': 'global',
         'name_last': 'user'
     }
-    token_dict = requests.post(url + 'auth/register/v2', data = user_details).json()
+    token_dict = requests.post(url + 'auth/register/v2', json = user_details).json()
     token = token_dict.get('token')
 
     channel_details = {
@@ -30,7 +30,7 @@ def first_register(extract_token, extract_channel):
         'name': 'channel',
         'is_public': True
     }
-    channel_id_dict = requests.post(url + 'channels/create/v2', data = channel_details).json()
+    channel_id_dict = requests.post(url + 'channels/create/v2', json = channel_details).json()
     channel_id = channel_id_dict.get('channel_id')
     
     return {'token': token, 'channel_id': channel_id}
@@ -45,7 +45,7 @@ def register_user():
             'name_first': 'some',
             'name_last': 'user'
         }
-        token_dict = requests.post(url + 'auth/register/v2', data = user_details).json()
+        token_dict = requests.post(url + 'auth/register/v2', json = user_details).json()
         token = token_dict.get('token')
 
         return token
@@ -60,7 +60,7 @@ def register_channel():
             'name': name,
             'is_public': is_public
         }
-        channel_id_dict = requests.post(url + 'channels/create/v2', data = channel_details).json()
+        channel_id_dict = requests.post(url + 'channels/create/v2', json = channel_details).json()
         channel_id = channel_id_dict.get('channel_id')
 
         return channel_id
@@ -144,7 +144,7 @@ def test_channel_list_after_newjoin_test(clear, first_register, register_user):
     channel_id = first_register.get('channel_id')
     token2 = register_user('user2@test.com')
 
-    requests.post(url + 'channel/join/v2', data = {token2, channel_id})
+    requests.post(url + 'channel/join/v2', json = {token2, channel_id})
 
     channel_list = requests.get(url + 'channels/list/v2', params = {token2}).json()
     assert channel_list == { 

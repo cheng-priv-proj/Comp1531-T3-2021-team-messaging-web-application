@@ -15,14 +15,14 @@ def clear():
 
 # Generates the first user
 @pytest.fixture
-def first_register(extract_token, extract_channel):
+def first_register():
     user_details = {
         'email': 'globalowner@test.com',
         'password': 'password', 
         'name_first': 'global',
         'name_last': 'user'
     }
-    token_dict = requests.post(url + 'auth/register/v2', data = user_details).json()
+    token_dict = requests.post(url + 'auth/register/v2', json = user_details).json()
     token = token_dict.get('token')
 
     channel_details = {
@@ -30,7 +30,7 @@ def first_register(extract_token, extract_channel):
         'name': 'channel',
         'is_public': True
     }
-    channel_id_dict = requests.post(url + 'channels/create/v2', data = channel_details).json()
+    channel_id_dict = requests.post(url + 'channels/create/v2', json = channel_details).json()
     channel_id = channel_id_dict.get('channel_id')
     
     return {'token': token, 'channel_id': channel_id}
@@ -45,7 +45,7 @@ def register_user():
             'name_first': 'some',
             'name_last': 'user'
         }
-        token_dict = requests.post(url + 'auth/register/v2', data = user_details).json()
+        token_dict = requests.post(url + 'auth/register/v2', json = user_details).json()
         token = token_dict.get('token')
 
         return token
@@ -60,7 +60,7 @@ def register_channel():
             'name': name,
             'is_public': is_public
         }
-        channel_id_dict = requests.post(url + 'channels/create/v2', data = channel_details).json()
+        channel_id_dict = requests.post(url + 'channels/create/v2', json = channel_details).json()
         channel_id = channel_id_dict.get('channel_id')
 
         return channel_id
