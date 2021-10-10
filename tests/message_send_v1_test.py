@@ -39,14 +39,14 @@ def clear():
 # Automatically create owner user id and channel id. Both are 1 by default.
 @pytest.fixture
 def register():
-    owner_id_dict = requests.post(url + 'auth/register/v2', data = {
+    owner_id_dict = requests.post(url + 'auth/register/v2', json = {
         'username': 'owner@test.com', 
         'password': 'password', 
         'name_first': 'owner',
         'name_last': 'one' }
         ).json()
     owner_user_token = owner_id_dict['token']
-    channel_id_dict = requests.post(url + 'channels/create/v2', data = {
+    channel_id_dict = requests.post(url + 'channels/create/v2', json = {
         'token': owner_user_token,
         'name': 'channel_name', 
         'is_public': True }).json()
@@ -57,11 +57,11 @@ def test_send_one_valid_message(clear, register, extract_token, extract_user, ex
     channel_id = extract_channel(register)
     owner_token = extract_token(register)
     now = datetime.now()
-    message_id = extract_message(requests.post(url + 'message/send/v1', data = {
+    message_id = extract_message(requests.post(url + 'message/send/v1', json = {
         'token': owner_token,
         'channel_id': channel_id,
         'message': 'testmessage' }).json())
-    messages = requests.get(url + 'message/channel/v2', params = {
+    messages = requests.get(url + 'message/channel/v2', json = {
         'token': owner_token,
         'channel_id': channel_id, 
         'start': 0 }).json()
@@ -84,19 +84,19 @@ def test_send_multiple_valid_messages(clear, register, extract_token, extract_us
     owner_token = extract_token(register)
     owner_id = extract_user(register)
     now = datetime.now()
-    message_id0 = extract_message(requests.post(url + 'message/send/v1', data = {
+    message_id0 = extract_message(requests.post(url + 'message/send/v1', json = {
         'token': owner_token,
         'channel_id': channel_id,
         'message': 'testmessage' }).json())
-    message_id1 = extract_message(requests.post(url + 'message/send/v1', data = {
+    message_id1 = extract_message(requests.post(url + 'message/send/v1', json = {
         'token': owner_token,
         'channel_id': channel_id,
         'message': 'testmessage0' }).json())
-    message_id2 = extract_message(requests.post(url + 'message/send/v1', data = {
+    message_id2 = extract_message(requests.post(url + 'message/send/v1', json = {
         'token': owner_token,
         'channel_id': channel_id,
         'message': 'testmessage2' }).json())
-    messages = requests.get(url + 'message/channel/v2', params = {
+    messages = requests.get(url + 'message/channel/v2', json = {
         'token': owner_token,
         'channel_id': channel_id, 
         'start': 0 }).json()
@@ -132,7 +132,7 @@ def test_send_invalid_message_to_short(clear, register, extract_token, extract_c
     channel_id = extract_channel(register)
     owner_token = extract_token(register)
 
-    assert requests.post(url + 'messages/send/v1', data = {
+    assert requests.post(url + 'messages/send/v1', json = {
         'token': owner_token,
         'channel_id': channel_id,
         'message': ''
@@ -142,7 +142,7 @@ def test_send_invalid_message_to_long(clear, register, extract_token, extract_ch
     channel_id = extract_channel(register)
     owner_token = extract_token(register)
     
-    assert requests.post(url + 'messages/send/v1', data = {
+    assert requests.post(url + 'messages/send/v1', json = {
         'token': owner_token,
         'channel_id': channel_id,
         'message': """aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
@@ -153,13 +153,13 @@ def test_send_invalid_message_to_long(clear, register, extract_token, extract_ch
 
 def test_send_valid_message_unauthorized_user(clear, register, extract_token, extract_channel):
     channel_id = extract_channel(register)
-    user_token = extract_token(requests.post(url + 'auth/register/v2', data = {
+    user_token = extract_token(requests.post(url + 'auth/register/v2', json = {
     'username': 'user@test.com', 
     'password': 'password', 
     'name_first': 'user',
     'name_last': 'one' }
     ).json())
-    assert requests.post(url + 'messages/send/v1', data = {
+    assert requests.post(url + 'messages/send/v1', json = {
         'token': user_token,
         'channel_id': channel_id,
         'message': '123456'
@@ -167,7 +167,7 @@ def test_send_valid_message_unauthorized_user(clear, register, extract_token, ex
 
 def test_send_message_invalid_channel_id(clear, register, extract_token, extract_user, extract_message):
     owner_token = extract_token(register)
-    assert requests.post(url + 'messages/send/v1', data = {
+    assert requests.post(url + 'messages/send/v1', json = {
         'token': owner_token,
         'channel_id': 123123,
         'message': '123123'
@@ -175,22 +175,17 @@ def test_send_message_invalid_channel_id(clear, register, extract_token, extract
 
 def test_send_valid_message_invalid_token(clear, register, extract_token):
     channel_id = extract_token(register)
-    assert requests.post(url + 'messages/send/v1', data = {
+    assert requests.post(url + 'messages/send/v1', json = {
         'token': '123123414',
         'channel_id': channel_id,
         'message': 'asds'
     }) == 403
 
 def test_send_invalid_message_invalid_token(clear, register):
-    assert requests.post(url + 'messages/send/v1', data = {
+    assert requests.post(url + 'messages/send/v1', json = {
         'token': '123123414',
         'channel_id': 23423,
         'message': ''
     }) == 403
 
 
-# valid channel id
-# valid length of message too small and too long
-# authorized user 
-# unique message id
-# correct types
