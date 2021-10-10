@@ -66,9 +66,9 @@ def test_email_does_not_exist_v2(auth_id_v2):
     assert(resp.status_code == 400)
 
 # Test that expects an input error when all the fields are invalid. 
-def test_all_incorrect_v2(clear, auth_id):
-    with pytest.raises(InputError):
-        auth_login_v1("invalid@gmail.com", "notpotato")
+def test_all_incorrect_v2(auth_id_v2):
+    resp = requests.post(config.url + 'auth/login/v2', data={'email': 'baaaaddexample@email.com', 'password': 'naughty_potato'})
+    assert(resp.status_code == 400)
 
 def test_invalid_return_token_v2():
     return
