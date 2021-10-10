@@ -1,3 +1,7 @@
+# NEED TO CLARIFY POS AND GET USAGE AND RETURN VALUES.
+
+
+
 import pytest
 import requests
 import json
