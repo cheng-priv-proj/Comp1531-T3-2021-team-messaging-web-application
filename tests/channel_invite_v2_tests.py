@@ -16,48 +16,54 @@ import json
 import flask
 from src import config
 
-#NEED TO IMPLEMENT CLEAR v2
+#NEED TO IMPLEMENT CLEAR v2 or change clear v1
 @pytest.fixture
 def clear_server():
     clear_v2()
 
 @pytest.fixture
-def get_valid_token():
+def get_user_1():
     response = requests.post(config.url + 'auth/register/v2', data={
         'email': 'example@email.com', 
         'password': 'potato', 
         'name_first': 'John', 
         'name_last' : 'smith'
         })
-    token = response.json()
-    return token['token']
+    return response.json()
 
-def get_invitee_uid():
+def get_invitee():
     response = requests.post(config.url + 'auth/register/v2', data={
         'email': 'example@email.com', 
         'password': 'potato', 
         'name_first': 'John', 
         'name_last' : 'smith'
         })
-    u_id = response.json()
-    return u_id['auth_user_id']
+    return response.json()
 
-def test_member_invite(clear, register, extract_user, extract_channel):
-    member_user_id = extract_user(auth_register_v1('member@test.com', 'password', 'member', 'one'))
-    channel_id = extract_channel(register)
-    friend_auth_id = extract_user(auth_register_v1('friend@test.com', 'password', 'friend', 'one'))
-    
-    channel_join_v1(member_user_id, channel_id)
-    channel_invite_v1(member_user_id, channel_id, friend_auth_id)
+def test_member_invite(clear_server, get_invitee, get_user_1):
+    channel_dict = requests.post(config.url + 'channels/create/v2', data={'token': get_user_1['token'], 'name': 'test channel', 'is_public': True}).json()
+    extracted_channel_id = channel_dict['channel_id']
 
-    assert channels_list_v1(friend_auth_id) == {
-        'channels': [
-        	{
-                'channel_id': channel_id,
-                'name': 'test channel'
-            },
-        ],
-    }
+    requests.post(config.url + 'channel/invite/v2', data={'token': get_user_1['token'], 'channel_id': extracted_channel_id, 'u_id': get_invitee['auth_user_id']}).json()
+    details = requests.get(config.url + 'channel/details/v2', params={'token': get_user_1['token'], 'channel_id': extracted_channel_id}).json()
+
+    assert details["all_members"] == [
+        {
+            'u_id': auth_user_id,
+            'email': 'owner@test.com',
+            'name_first': 'owner',
+            'name_last': 'one',
+            'handle_str': 'ownerone'
+        }
+        {
+            'u_id': auth_user_id,
+            'email': 'owner@test.com',
+            'name_first': 'owner',
+            'name_last': 'one',
+            'handle_str': 'ownerone'
+        }
+    ]
+
 
 # Testing that owner has correct permissions.
 def test_owner_invite(clear, register, extract_user, extract_channel):
