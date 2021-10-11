@@ -41,7 +41,7 @@ def get_invitee():
     return response.json()
 
 # TEsting that inviting someone shows up in channel details
-def test_member_invite(clear_server, get_invitee, get_user_1):
+def test_member_invite_v2(clear_server, get_invitee, get_user_1):
     channel_dict = requests.post(config.url + 'channels/create/v2', data={'token': get_user_1['token'], 'name': 'test channel', 'is_public': True}).json()
     extracted_channel_id = channel_dict['channel_id']
 
@@ -65,7 +65,48 @@ def test_member_invite(clear_server, get_invitee, get_user_1):
         }
     ]
 
-def test_invite_multiple(clear_server, get_invitee, get_user_1): 
+# Checks that multiple users can be invited to a channel also owner and members both have invite perms
+def test_invite_multiple_v2(clear_server, get_invitee, get_user_1): 
+    channel_dict = requests.post(config.url + 'channels/create/v2', data={'token': get_user_1['token'], 'name': 'test channel', 'is_public': True}).json()
+    extracted_channel_id = channel_dict['channel_id']
+
+
+    response = requests.post(config.url + 'auth/register/v2', data={
+        'email': 'eexample@email.com', 
+        'password': 'pootato', 
+        'name_first': 'Johno', 
+        'name_last' : 'smith'
+        })
+    user_3_dict = response.json()
+
+    requests.post(config.url + 'channel/invite/v2', data={'token': get_user_1['token'], 'channel_id': extracted_channel_id, 'u_id': get_invitee['auth_user_id']}).json()
+    requests.post(config.url + 'channel/invite/v2', data={'token': get_invitee['token'], 'channel_id': extracted_channel_id, 'u_id': user_3_dict['auth_user_id']}).json()
+
+    details = requests.get(config.url + 'channel/details/v2', params={'token': get_user_1['token'], 'channel_id': extracted_channel_id}).json()
+    assert details["all_members"] == [
+        {
+            'u_id': get_user_1['auth_user_id'],
+            'email': 'owner@test.com',
+            'name_first': 'owner',
+            'name_last': 'one',
+            'handle_str': 'ownerone'
+        },
+        {
+            'u_id': get_invitee['auth_user_id'],
+            'email': 'example@email.com',
+            'name_first': 'John',
+            'name_last': 'smith',
+            'handle_str': 'Johnsmith'
+        },
+        {
+            'u_id': user_3_dict['auth_user_id'],
+            'email': 'eexample@email.com',
+            'name_first': 'Johno',
+            'name_last': 'smith',
+            'handle_str': 'Johnosmith'
+        }
+    ]
+
     return
     
 def test_private_invite(clear_server, get_invitee, get_user_1):
@@ -132,12 +173,18 @@ def test_already_member(clear, register, extract_user, extract_channel):
     with pytest.raises(InputError):
         channel_invite_v1(owner_user_id, channel_id, friend_auth_id)
 
+
+
 def test_already_owner(clear, register, extract_user, extract_channel):
     owner_user_id = extract_user(register)
     channel_id = extract_channel(register)
 
     with pytest.raises(InputError):
         channel_invite_v1(owner_user_id, channel_id, owner_user_id)
+
+
+
+
 
 def test_unauthorised_invite(clear, register, extract_user, extract_channel):
     notmember_user_id = extract_user(auth_register_v1('member@test.com', 'password', 'member', 'one'))
