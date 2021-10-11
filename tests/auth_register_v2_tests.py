@@ -13,6 +13,8 @@ from src.other import clear_v1
 from src.channel import channel_details_v1
 from src.channels import channels_create_v1
 
+# Need to implement handle checking
+
 @pytest.fixture
 def clear():
     clear_v1()
@@ -50,8 +52,7 @@ def auth_id_v2(clear_server):
 # So this test is the same test as the one in auth_login_v2
 def test_standard(extract_user_v2, auth_id_v2):
     dict_id_token = requests.post(config.url + 'auth/login/v2', data={'email': 'example@email.com', 'password': 'potato'}).json()
-    assert extract_user_v2(dict_id_token) == extract_user_v2(auth_id_v2), 'Valid case: Auth_id not consitant across login and register'
-
+    assert extract_user_v2(dict_id_token) == extract_user_v2(auth_id_v2), 'Valid case: Auth_id not consistant across login and register'
 
 def test_invalid_email(clear):
     bad_email_response = (requests.post(config.url + 'auth/register/v2', data={
@@ -77,7 +78,6 @@ def test_invalid_email(clear):
         'name_last' : 'smith'
         })).json()
     assert(bad_email_response_3.status_code == 400)
-
 
 # A test that expects a InputError when the email given already exists.
 def test_duplicate_email(auth_id_v2):
