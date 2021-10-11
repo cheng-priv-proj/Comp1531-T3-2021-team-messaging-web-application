@@ -7,7 +7,7 @@ from src.channels import channels_create_v1
 from src.channels import channels_list_v1
 from src.channel import channel_join_v1
 
-from src.other import clear_v1
+from src.other import clear_v2
 from src.error import InputError
 from src.error import AccessError
 
@@ -16,31 +16,24 @@ import json
 import flask
 from src import config
 
-# Extracts the auth_user_id from a given dictionary.
+#NEED TO IMPLEMENT CLEAR v2
 @pytest.fixture
-def extract_user():
-    def extract_user_id_function(auth_user_id_dict):
-        return auth_user_id_dict['auth_user_id']
-    return extract_user_id_function
-
-# Extracts the channel from a given dictionary.
-@pytest.fixture
-def extract_channel():
-    def extract_channel_id_function(channel_id_dict):
-        return channel_id_dict['channel_id']
-    return extract_channel_id_function
+def clear_server():
+    clear_v2()
 
 @pytest.fixture
-def clear():
-    clear_v1()
+def get_valid_token(clear_server):
+    response = requests.post(config.url + 'auth/register/v2', data={
+        'email': 'example@email.com', 
+        'password': 'potato', 
+        'name_first': 'John', 
+        'name_last' : 'smith'
+        })
+    token = response.json()
+    return token['token']
 
-# Automatically create owner user id and channel id. Both are 1 by default.
-@pytest.fixture
-def register():
-    owner_id_dict = auth_register_v1('owner@test.com', 'password', 'owner', 'one')
-    owner_user_id = owner_id_dict['auth_user_id']
-    channel_id_dict = channels_create_v1(owner_user_id, 'test channel', True)
-    return {**owner_id_dict, **channel_id_dict}
+
+
 
 def test_member_invite(clear, register, extract_user, extract_channel):
     member_user_id = extract_user(auth_register_v1('member@test.com', 'password', 'member', 'one'))
