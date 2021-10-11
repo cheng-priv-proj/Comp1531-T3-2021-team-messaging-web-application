@@ -66,12 +66,17 @@ def test_private_channel(get_valid_token):
     details = requests.get(config.url + 'channel/details/v2', params={'token': get_valid_token, 'channel_id': extracted_channel_id}).json()
     assert details["is_public"] == False
 
+# Tests that all generated channel id is unique
 def test_unique_channel_id(get_valid_token):
-    auth_user_id = extract_user(register)
-    channel_1 = extract_channel(register)
-    channel_2 = extract_channel(channels_create_v1(auth_user_id, "name2", False))
+    channel_dict1 = requests.post(config.url + 'channels/create/v2', data={'token': get_valid_token, 'name': 'test channel', 'is_public': False}).json()
 
-    assert channel_1 != channel_2
+    extracted_channel_id1 = channel_dict1['channel_id']
+
+    channel_dict2 = requests.post(config.url + 'channels/create/v2', data={'token': get_valid_token, 'name': 'test channel22', 'is_public': False}).json()
+
+    extracted_channel_id2 = channel_dict2['channel_id']
+
+    assert extracted_channel_id2 != extracted_channel_id1
 
 # Testing that the stream owner has correct permissions.
 def test_creator_joins_channel(clear, register, extract_user, extract_channel):
