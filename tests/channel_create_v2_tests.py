@@ -6,15 +6,16 @@ from src import config
 
 import pytest
 from src.channels import channels_create_v1
-from src.other import clear_v1
+from src.other import clear_v2
 from src.channel import channel_details_v1
 from src.auth import auth_register_v1
 
 from src.error import AccessError, InputError
 
+#NEED TO IMPLEMENT CLEAR v2
 @pytest.fixture
-def clear():
-    clear_v1()
+def clear_server():
+    clear_v2()
 
 @pytest.fixture
 def get_valid_token(clear_server):
