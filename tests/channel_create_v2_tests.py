@@ -86,14 +86,23 @@ def test_creator_joins_channel(clear, register, extract_user, extract_channel):
     details = channel_details_v1(auth_user_id, channel_1)
     assert details["all_members"][auth_user_id]["email"] == "owner@test.com"
 
-def test_becomes_owner(clear, register, extract_user, extract_channel):
-    auth_user_id = extract_user(register)
-    channel_1 = extract_channel(register)
-    
-    details = channel_details_v1(auth_user_id, channel_1)
+def test_becomes_owner(clear_server):
+    response = requests.post(config.url + 'auth/register/v2', data={
+        'email': 'owner@test.com', 
+        'password': 'potato', 
+        'name_first': 'John', 
+        'name_last' : 'smith'
+        })
+    return_dict = response.json()
+    token = return_dict['token']
+    auth_user_id = return_dict['auth_user_id']
+
+    channel_dict = requests.post(config.url + 'channels/create/v2', data={'token': token, 'name': 'test channel', 'is_public': False}).json()
+    extracted_channel_id = channel_dict['channel_id']
+    details = requests.get(config.url + 'channel/details/v2', params={'token': token, 'channel_id': extracted_channel_id}).json()
     assert details["owner_members"][auth_user_id]["email"] == "owner@test.com"
 
-def test_short_channel_name(clear, register, extract_user):
+def test_short_channel_name(get_valid_token):
     auth_user_id = extract_user(register)
     
     with pytest.raises(InputError):
@@ -103,13 +112,6 @@ def test_long_channel_name(clear, register, extract_user):
     auth_user_id = extract_user(register)
     
     with pytest.raises(InputError):
-        channels_create_v1(auth_user_id, "reallylongname1234567eallylongname12345671234567", False)
-
-# Test expecting AccessError when both channel name and auth_user_id are invalid.
-def test_invalid_user_id_and_invalid_name(clear):
-    auth_user_id = 100000
-    
-    with pytest.raises(AccessError):
         channels_create_v1(auth_user_id, "reallylongname1234567eallylongname12345671234567", False)
 
 
