@@ -46,6 +46,7 @@ def test_empty_messages(get_user_1, clear_server):
         'start': 0, 
         'end': -1
     }
+
 ''' Auth id is not a parameter yet the spec still considers it so. Need to clarify what it means 
 "return access error when,"
 'channel_id is valid and the authorised user is not a member of the channel'
@@ -59,11 +60,12 @@ def test_valid_channel_id_and_unauthorized_auth_user_id(clear, register, extract
 
 '''
 
-def test_invalid_channel_id(clear, register, extract_user, extract_channel):
-    auth_user_id = extract_user(register)
-    invalid_channel_id = 123123123123
-    with pytest.raises(InputError):
-        channel_messages_v1(auth_user_id, invalid_channel_id, 0)
+def test_invalid_channel_id(get_user_1, clear_server):
+    channel_dict = requests.post(config.url + 'channels/create/v2', data={'token': get_user_1['token'], 'name': 'test channel', 'is_public': True}).json()
+    extracted_channel_id = channel_dict['channel_id']
+
+    channel_messages = requests.get(config.url + 'channel/messages/v2', data={'token': get_user_1['token'], 'channel_id': extracted_channel_id, 'start': 0}).json()
+    assert(channel_messages.status_code)
 
 # Test expecting InputError when given a negative starting index.
 def test_negative_start(clear, register, extract_user, extract_channel):
