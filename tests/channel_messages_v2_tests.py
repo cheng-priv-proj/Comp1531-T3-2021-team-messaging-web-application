@@ -74,14 +74,13 @@ def test_negative_start(get_user_1, clear_server):
     channel_messages = requests.get(config.url + 'channel/messages/v2', data={'token': get_user_1['token'], 'channel_id': extracted_channel_id, 'start': -42}).json()
     assert(channel_messages.status_code == 400)
 
-
+# Test expecting an error code 400 (input error) when the starting index is greater than the amount of messages avaliable.
 def test_start_greater_than_messages(get_user_1, clear_server):
     channel_dict = requests.post(config.url + 'channels/create/v2', data={'token': get_user_1['token'], 'name': 'test channel', 'is_public': True}).json()
     extracted_channel_id = channel_dict['channel_id']
 
     channel_messages = requests.get(config.url + 'channel/messages/v2', data={'token': get_user_1['token'], 'channel_id': extracted_channel_id, 'start': 10000}).json()
     assert(channel_messages.status_code == 400)
-
 
 
 ''' Auth id is not a parameter yet the spec still considers it so. Need to clarify what it means 
