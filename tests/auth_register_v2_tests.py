@@ -98,7 +98,7 @@ def test_invalid_password_v2(clear_server):
         })).json()
     assert(bad_password.status_code == 400)
 
-def test_invalid_first_name_v2(clear):
+def test_invalid_first_name_v2(clear_server):
     short_first_name = (requests.post(config.url + 'auth/register/v2', data={
         'email': 'example@email.com', 
         'password': 'password', 
@@ -136,7 +136,8 @@ def test_invalid_last_name_v2(clear_server):
         })).json()
     assert(long_last_name.status_code == 400)
 
-
+# Token generation is not known yet.
+# Will implement token related tests later. 
 def test_invalid_register_return_token_v2():
     return
 
