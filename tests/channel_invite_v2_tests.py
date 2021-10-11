@@ -16,6 +16,11 @@ import json
 import flask
 from src import config
 
+# Important Accessarror case
+# In the spec, it spacifies an access error when 'channel_id is valid and the authorised user is not a member of the channel'
+# Howver in this iteration, auth id is not a parameter for this function. 
+
+
 #NEED TO IMPLEMENT CLEAR v2 or change clear v1
 @pytest.fixture
 def clear_server():
@@ -70,7 +75,6 @@ def test_invite_multiple_v2(clear_server, get_invitee, get_user_1):
     channel_dict = requests.post(config.url + 'channels/create/v2', data={'token': get_user_1['token'], 'name': 'test channel', 'is_public': True}).json()
     extracted_channel_id = channel_dict['channel_id']
 
-
     response = requests.post(config.url + 'auth/register/v2', data={
         'email': 'eexample@email.com', 
         'password': 'pootato', 
@@ -106,8 +110,6 @@ def test_invite_multiple_v2(clear_server, get_invitee, get_user_1):
             'handle_str': 'Johnosmith'
         }
     ]
-
-    return
     
 def test_private_invite(clear_server, get_invitee, get_user_1):
     channel_dict = requests.post(config.url + 'channels/create/v2', data={'token': get_user_1['token'], 'name': 'test channel', 'is_public': False}).json()
@@ -162,25 +164,24 @@ def test_invalid_channel_id(clear_server, get_invitee, get_user_1):
     response = requests.post(config.url + 'channel/invite/v2', data={'token': get_user_1['token'], 'channel_id': bad_channel_id, 'u_id': get_invitee['auth_user_id']}).json()
     assert(response.status_code == 400)
 
+# U_id is already in the channel
+def test_already_member(clear_server, get_invitee, get_user_1):
+    channel_dict = requests.post(config.url + 'channels/create/v2', data={'token': get_user_1['token'], 'name': 'test channel', 'is_public': True}).json()
+    extracted_channel_id = channel_dict['channel_id']
 
-def test_already_member(clear, register, extract_user, extract_channel):
-    friend_auth_id = extract_user(auth_register_v1('friend@test.com', 'password', 'friend', 'one'))
-    
-    owner_user_id = extract_user(register)
-    channel_id = extract_channel(register)
-
-    channel_invite_v1(owner_user_id, channel_id, friend_auth_id)
-    with pytest.raises(InputError):
-        channel_invite_v1(owner_user_id, channel_id, friend_auth_id)
+    requests.post(config.url + 'channel/invite/v2', data={'token': get_user_1['token'], 'channel_id': extracted_channel_id, 'u_id': get_invitee['auth_user_id']}).json()
+    response = requests.post(config.url + 'channel/invite/v2', data={'token': get_user_1['token'], 'channel_id': extracted_channel_id, 'u_id': get_invitee['auth_user_id']}).json()
+    assert(response.status_code == 400)
 
 
 
 def test_already_owner(clear, register, extract_user, extract_channel):
-    owner_user_id = extract_user(register)
-    channel_id = extract_channel(register)
+    channel_dict = requests.post(config.url + 'channels/create/v2', data={'token': get_user_1['token'], 'name': 'test channel', 'is_public': True}).json()
+    extracted_channel_id = channel_dict['channel_id']
 
-    with pytest.raises(InputError):
-        channel_invite_v1(owner_user_id, channel_id, owner_user_id)
+    requests.post(config.url + 'channel/invite/v2', data={'token': get_user_1['token'], 'channel_id': extracted_channel_id, 'u_id': get_invitee['auth_user_id']}).json()
+    response = requests.post(config.url + 'channel/invite/v2', data={'token': get_user_1['token'], 'channel_id': extracted_channel_id, 'u_id': get_invitee['auth_user_id']}).json()
+    assert(response.status_code == 400)
 
 
 
