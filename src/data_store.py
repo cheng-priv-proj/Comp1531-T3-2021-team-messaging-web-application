@@ -8,13 +8,24 @@ import json
 # Channels:
 #   Key: channel_id:
 #   Value: Dictionary {
-#          channel: {
 #              name
 #              is_public
 #              owner_members
 #              all_members }
+#
+# DMs:
+#   Key: dm_id:
+#   Value: Dictionary {
+#              details : { name, members}
+#              creator }
+#
+# Message ids:
+#   Key: message_id
+#   Value: channel_id or dm_id
+# 
 # Messages:
-#   Key: channel_id
+#   (dm_ids must be negative)
+#   Key: channel_id or dm_id
 #   Value: [message]
 #               
 # Users: 
@@ -29,12 +40,14 @@ import json
 #
 # Permissions:
 #   Key: u_id
-#   Value: {global_id : 1 or 2}
+#   Value: { 1 or 2 }
 
 ## YOU SHOULD MODIFY THIS OBJECT BELOW
 initial_object = {
-    'login': {},
-    'channels': {},
+    'login' : {},
+    'channels' : {},
+    'dms': {},
+    'message_ids' : {},
     'messages' : {},
     'users': {},
     'perms' : {}
@@ -52,8 +65,10 @@ class Datastore:
         with open('json_dump/data_store.txt', 'w') as FILE:
             json.dump(
             {
-                'login': {},
-                'channels': {},
+                'login' : {},
+                'channels' : {},
+                'dms': {},
+                'message_ids' : {},
                 'messages' : {},
                 'users': {},
                 'perms' : {}
@@ -68,10 +83,12 @@ class Datastore:
         with open('json_dump/data_store.txt', 'w') as FILE:
             json.dump(self.__store, FILE)
 
-    # Get Functions
+    # Get Functions ############################################################
 
     def get(self):
         return self.__store
+
+    # login
 
     def get_logins_from_email_dict(self):
         return self.__store['login']
@@ -79,17 +96,48 @@ class Datastore:
     def get_login_from_email(self, email):
         return self.get_logins_from_email_dict().get(email)
     
+    # channels
+
     def get_channels_from_channel_id_dict(self):
         return self.__store['channels']
 
     def get_channel_from_channel_id(self, channel_id):
         return self.get_channels_from_channel_id_dict().get(channel_id)
+    
+    # dms
 
+    def get_dms_from_dm_id_dict(self):
+        return self.__store['dms']
+
+    def get_dm_from_dm_id(self, dm_id):
+        return self.get_dms_from_dm_id_dict().get(dm_id).get('details')
+
+    def get_dm_creator_from_dm_id(self, dm_id):
+        return self.get_dms_from_dm_id_dict().get(dm_id).get('creator')
+
+    # DEPRECATED, PLEASE CHANGE TO UPDATED FUNCTION
     def get_messages_from_channel_id_dict(self):
         return self.__store['messages']
 
+    # DEPRECATED, PLEASE CHANGE TO UPDATED FUNCTION    
     def get_message_from_channel_id(self, channel_id):
         return self.get_messages_from_channel_id_dict().get(channel_id)
+
+    # messages
+
+    def get_channel_or_dm_id_from_message_id_dict(self):
+        return self.__store['message_ids']
+
+    def get_channel_or_dm_id_from_message_id(self, message_id):
+        return self.get_channel_or_dm_id_from_message_id_dict().get(message_id)
+
+    def get_messages_from_channel_or_dm_id_dict(self):
+        return self.__store['messages']
+  
+    def get_messages_from_channel_or_dm_id(self, id):
+        return self.get_messages_from_channel_or_dm_id_dict().get(id)
+
+    # users
 
     def get_users_from_u_id_dict(self):
         return self.__store['users']
@@ -176,7 +224,15 @@ class Datastore:
             'owner_members': owner_members,
             'all_members': all_members,
         }
-        self.get_messages_from_channel_id_dict()[channel_id] = messages
+        self.get_messages_from_channel_or_dm_id_dict()[channel_id] = messages
+        self.update_json()
+
+    def insert_dm(self, creator, dm_id, u_ids, name):
+        self.get_dms_from_dm_id_dict()[dm_id] = {
+            'details' : {'name': name, 'members': u_ids},
+            'creator' : creator
+        }
+        self.get_messages_from_channel_or_dm_id_dict()[dm_id] = []
         self.update_json()
 
     def update_value(self, dict_key, key, value):
