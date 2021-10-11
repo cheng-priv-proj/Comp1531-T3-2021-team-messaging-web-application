@@ -137,8 +137,7 @@ def test_invalid_last_name_v2(clear_server):
     assert(long_last_name.status_code == 400)
 
 
-
-def test_invalid_return_token_v2():
+def test_invalid_register_return_token_v2():
     return
 
 
