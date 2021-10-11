@@ -26,6 +26,7 @@ from src import config
 def clear_server():
     clear_v2()
 
+# Fixture to register someone and returns a dictionary of {token, auth_user_id}
 @pytest.fixture
 def get_user_1():
     response = requests.post(config.url + 'auth/register/v2', data={
@@ -36,6 +37,7 @@ def get_user_1():
         })
     return response.json()
 
+# Fixture to register someone and returns a dictionary of {token, auth_user_id}
 def get_invitee():
     response = requests.post(config.url + 'auth/register/v2', data={
         'email': 'example@email.com', 
@@ -45,7 +47,8 @@ def get_invitee():
         })
     return response.json()
 
-# TEsting that inviting someone shows up in channel details
+# TEsting that inviting someone works and shows up in channel details
+# Requires that channel details to be working correctly 
 def test_member_invite_v2(clear_server, get_invitee, get_user_1):
     channel_dict = requests.post(config.url + 'channels/create/v2', data={'token': get_user_1['token'], 'name': 'test channel', 'is_public': True}).json()
     extracted_channel_id = channel_dict['channel_id']
@@ -110,7 +113,8 @@ def test_invite_multiple_v2(clear_server, get_invitee, get_user_1):
             'handle_str': 'Johnosmith'
         }
     ]
-    
+
+# Tests that public and private behaviour is correct
 def test_private_invite(clear_server, get_invitee, get_user_1):
     channel_dict = requests.post(config.url + 'channels/create/v2', data={'token': get_user_1['token'], 'name': 'test channel', 'is_public': False}).json()
     extracted_channel_id = channel_dict['channel_id']
@@ -143,7 +147,7 @@ def test_invalid_uid(clear_server, get_user_1):
     response = requests.post(config.url + 'channel/invite/v2', data={'token': get_user_1['token'], 'channel_id': extracted_channel_id, 'u_id': fake_u_id}).json()
     assert(response.status_code == 400)
 
-
+# Tests an invalid channel id
 def test_invalid_channel_id(clear_server, get_invitee, get_user_1):
     bad_channel_id = 5000000
     response = requests.post(config.url + 'channel/invite/v2', data={'token': get_user_1['token'], 'channel_id': bad_channel_id, 'u_id': get_invitee['auth_user_id']}).json()
@@ -170,7 +174,7 @@ def test_already_owner(clear_server, get_invitee, get_user_1):
     response = requests.post(config.url + 'channel/invite/v2', data={'token': get_invitee['token'], 'channel_id': extracted_channel_id, 'u_id': get_user_1['auth_user_id']}).json()
     assert(response.status_code == 400)
 
-
+# When someone not in the channel sends an invite to someone else that is not in the channel
 def test_unauthorised_invite(clear_server, get_invitee, get_user_1):
     channel_dict = requests.post(config.url + 'channels/create/v2', data={'token': get_user_1['token'], 'name': 'test channel', 'is_public': True}).json()
     extracted_channel_id = channel_dict['channel_id']
