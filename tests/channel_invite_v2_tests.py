@@ -164,12 +164,11 @@ def test_already_owner(clear_server, get_invitee, get_user_1):
     channel_dict = requests.post(config.url + 'channels/create/v2', data={'token': get_user_1['token'], 'name': 'test channel', 'is_public': True}).json()
     extracted_channel_id = channel_dict['channel_id']
 
+    #makes user 2 joins so they can send an invite to the owner 
     requests.post(config.url + 'channel/invite/v2', data={'token': get_user_1['token'], 'channel_id': extracted_channel_id, 'u_id': get_invitee['auth_user_id']}).json()
-    response = requests.post(config.url + 'channel/invite/v2', data={'token': get_user_1['token'], 'channel_id': extracted_channel_id, 'u_id': get_invitee['auth_user_id']}).json()
+    
+    response = requests.post(config.url + 'channel/invite/v2', data={'token': get_invitee['token'], 'channel_id': extracted_channel_id, 'u_id': get_user_1['auth_user_id']}).json()
     assert(response.status_code == 400)
-
-
-
 
 
 def test_unauthorised_invite(clear, register, extract_user, extract_channel):
