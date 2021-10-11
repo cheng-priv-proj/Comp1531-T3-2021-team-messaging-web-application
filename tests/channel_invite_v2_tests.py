@@ -171,11 +171,14 @@ def test_already_owner(clear_server, get_invitee, get_user_1):
     assert(response.status_code == 400)
 
 
-def test_unauthorised_invite(clear, register, extract_user, extract_channel):
-    notmember_user_id = extract_user(auth_register_v1('member@test.com', 'password', 'member', 'one'))
-    friend_auth_id = extract_user(auth_register_v1('friend@test.com', 'password', 'friend', 'one'))
-    
-    channel_id = extract_channel(register)
+def test_unauthorised_invite(clear_server, get_invitee, get_user_1):
+    channel_dict = requests.post(config.url + 'channels/create/v2', data={'token': get_user_1['token'], 'name': 'test channel', 'is_public': True}).json()
+    extracted_channel_id = channel_dict['channel_id']
 
-    with pytest.raises(AccessError):
-        channel_invite_v1(notmember_user_id, channel_id, friend_auth_id)
+    response = requests.post(config.url + 'auth/register/v2', data={
+        'email': 'eexample@email.com', 
+        'password': 'pootato', 
+        'name_first': 'Johno', 
+        'name_last' : 'smith'
+        })
+    user_3_dict = response.json()
