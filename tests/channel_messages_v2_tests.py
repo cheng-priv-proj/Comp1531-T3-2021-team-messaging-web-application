@@ -46,7 +46,11 @@ def test_empty_messages(get_user_1, clear_server):
         'start': 0, 
         'end': -1
     }
-'''
+''' Auth id is not a parameter yet the spec still considers it so. Need to clarify what it means 
+"return access error when,"
+'channel_id is valid and the authorised user is not a member of the channel'
+
+
 def test_valid_channel_id_and_unauthorized_auth_user_id(clear, register, extract_user, extract_channel):
     channel_id = extract_channel(register)
     invalid_auth_user_id = extract_user(auth_register_v1('test2@gmail.com', '12234234323', 'first', 'last'))
