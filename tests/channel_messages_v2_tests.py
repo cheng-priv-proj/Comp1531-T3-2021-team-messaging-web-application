@@ -82,9 +82,20 @@ def test_start_greater_than_messages(get_user_1, clear_server):
     channel_messages = requests.get(config.url + 'channel/messages/v2', data={'token': get_user_1['token'], 'channel_id': extracted_channel_id, 'start': 10000}).json()
     assert(channel_messages.status_code == 400)
 
+# ASSUMES THAT message/send/v1 COMPLETELY WORKS
+def test_message_is_sent(clear_server, get_user_1):
+    channel_dict = requests.post(config.url + 'channels/create/v2', data={'token': get_user_1['token'], 'name': 'test channel', 'is_public': True}).json()
+    extracted_channel_id = channel_dict['channel_id']
 
-def test_message_is_sent():
-    return
+    msg_id = requests.post(config.url + 'message/send/v1', data={'token': get_user_1['token'], 'channel_id': extracted_channel_id, 'message': "Hello there, General Kenobi"}).json()
+
+    channel_messages = requests.get(config.url + 'channel/messages/v2', data={'token': get_user_1['token'], 'channel_id': extracted_channel_id, 'start': 0}).json()
+    messages_list = channel_messages['messages']
+    specific_message_info = messages_list[0]
+    assert specific_message_info['message'] == "Hello there, General Kenobi"
+    assert channel_messages['start'] == 0
+    assert channel_messages['end'] == -1
+
 
 def test_message_is_edited():
     return
