@@ -135,29 +135,14 @@ def test_private_invite(clear_server, get_invitee, get_user_1):
         }
     ]
 
-def test_invalid_uid(clear_server, get_invitee, get_user_1):
+# Uid is not an existing uid
+def test_invalid_uid(clear_server, get_user_1):
     channel_dict = requests.post(config.url + 'channels/create/v2', data={'token': get_user_1['token'], 'name': 'test channel', 'is_public': True}).json()
     extracted_channel_id = channel_dict['channel_id']
+    fake_u_id = 42424242
+    response = requests.post(config.url + 'channel/invite/v2', data={'token': get_user_1['token'], 'channel_id': extracted_channel_id, 'u_id': fake_u_id}).json()
+    assert(response.status_code == 400)
 
-    requests.post(config.url + 'channel/invite/v2', data={'token': get_user_1['token'], 'channel_id': extracted_channel_id, 'u_id': get_invitee['auth_user_id']}).json()
-    details = requests.get(config.url + 'channel/details/v2', params={'token': get_user_1['token'], 'channel_id': extracted_channel_id}).json()
-
-    assert details["all_members"] == [
-        {
-            'u_id': get_user_1['auth_user_id'],
-            'email': 'owner@test.com',
-            'name_first': 'owner',
-            'name_last': 'one',
-            'handle_str': 'ownerone'
-        },
-        {
-            'u_id': get_invitee['auth_user_id'],
-            'email': 'example@email.com',
-            'name_first': 'John',
-            'name_last': 'smith',
-            'handle_str': 'Johnsmith'
-        }
-    ]
 
 def test_invalid_channel_id(clear_server, get_invitee, get_user_1):
     bad_channel_id = 5000000
@@ -174,8 +159,8 @@ def test_already_member(clear_server, get_invitee, get_user_1):
     assert(response.status_code == 400)
 
 
-
-def test_already_owner(clear, register, extract_user, extract_channel):
+# Owner tries to join again
+def test_already_owner(clear_server, get_invitee, get_user_1):
     channel_dict = requests.post(config.url + 'channels/create/v2', data={'token': get_user_1['token'], 'name': 'test channel', 'is_public': True}).json()
     extracted_channel_id = channel_dict['channel_id']
 
