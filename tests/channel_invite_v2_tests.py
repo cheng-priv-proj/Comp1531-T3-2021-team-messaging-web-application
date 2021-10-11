@@ -147,20 +147,3 @@ def test_unauthorised_invite(clear, register, extract_user, extract_channel):
 
     with pytest.raises(AccessError):
         channel_invite_v1(notmember_user_id, channel_id, friend_auth_id)
-
-# Test that checks channel list to comfirm successful invite.
-def test_is_added(clear, register, extract_user, extract_channel):
-    owner_user_id = extract_user(register)
-    channel_id = extract_channel(register)
-    friend_auth_id = extract_user(auth_register_v1('friend@test.com', 'password', 'friend', 'one'))
-
-    channel_invite_v1(owner_user_id, channel_id, friend_auth_id)
-
-    assert channels_list_v1(friend_auth_id) == {
-        'channels': [
-        	{
-                'channel_id': channel_id,
-                'name': 'test channel'
-            },
-        ],
-    }
