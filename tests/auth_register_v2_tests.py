@@ -2,6 +2,7 @@ import pytest
 import requests
 import json
 import flask
+from requests.models import Response
 from src import config
 
 from src.auth import *
@@ -13,30 +14,23 @@ from src.other import clear_v1
 from src.channel import channel_details_v1
 from src.channels import channels_create_v1
 
-# Need to implement handle checking
-
-@pytest.fixture
-def clear():
-    clear_v1()
-
+#NEED TO IMPLEMENT CLEAR v2 or change clear v1
 @pytest.fixture
 def clear_server():
     clear_v2()
 
-# Extracts the auth_user_id from a given dictionary.
+# Fixture to register someone and returns a dictionary of {token, auth_user_id}
 @pytest.fixture
-def extract_user_v2():
-    def extract_user_id_function(auth_user_id_dict):
-        return auth_user_id_dict['auth_user_id']
-    return extract_user_id_function
+def get_user_1():
+    response = requests.post(config.url + 'auth/register/v2', data={
+        'email': 'owner@test.com', 
+        'password': 'spotato', 
+        'name_first': 'owner', 
+        'name_last' : 'one'
+        })
+    return response.json()
 
-@pytest.fixture
-def extract_user_v2_token():
-    def extract_user_id_token(auth_user_id_dict):
-        return auth_user_id_dict['token']
-    return extract_user_id_token
-
-# Fixture that registers a valid user.
+# Fixture to register someone and returns a dictionary of {token, auth_user_id}
 @pytest.fixture
 def auth_id_v2(clear_server):
     response = requests.post(config.url + 'auth/register/v2', data={
@@ -50,11 +44,15 @@ def auth_id_v2(clear_server):
 
 # Dont know how to test register without dirctly calling functions or using another endpoint like auth/login/v2.
 # So this test is the same test as the one in auth_login_v2
-def test_standard(extract_user_v2, auth_id_v2):
-    dict_id_token = requests.post(config.url + 'auth/login/v2', data={'email': 'example@email.com', 'password': 'potato'}).json()
-    assert extract_user_v2(dict_id_token) == extract_user_v2(auth_id_v2), 'Valid case: Auth_id not consistant across login and register'
 
-def test_invalid_email(clear):
+# Do fixtures call from left to right?
+# if not then the server may run into the case where it runs get_user1 and then clears or it runs get_user1 and sometimes gets an input error
+def test_standard(clear_server, get_user_1):
+    response = requests.post(config.url + 'auth/login/v2', data={'email': 'owner@test.com', 'password': 'spotato'}).json()
+
+    assert response['auth_user_id'] == get_user_1['auth_user_id'], 'Valid case: Auth_id not consistant across login and register'
+
+def test_invalid_email(clear_server):
     bad_email_response = (requests.post(config.url + 'auth/register/v2', data={
         'email': 'inv$alid@gmail.com', 
         'password': 'potato', 
@@ -142,25 +140,22 @@ def test_invalid_register_return_token_v2():
     return
 
 
-''' NOT SURE ABOUT HANDLE GENERATION
+
 # A test that checks if handle genneration has been correctly generated. 
-def test_appended_handle_number(clear, extract_user, extract_handle, extract_channel):
-    auth_register_v1("example@email.com", "password", "john", "smith")
-    auth1_user_id = extract_user(auth_register_v1("example2@email.com", "password", "john", "smith"))
+def test_appended_handle_number(clear_server, get_user_1):
+    user_1_dict = requests.get(config.url + 'user/profile/v1', params={'token': get_user_1['token'], 'u_id': get_user_1['auth_user_id']}).json()
+    assert(user_1_dict['handle'] == "ownerone")
 
-    channel1_id = extract_channel(channels_create_v1(auth1_user_id, 'test_channel', True))
-    handle = extract_handle(channel_details_v1(auth1_user_id, channel1_id))
-    assert handle == 'johnsmith0'
+    response = requests.post(config.url + 'auth/register/v2', data={
+        'email': 'owner1@test.com', 
+        'password': 'spotato', 
+        'name_first': 'owner', 
+        'name_last' : 'one'
+        })
+    user_2 = response.json()
+    user_2_dict = requests.get(config.url + 'user/profile/v1', params={'token': user_2['token'], 'u_id': user_2['auth_user_id']}).json()
 
-    auth2_user_id = extract_user(auth_register_v1("example3@email.com", "password", "john", "smith"))
-    channel2_id = extract_channel(channels_create_v1(auth2_user_id, 'test_channel', True))
-    handle = extract_handle(channel_details_v1(auth2_user_id, channel2_id))
-    assert handle == 'johnsmith1'
-
-    auth3_user_id = extract_user(auth_register_v1("example4@email.com", "password", "john", "smith"))
-    channel_id3 = extract_channel(channels_create_v1(auth3_user_id, 'test_channel', True))
-    handle = extract_handle(channel_details_v1(auth3_user_id, channel_id3))
-    assert handle == 'johnsmith2'
+    assert(user_2_dict['handle'] == "ownerone0"), 'handle generation of appended handle number'
 
 def test_concatenated_length(clear, extract_handle):
     auth_user_id = auth_register_v1("example@email.com", "password", "johnsmithjohnsmithjohnsmithjohnsmithssmsmsmsmsms", "smith")
@@ -168,4 +163,3 @@ def test_concatenated_length(clear, extract_handle):
     handle = extract_handle(channel_details_v1(auth_user_id['auth_user_id'], channel_id['channel_id']))
     assert len(handle) <= 20
 
-'''
