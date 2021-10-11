@@ -34,20 +34,26 @@ def get_user_1():
     return response.json()
 
 
-
+# No messages are sent
 def test_empty_messages(get_user_1, clear_server):
-    
-    assert channel_messages_v1(auth_user_id, channel_id, 0) == {
+    channel_dict = requests.post(config.url + 'channels/create/v2', data={'token': get_user_1['token'], 'name': 'test channel', 'is_public': True}).json()
+    extracted_channel_id = channel_dict['channel_id']
+
+    channel_messages = requests.get(config.url + 'channel/messages/v2', data={'token': get_user_1['token'], 'channel_id': extracted_channel_id, 'start': 0}).json()
+
+    assert channel_messages == {
         'messages': [], 
         'start': 0, 
         'end': -1
     }
-
+'''
 def test_valid_channel_id_and_unauthorized_auth_user_id(clear, register, extract_user, extract_channel):
     channel_id = extract_channel(register)
     invalid_auth_user_id = extract_user(auth_register_v1('test2@gmail.com', '12234234323', 'first', 'last'))
     with pytest.raises(AccessError):
         channel_messages_v1(invalid_auth_user_id, channel_id, 0)
+
+'''
 
 def test_invalid_channel_id(clear, register, extract_user, extract_channel):
     auth_user_id = extract_user(register)
