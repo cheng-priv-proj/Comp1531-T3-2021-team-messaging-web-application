@@ -24,10 +24,10 @@ def clear_server():
 @pytest.fixture
 def get_user_1():
     response = requests.post(config.url + 'auth/register/v2', data={
-        'email': 'example@email.com', 
-        'password': 'potato', 
-        'name_first': 'John', 
-        'name_last' : 'smith'
+        'email': 'owner@test.com', 
+        'password': 'spotato', 
+        'name_first': 'owner', 
+        'name_last' : 'one'
         })
     return response.json()
 
@@ -49,18 +49,18 @@ def test_member_invite(clear_server, get_invitee, get_user_1):
 
     assert details["all_members"] == [
         {
-            'u_id': auth_user_id,
+            'u_id': get_user_1['auth_user_id'],
             'email': 'owner@test.com',
             'name_first': 'owner',
             'name_last': 'one',
             'handle_str': 'ownerone'
-        }
+        },
         {
-            'u_id': auth_user_id,
-            'email': 'owner@test.com',
+            'u_id': get_invitee['auth_user_id'],
+            'email': 'example@email.com',
             'name_first': 'owner',
             'name_last': 'one',
-            'handle_str': 'ownerone'
+            'handle_str': 'Johnsmith'
         }
     ]
 
