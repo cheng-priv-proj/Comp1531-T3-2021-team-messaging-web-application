@@ -44,24 +44,14 @@ def test_dm_create_v1_returns_unique_ids(clear_server):
     assert dm_id1 != dm_id2
 
 def test_dm_create_v1_name(clear_server):
-    #create users
-    #get user handle from user_profile_v1
-    #generate name from dm_create_v1
-    #get name from dm_details_v1 
-
     user_1 = auth_register('email@test.com', 'password', 'firstname', 'lastname')
     user_2 = auth_register('email2@test.com', 'password2', 'othername', 'otherlastname')
-
-    user_profile1 = user_profile_v1(user1['token'], user1['auth_user_id'])
-    user_profile2 = user_profile_v1(user2['token'], user2['auth_user_id'])
-    user1_handle = user_profile1['handle_str']
-    user2_handle = user_profile2['handle_str']
 
     auth_ids = [user1['auth_user_id'], user2['auth_user_id']]
     dm_id = dm_create(token, auth_ids)
 
     dm_details = dm_details_v1(token, dm_id)
-    assert dm_details['name'] == ['firstname', 'othername']
+    assert dm_details['name'] == ['firstnamelastname', 'othernameotherlastname']
 
 def test_dm_create_v1_members(clear_server):
     valid_auth_ids = ['1', '2', '3', '4']
