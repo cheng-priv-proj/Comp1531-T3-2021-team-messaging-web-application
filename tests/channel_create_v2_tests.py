@@ -56,26 +56,17 @@ def get_valid_token(clear_server):
 def test_public_channel(get_valid_token):
     channel_dict = requests.post(config.url + 'channels/create/v2', data={'token': get_valid_token, 'name': 'test channel', 'is_public': True}).json()
     extracted_channel_id = channel_dict['channel_id']
-
-    details = requests.get(config.url + 'channel/details/v2', params={'token': get_valid_token, 'name': 'test channel', 'is_public': True}).json()
-
+    details = requests.get(config.url + 'channel/details/v2', params={'token': get_valid_token, 'channel_id': extracted_channel_id}).json()
     assert details["is_public"] == True
 
 # Tests that a private channel is created correctly.
-def test_private_channel(clear, register, extract_user, extract_channel):
-    auth_user_id = extract_user(register)
-    channel_id = extract_channel(channels_create_v1(auth_user_id, "name", False))
-    
-    details = channel_details_v1(auth_user_id, channel_id)
+def test_private_channel(get_valid_token):
+    channel_dict = requests.post(config.url + 'channels/create/v2', data={'token': get_valid_token, 'name': 'test channel', 'is_public': False}).json()
+    extracted_channel_id = channel_dict['channel_id']
+    details = requests.get(config.url + 'channel/details/v2', params={'token': get_valid_token, 'channel_id': extracted_channel_id}).json()
     assert details["is_public"] == False
 
-def test_invalid_user_id(clear):
-    auth_user_id = 100000
-    
-    with pytest.raises(AccessError):
-        channels_create_v1(auth_user_id, "name", False)
-
-def test_unique_channel_id(clear, register, extract_user, extract_channel):
+def test_unique_channel_id(get_valid_token):
     auth_user_id = extract_user(register)
     channel_1 = extract_channel(register)
     channel_2 = extract_channel(channels_create_v1(auth_user_id, "name2", False))
