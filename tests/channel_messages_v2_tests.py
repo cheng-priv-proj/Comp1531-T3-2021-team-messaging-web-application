@@ -83,6 +83,13 @@ def test_start_greater_than_messages(get_user_1, clear_server):
     assert(channel_messages.status_code == 400)
 
 
+def test_message_is_sent():
+    return
+
+def test_message_is_edited():
+    return
+
+
 ''' Auth id is not a parameter yet the spec still considers it so. Need to clarify what it means 
 it says in the spec:
 "return access error when,"
