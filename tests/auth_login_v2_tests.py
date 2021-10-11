@@ -7,14 +7,9 @@ from src import config
 from src.auth import *
 from src.error import InputError
 from src.other import clear_v2
-from src.other import clear_v1
 
 # clear_v2
-
 # Fixture to reset data store before every test
-@pytest.fixture
-def clear():
-    clear_v1()
 
 @pytest.fixture
 def clear_server():
@@ -44,7 +39,6 @@ def auth_id_v2(clear_server):
         })
     return response.json()
 
-
 def test_standard_v2(auth_id_v2, extract_user_v2):
     dict_id_token = requests.post(config.url + 'auth/login/v2', data={'email': 'example@email.com', 'password': 'potato'}).json()
     assert extract_user_v2(dict_id_token) == extract_user_v2(auth_id_v2), 'Valid case: Auth_id not successful'
@@ -52,7 +46,6 @@ def test_standard_v2(auth_id_v2, extract_user_v2):
 def test_incorrect_password_v2(auth_id_v2):
     resp = requests.post(config.url + 'auth/login/v2', data={'email': 'example@email.com', 'password': 'rongPASSWORD'})
     assert(resp.status_code == 400)
-
 
 # Test that expects an input error when given a non-existant email.
 def test_email_does_not_exist_v2(auth_id_v2):
