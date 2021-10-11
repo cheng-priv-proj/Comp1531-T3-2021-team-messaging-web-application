@@ -1,12 +1,8 @@
-# NEED TO CLARIFY POS AND GET USAGE AND RETURN VALUES.
-
 import pytest
 import requests
 import json
 import flask
 from src import config
-
-import pytest
 
 from src.auth import *
 from src.error import InputError
