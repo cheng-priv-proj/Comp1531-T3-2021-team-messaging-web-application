@@ -35,15 +35,8 @@ def get_user_1():
 
 
 
-
-
-
-
-
-
-def test_empty_messages(clear, register, extract_user, extract_channel):  
-    auth_user_id = extract_user(register)
-    channel_id = extract_channel(register)
+def test_empty_messages(get_user_1, clear_server):
+    
     assert channel_messages_v1(auth_user_id, channel_id, 0) == {
         'messages': [], 
         'start': 0, 
