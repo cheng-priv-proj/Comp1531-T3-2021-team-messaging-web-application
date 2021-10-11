@@ -182,3 +182,10 @@ def test_unauthorised_invite(clear_server, get_invitee, get_user_1):
         'name_last' : 'smith'
         })
     user_3_dict = response.json()
+
+    response = requests.post(config.url + 'channel/invite/v2', data={'token': get_invitee['token'], 'channel_id': extracted_channel_id, 'u_id': user_3_dict['auth_user_id']}).json()
+    assert(response.status_code == 400)
+
+
+
+
