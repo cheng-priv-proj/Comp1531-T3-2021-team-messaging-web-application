@@ -1,7 +1,5 @@
 # NEED TO CLARIFY POS AND GET USAGE AND RETURN VALUES.
 
-
-
 import pytest
 import requests
 import json
@@ -52,12 +50,8 @@ def auth_id_v2(clear_server):
 
 
 def test_standard_v2(auth_id_v2, extract_user_v2):
-
-    requests.post(config.url + 'auth/login/v2', data={'email': 'example@email.com', 'password': 'potato'}).json()
-    dict_id_token = requests.get(config.url + 'auth/login/v2', params={'email': 'example@email.com', 'password': 'potato'}).json()
-    dict_id_token_register = (requests.get(config.url + 'auth/register/v2', params={'email': 'example@email.com', 'password': 'potato', 'name_first': 'John', 'name_last' : 'smith'})).json()
-    
-    assert extract_user_v2(dict_id_token) == extract_user_v2(dict_id_token_register), 'Valid case: Auth_id not successful'
+    dict_id_token = requests.post(config.url + 'auth/login/v2', data={'email': 'example@email.com', 'password': 'potato'}).json()
+    assert extract_user_v2(dict_id_token) == extract_user_v2(auth_id_v2), 'Valid case: Auth_id not successful'
 
 def test_incorrect_password_v2(auth_id_v2):
     resp = requests.post(config.url + 'auth/login/v2', data={'email': 'example@email.com', 'password': 'rongPASSWORD'})
