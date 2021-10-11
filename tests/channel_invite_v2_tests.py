@@ -22,7 +22,7 @@ def clear_server():
     clear_v2()
 
 @pytest.fixture
-def get_valid_token(clear_server):
+def get_valid_token():
     response = requests.post(config.url + 'auth/register/v2', data={
         'email': 'example@email.com', 
         'password': 'potato', 
@@ -32,8 +32,15 @@ def get_valid_token(clear_server):
     token = response.json()
     return token['token']
 
-
-
+def get_invitee_uid():
+    response = requests.post(config.url + 'auth/register/v2', data={
+        'email': 'example@email.com', 
+        'password': 'potato', 
+        'name_first': 'John', 
+        'name_last' : 'smith'
+        })
+    u_id = response.json()
+    return u_id['auth_user_id']
 
 def test_member_invite(clear, register, extract_user, extract_channel):
     member_user_id = extract_user(auth_register_v1('member@test.com', 'password', 'member', 'one'))
