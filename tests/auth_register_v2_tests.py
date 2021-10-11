@@ -142,6 +142,8 @@ def test_invalid_register_return_token_v2():
 
 
 # A test that checks if handle genneration has been correctly generated. 
+#<<<assume that user profiles is working>>
+
 def test_appended_handle_number(clear_server, get_user_1):
     user_1_dict = requests.get(config.url + 'user/profile/v1', params={'token': get_user_1['token'], 'u_id': get_user_1['auth_user_id']}).json()
     assert(user_1_dict['handle'] == "ownerone")
@@ -157,9 +159,17 @@ def test_appended_handle_number(clear_server, get_user_1):
 
     assert(user_2_dict['handle'] == "ownerone0"), 'handle generation of appended handle number'
 
-def test_concatenated_length(clear, extract_handle):
-    auth_user_id = auth_register_v1("example@email.com", "password", "johnsmithjohnsmithjohnsmithjohnsmithssmsmsmsmsms", "smith")
-    channel_id = channels_create_v1(auth_user_id['auth_user_id'], 'test_channel', True)
-    handle = extract_handle(channel_details_v1(auth_user_id['auth_user_id'], channel_id['channel_id']))
-    assert len(handle) <= 20
+#<<<assume that user profiles is working>>
+# TEsting handle generation on a name that is longer than 20 characters 
+def test_concatenated_length(clear_server):
+    response = requests.post(config.url + 'auth/register/v2', data={
+        'email': 'owner1@test.com', 
+        'password': 'spotato', 
+        'name_first': 'johnsmithjohnsmithjohnsmithjohnsmithssmsmsmsmsms', 
+        'name_last' : 'one'
+        })
+    user_2 = response.json()
+    user_2_dict = requests.get(config.url + 'user/profile/v1', params={'token': user_2['token'], 'u_id': user_2['auth_user_id']}).json()
+
+    assert len(user_2_dict['handle']) <= 20
 
