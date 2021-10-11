@@ -11,6 +11,11 @@ from src.other import clear_v1
 from src.error import InputError
 from src.error import AccessError
 
+import requests
+import json
+import flask
+from src import config
+
 # Extracts the auth_user_id from a given dictionary.
 @pytest.fixture
 def extract_user():
