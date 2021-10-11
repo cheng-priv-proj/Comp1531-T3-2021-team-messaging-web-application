@@ -13,8 +13,17 @@ import json
 #              is_public
 #              owner_members
 #              all_members }
+#
+# DM:
+#     Key: dm_id
+#     Value: Dictionary {
+#            name
+#            members
+#            owner_member
+#     }
+#
 # Messages:
-#   Key: channel_id
+#   Key: channel_id or dm_id
 #   Value: [message]
 #               
 # Users: 
@@ -35,9 +44,10 @@ import json
 initial_object = {
     'login': {},
     'channels': {},
+    'dm': {}
     'messages' : {},
     'users': {},
-    'perms' : {}
+    'perms' : {},
 }
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
 
@@ -57,6 +67,7 @@ class Datastore:
                 'messages' : {},
                 'users': {},
                 'perms' : {}
+                'dm': {}
             }, 
             FILE
             )
@@ -85,11 +96,11 @@ class Datastore:
     def get_channel_from_channel_id(self, channel_id):
         return self.get_channels_from_channel_id_dict().get(channel_id)
 
-    def get_messages_from_channel_id_dict(self):
+    def get_messages_from_channel_or_dm_id_dict(self):
         return self.__store['messages']
 
-    def get_message_from_channel_id(self, channel_id):
-        return self.get_messages_from_channel_id_dict().get(channel_id)
+    def get_message_from_channel_or_dm_id(self, channel_id):
+        return self.get_messages_from_channel_or_dm_id_dict().get(channel_id)
 
     def get_users_from_u_id_dict(self):
         return self.__store['users']
@@ -103,16 +114,28 @@ class Datastore:
     def get_user_perms_from_u_id(self, u_id):
         return self.get_user_perms_from_u_id_dict().get(u_id)
 
+    def get_dms_from_dm_id_dict(self):
+        return self.__store['dm']
+
+    def get_dms_from_dm_id(self, dm_id):
+        return self.get_dms_from_dm_id_dict().get(dm_id)
+
 
     # Check functions
 
     def is_user_member_of_channel(self, channel_id, u_id):
-
-        channels = self.get_channels_from_channel_id_dict().get(channel_id)
-        if not any (member['u_id'] == u_id for member in channels['all_members']):
-            return False
+        channels = self.get_channels_from_channel_id(channel_id)
+        if any (member['u_id'] == u_id for member in channels['all_members']):
+            return True
         
-        return True
+        return False
+
+    def is_user_member_of_dm(self, dm_id, u_id):
+        dms = self.get_dms_from_dm_id(dm_id)
+        if any (member['u_id'] == u_id for member in dms['members']):
+            return True
+
+        return False
     
     def is_stream_owner(self, u_id):
         return self.get_user_perms_from_u_id_dict().get(u_id) == 1
@@ -145,6 +168,13 @@ class Datastore:
         
         return False
 
+    def is_invalid_dm_id(self, dm_id):
+        dm = self.get_dms_from_dm_id_dict()
+        if dm_id not in dm:
+            return True
+
+        return False
+
 
     # Insertion functions
 
@@ -169,14 +199,23 @@ class Datastore:
         self.get_user_perms_from_u_id_dict()[u_id] = global_id
         self.update_json()
     
-    def insert_channel(self, channel_id, channel_name, is_public, messages, owner_members, all_members):
+    def insert_channel(self, channel_id, channel_name, is_public, owner_members, all_members):
         self.get_channels_from_channel_id_dict()[channel_id] = {
             'name': channel_name,
             'is_public': is_public,
             'owner_members': owner_members,
             'all_members': all_members,
         }
-        self.get_messages_from_channel_id_dict()[channel_id] = messages
+        self.get_messages_from_channel_or_dm_id_dict()[channel_id] = []
+        self.update_json()
+
+    def insert_dm(self, owner, dm_id, u_ids, name):
+        self.get_dms_from_dm_id_dict()[dm_id] = {
+            'members': u_ids,
+            'name': name,
+            'owner': owner
+        }
+        self.get_messages_from_channel_or_dm_id_dict()[dm_id] = []
         self.update_json()
 
     def update_value(self, dict_key, key, value):
