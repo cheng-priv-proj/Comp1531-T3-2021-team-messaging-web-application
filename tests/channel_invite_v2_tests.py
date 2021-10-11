@@ -40,6 +40,7 @@ def get_invitee():
         })
     return response.json()
 
+# TEsting that inviting someone shows up in channel details
 def test_member_invite(clear_server, get_invitee, get_user_1):
     channel_dict = requests.post(config.url + 'channels/create/v2', data={'token': get_user_1['token'], 'name': 'test channel', 'is_public': True}).json()
     extracted_channel_id = channel_dict['channel_id']
@@ -58,32 +59,13 @@ def test_member_invite(clear_server, get_invitee, get_user_1):
         {
             'u_id': get_invitee['auth_user_id'],
             'email': 'example@email.com',
-            'name_first': 'owner',
-            'name_last': 'one',
+            'name_first': 'John',
+            'name_last': 'smith',
             'handle_str': 'Johnsmith'
         }
     ]
 
-
-# Testing that owner has correct permissions.
-def test_owner_invite(clear, register, extract_user, extract_channel):
-    owner_user_id = extract_user(register)
-    channel_id = extract_channel(register)
-
-    friend_auth_id = extract_user(auth_register_v1('friend@test.com', 'password', 'friend', 'one'))
-
-    channel_invite_v1(owner_user_id, channel_id, friend_auth_id)
-
-    assert channels_list_v1(friend_auth_id) == {
-        'channels': [
-        	{
-                'channel_id': channel_id,
-                'name': 'test channel'
-            },
-        ],
-    }
-
-def test_invite_multiple(clear, register, extract_user, extract_channel): 
+def test_invite_multiple(clear_server, get_invitee, get_user_1): 
     owner2_user_id = extract_user(auth_register_v1('owner2@test.com', 'password', 'owner', 'two'))
     channel2_id = extract_channel(channels_create_v1(owner2_user_id, 'test channel2', True))
     owner1_user_id = extract_user(register)
@@ -108,31 +90,29 @@ def test_invite_multiple(clear, register, extract_user, extract_channel):
     }
     
 def test_private_invite(clear, extract_user, extract_channel):
-    owner_user_id = extract_user(auth_register_v1('owner@test.com', 'password', 'owner', 'one'))
-    channel_id = extract_channel(channels_create_v1(owner_user_id, 'test channel', False))
+    channel_dict = requests.post(config.url + 'channels/create/v2', data={'token': get_user_1['token'], 'name': 'test channel', 'is_public': False}).json()
+    extracted_channel_id = channel_dict['channel_id']
 
-    friend_auth_id = extract_user(auth_register_v1('friend@test.com', 'password', 'friend', 'one'))
+    requests.post(config.url + 'channel/invite/v2', data={'token': get_user_1['token'], 'channel_id': extracted_channel_id, 'u_id': get_invitee['auth_user_id']}).json()
+    details = requests.get(config.url + 'channel/details/v2', params={'token': get_user_1['token'], 'channel_id': extracted_channel_id}).json()
+
+    assert details["all_members"] == [
+        {
+            'u_id': get_user_1['auth_user_id'],
+            'email': 'owner@test.com',
+            'name_first': 'owner',
+            'name_last': 'one',
+            'handle_str': 'ownerone'
+        },
+        {
+            'u_id': get_invitee['auth_user_id'],
+            'email': 'example@email.com',
+            'name_first': 'John',
+            'name_last': 'smith',
+            'handle_str': 'Johnsmith'
+        }
+    ]
     
-
-    channel_invite_v1(owner_user_id, channel_id, friend_auth_id)
-
-    assert channels_list_v1(friend_auth_id) == {
-        'channels': [
-        	{
-                'channel_id': channel_id,
-                'name': 'test channel'
-            },
-        ],
-    }
-
-def test_invalid_auth_id(clear, register, extract_user, extract_channel):
-    invalid_auth_user_id = 100
-    channel_id = extract_channel(register)
-    friend_auth_id = extract_user(auth_register_v1('friend@test.com', 'password', 'friend', 'one'))
-
-    with pytest.raises(AccessError):
-        channel_invite_v1(invalid_auth_user_id, channel_id, friend_auth_id)
-
 def test_invalid_uid(clear, register, extract_user, extract_channel):
     owner_user_id = extract_user(register)
     channel_id = extract_channel(register)
