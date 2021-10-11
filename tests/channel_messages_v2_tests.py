@@ -11,32 +11,35 @@ from src.other import clear_v1
 from src.error import InputError
 from src.error import AccessError
 
-# Extracts the auth_user_id from a given dictionary.
-@pytest.fixture
-def extract_user():
-    def extract_user_id_function(auth_user_id_dict):
-        return auth_user_id_dict['auth_user_id']
-    return extract_user_id_function
+import pytest
+import requests
+import json
+import flask
+from src import config
 
-# Extracts the channel from a given dictionary.
+#NEED TO IMPLEMENT clear for server or change clear v1
 @pytest.fixture
-def extract_channel():
-    def extract_channel_id_function(channel_id_dict):
-        return channel_id_dict['channel_id']
-    return extract_channel_id_function
-
-# Registers a user who is the owner of a created channel. 
-@pytest.fixture
-def register():
-    auth_user_id = auth_register_v1('test@gmail.com', '124562343', 'first', 'last')
-    channel_id = channels_create_v1(auth_user_id['auth_user_id'], 'test channel', True)
-    return {**auth_user_id, **channel_id}
-
-# Registers a user who is the owner of a created channel. 
-@pytest.fixture
-def clear():
+def clear_server():
     clear_v1()
-    
+
+
+@pytest.fixture
+def get_user_1():
+    response = requests.post(config.url + 'auth/register/v2', data={
+        'email': 'owner@test.com', 
+        'password': 'spotato', 
+        'name_first': 'owner', 
+        'name_last' : 'one'
+        })
+    return response.json()
+
+
+
+
+
+
+
+
 
 def test_empty_messages(clear, register, extract_user, extract_channel):  
     auth_user_id = extract_user(register)
@@ -89,10 +92,3 @@ def test_invalid_auth_user_id(clear, register, extract_channel):
     with pytest.raises(AccessError):
         channel_messages_v1(21312123, channel_id, 0)
 
-def test_invalid_types_v1(clear):
-    with pytest.raises(TypeError):
-        channel_messages_v1('string', 'string', 'string')
-
-def test_invalid_types_v2(clear):
-    with pytest.raises(TypeError):
-        channel_messages_v1([], [], [])
