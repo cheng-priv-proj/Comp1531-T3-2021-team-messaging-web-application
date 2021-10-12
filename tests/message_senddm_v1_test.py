@@ -63,7 +63,7 @@ def register():
         'name_last': 'one' }
         ).json() 
     
-    dm_id_dict = requests.post(url + 'dm/create/v2', json = {
+    dm_id_dict = requests.post(url + 'dm/create/v1', json = {
         'token': owner_user_token,
         'u_ids': [user_id_dict['auth_user_id']]}
         ).json()
@@ -78,7 +78,7 @@ def test_senddm_one_valid_message(clear, register, extract_token, extract_user, 
         'token': owner_token,
         'dm_id': dm_id,
         'message': 'testmessage' }).json())
-    messages = requests.get(url + 'message/senddm/v2', json = {
+    messages = requests.get(url + 'message/senddm/v1', json = {
         'token': owner_token,
         'dm_id': dm_id, 
         'start': 0 }).json()
@@ -101,19 +101,19 @@ def test_senddm_multiple_valid_messages(clear, register, extract_token, extract_
     owner_token = extract_token(register)
     owner_id = extract_user(register)
     now = datetime.now()
-    message_id0 = extract_message(requests.post(url + 'message/senddm/v2', json = {
+    message_id0 = extract_message(requests.post(url + 'message/senddm/v1', json = {
         'token': owner_token,
         'dm_id': dm_id,
         'message': 'testmessage' }).json())
-    message_id1 = extract_message(requests.post(url + 'message/senddm/v2', json = {
+    message_id1 = extract_message(requests.post(url + 'message/senddm/v1', json = {
         'token': owner_token,
         'dm_id': dm_id,
         'message': 'testmessage0' }).json())
-    message_id2 = extract_message(requests.post(url + 'message/senddm/v2', json = {
+    message_id2 = extract_message(requests.post(url + 'message/senddm/v1', json = {
         'token': owner_token,
         'dm_id': dm_id,
         'message': 'testmessage2' }).json())
-    messages = requests.get(url + 'message/senddm/v2', json = {
+    messages = requests.get(url + 'message/senddm/v1', json = {
         'token': owner_token,
         'dm_id': dm_id, 
         'start': 0 }).json()
@@ -198,7 +198,7 @@ def test_senddm_valid_message_invalid_token(clear, register, extract_token):
         'message': 'asds'
     }) == 403
 
-def test_senddm_invalid_message_invalid_token(clear, register):
+def test_senddm_invalid__invalid_token(clear, register):
     assert requests.post(url + 'messages/senddm/v1', json = {
         'token': '123123414',
         'dm_id': 23423,
