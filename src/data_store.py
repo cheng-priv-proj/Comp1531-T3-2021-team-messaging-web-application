@@ -5,6 +5,7 @@ import json
 #   Value: Dictionary {
 #          password, 
 #          auth_id } 
+#
 # Channels:
 #   Key: channel_id:
 #   Value: Dictionary {
@@ -41,6 +42,7 @@ import json
 # Permissions:
 #   Key: u_id
 #   Value: { 1 or 2 }
+# 
 
 ## YOU SHOULD MODIFY THIS OBJECT BELOW
 initial_object = {
