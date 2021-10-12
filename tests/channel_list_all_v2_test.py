@@ -215,4 +215,4 @@ def test_invalid_auth_id(clear):
     invalid_token = 1000
     
     invalid_request = requests.get(url + 'channels/listall/v2', params = {invalid_token})
-    assert (invalid_request.status_code) == 400
+    assert (invalid_request.status_code) == 403
