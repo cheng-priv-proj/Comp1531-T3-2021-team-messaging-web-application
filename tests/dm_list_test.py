@@ -59,7 +59,7 @@ def test_standard(register, dm_factory):
         'token': register[0]['token']
         }).json()
 
-    assert list is [
+    assert list == [
         {
             'dm_id' : dm_id,
             'name' : 'ownerone, userone, userthree, usertwo'
@@ -73,7 +73,7 @@ def test_creator_only(register, dm_factory):
         'token': register[0]['token']
         }).json()
 
-    assert list is [
+    assert list == [
         {
             'dm_id' : dm_id,
             'name' : 'ownerone'
@@ -86,7 +86,7 @@ def test_user_has_no_dms(register, dm_factory):
         'token': register[0]['token']
         }).json()
 
-    assert list is []
+    assert list == []
 
     dm_factory(register[0]['token'], [register[1]['auth_user_id']])
 
@@ -94,10 +94,10 @@ def test_user_has_no_dms(register, dm_factory):
         'token': register[2]['token']
         }).json()
 
-    assert list is []
+    assert list == []
 
 def test_invalid_token():
     requests.get(url + 'dm/list/v1', json = {
         'token': 'no token has been registered yet'
-        }).status_code is 403
+        }).status_code == 403
 
