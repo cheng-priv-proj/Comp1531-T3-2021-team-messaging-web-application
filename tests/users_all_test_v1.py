@@ -12,13 +12,6 @@ def extract_token():
         return auth_user_id_dict['token']
     return extract_token_id_function
 
-# Extracts the auth_user_id from a given dictionary.
-@pytest.fixture
-def extract_user():
-    def extract_auth_user_id_function(auth_user_id_dict):
-        return auth_user_id_dict['auth_user_id']
-    return extract_auth_user_id_function
-
 # Call users all
 @pytest.fixture
 def users_all():
@@ -40,9 +33,12 @@ def register_user():
         registration_info = {
             'username': email, 
             'password': 'password', 
-            'name_first': 'owner',
-            'name_last': 'one' }
+            'name_first': name_first,
+            'name_last': name_last }
         owner_id_dict = requests.post(url + 'auth/register/v2', json = registration_info).json()
+        if owner_id_dict.status_code == 400 or owner_id_dict.status_code == 403:
+            return {}
+        
         owner_id_dict['handle_str'] = registration_info.get('name_first') + registration_info.get('name_last')
         return {**owner_id_dict, **registration_info}
     return register_user_function
