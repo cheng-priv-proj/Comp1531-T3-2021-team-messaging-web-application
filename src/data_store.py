@@ -243,7 +243,7 @@ class Datastore:
             'owner_members': owner_members,
             'all_members': all_members,
         }
-        self.get_messages_from_channel_or_dm_id_dict()[channel_id] = messages
+        self.get_messages_from_channel_or_dm_id_dict()[channel_id] = []
         self.update_json()
 
     def insert_dm(self, creator, dm_id, u_ids, name):
