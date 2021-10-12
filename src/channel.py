@@ -137,7 +137,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     if not data_store.is_user_member_of_channel(channel_id, auth_user_id):
         raise AccessError('the authorised user is not a member of the channel')
 
-    messages = data_store.get_message_from_channel_id(channel_id)
+    messages = data_store.get_messages_from_channel_or_dm_id(channel_id)
     no_of_messages = len(messages)
 
     end = start + 50
