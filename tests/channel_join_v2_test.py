@@ -116,12 +116,12 @@ def test_invalid_channel_id(clear, first_register):
     invalid_request = requests.get(url + 'channel/join/v2', params = {token, invalid_channel_id})
     assert (invalid_request.status_code) == 400
 
-def test_invalid_auth_id(clear, first_register):
+def test_invalid_user_id(clear, first_register):
     invalid_token = 10000
     channel_id = first_register.get('channel_id')
 
     invalid_request = requests.get(url + 'channel/join/v2', params = {invalid_token, channel_id})
-    assert (invalid_request.status_code) == 400
+    assert (invalid_request.status_code) == 403
 
 # Test expecting prority to AccessError when an invalid auth_id and channel_id are given.
 def test_invalid_user_id_and_invalid_channel_id(clear):
@@ -129,7 +129,7 @@ def test_invalid_user_id_and_invalid_channel_id(clear):
     invalid_channel_id = 10000
 
     invalid_request = requests.get(url + 'channel/join/v2', params = {invalid_token, invalid_channel_id})
-    assert (invalid_request.status_code) == 400
+    assert (invalid_request.status_code) == 403
 
 def test_already_member(clear, first_register, register_user, register_channel):
     member_token = register_user('member@test.com')
@@ -154,7 +154,7 @@ def test_private_not_owner(clear, register_user, register_channel):
     member_token = register_user('member@test.com')
     
     invalid_request = requests.get(url + 'channel/join/v2', params = {member_token, private_channel_id})
-    assert (invalid_request.status_code) == 400
+    assert (invalid_request.status_code) == 403
 
 # Testing that global owner has the correct permissions.
 def test_global_owner(clear, register_user, register_channel):
@@ -178,4 +178,4 @@ def test_global_owner(clear, register_user, register_channel):
     }
 
     invalid_request = requests.get(url + 'channel/join/v2', params = {member_token, private_channel_id})
-    assert (invalid_request.status_code) == 400
+    assert (invalid_request.status_code) == 403
