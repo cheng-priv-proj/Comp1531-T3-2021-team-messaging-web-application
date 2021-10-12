@@ -50,10 +50,7 @@ import json
 ## YOU SHOULD MODIFY THIS OBJECT BELOW
 initial_object = {
     'login' : {},
-<<<<<<< HEAD
-=======
     'token' : {},
->>>>>>> 55bb6d6c46ff9da6798200047d3a652d4dcfa943
     'channels' : {},
     'dms': {},
     'message_ids' : {},
@@ -75,10 +72,7 @@ class Datastore:
             json.dump(
             {
                 'login' : {},
-<<<<<<< HEAD
-=======
                 'token' : {},
->>>>>>> 55bb6d6c46ff9da6798200047d3a652d4dcfa943
                 'channels' : {},
                 'dms': {},
                 'message_ids' : {},
@@ -109,8 +103,6 @@ class Datastore:
     def get_login_from_email(self, email):
         return self.get_logins_from_email_dict().get(email)
     
-<<<<<<< HEAD
-=======
     # tokens
 
     def get_u_ids_from_token_dict(self):
@@ -119,7 +111,6 @@ class Datastore:
     def get_u_id_from_token(self, token):
         return self.get_u_ids_from_token_dict().get(token)
 
->>>>>>> 55bb6d6c46ff9da6798200047d3a652d4dcfa943
     # channels
 
     def get_channels_from_channel_id_dict(self):
@@ -135,14 +126,6 @@ class Datastore:
 
     def get_dm_from_dm_id(self, dm_id):
         return self.get_dms_from_dm_id_dict().get(dm_id).get('details')
-<<<<<<< HEAD
-
-    def get_dm_creator_from_dm_id(self, dm_id):
-        return self.get_dms_from_dm_id_dict().get(dm_id).get('creator')
-
-    # DEPRECATED, PLEASE CHANGE TO UPDATED FUNCTION
-    def get_messages_from_channel_id_dict(self):
-=======
 
     def get_dm_creator_from_dm_id(self, dm_id):
         return self.get_dms_from_dm_id_dict().get(dm_id).get('creator')
@@ -156,19 +139,11 @@ class Datastore:
         return self.get_channels_or_dms_id_from_message_id_dict().get(message_id)
 
     def get_messages_from_channel_or_dm_id_dict(self):
->>>>>>> 55bb6d6c46ff9da6798200047d3a652d4dcfa943
         return self.__store['messages']
   
     def get_messages_from_channel_or_dm_id(self, id):
         return self.get_messages_from_channel_or_dm_id_dict().get(id)
 
-<<<<<<< HEAD
-    # DEPRECATED, PLEASE CHANGE TO UPDATED FUNCTION    
-    def get_message_from_channel_id(self, channel_id):
-        return self.get_messages_from_channel_id_dict().get(channel_id)
-=======
-    # users
->>>>>>> 55bb6d6c46ff9da6798200047d3a652d4dcfa943
 
     # messages
 
@@ -213,7 +188,15 @@ class Datastore:
             return False
         
         return True
-    
+        
+    def is_user_member_of_dm(self, dm_id, u_id):
+
+        dm = self.get_dms_from_dm_id(dm_id)
+        if u_id not in dm.get('details').get('members'):
+            return False
+        
+        return True
+
     def is_stream_owner(self, u_id):
         return self.get_user_perms_from_u_id_dict().get(u_id) == 1
 
@@ -245,6 +228,12 @@ class Datastore:
         
         return False
 
+    def is_invalid_dm_id(self, dm_id):
+        dms = self.get_dms_from_dm_id_dict()
+        if dm_id not in dms:
+            return True
+        
+        return False
 
     # Insertion functions
 
@@ -290,6 +279,10 @@ class Datastore:
         }
         self.get_messages_from_channel_or_dm_id_dict()[dm_id] = []
         self.update_json()
+
+    def insert_message(self, id, message):
+        self.get_messages_from_channel_or_dm_id(id).insert(0, message)
+        self.get_channel_or_dm_id_from_message_id_dict()[message.get('message_id')] = id
 
     def update_value(self, dict_key, key, value):
         self.__store[dict_key][key] = value
