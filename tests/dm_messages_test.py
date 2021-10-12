@@ -70,7 +70,7 @@ def test_invalid_token_valid_dm_id(register):
         'dm_id': dm_id,
         'start': 0
     }).status_code is 403
-def test_invalid_dm_id():
+def test_invalid_dm_id(register):
 
     assert requests.get(url + 'dm/messages/v1', json = {
         'token': register[0]['token'],
@@ -78,7 +78,7 @@ def test_invalid_dm_id():
         'start': 0
     }).status_code is 400
 
-def test_invalid_start():
+def test_invalid_start(register, dm_factory):
     dm_id = dm_factory(register[0]['token'], [])
 
     assert requests.get(url + 'dm/messages/v1', json = {
