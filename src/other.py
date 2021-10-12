@@ -48,6 +48,18 @@ def handle_str_generation(firstname, lastname):
 
 # Returns a nonduplicate handle_str
 def handle_prevent_duplicates(base_handle_str):
+    '''
+    Given a handle string adds a number at the end to guarantee uniqueness
+
+    Arguments:
+        base_handle_str (str)
+
+    Exceptions:
+        none
+
+    Return value:
+        Returns an unique handle string
+    '''
     duplicate_count = -1
     duplicate_exists = True
     handle_str = base_handle_str
@@ -69,6 +81,18 @@ def handle_prevent_duplicates(base_handle_str):
 
 # handle_str_generation helper function
 def base_handle_str_generation(firstname, lastname):
+    '''
+    Given a first and last name returns a nonunique handle_str
+
+    Arguments:
+        firstname (str), lastname (str)
+
+    Exceptions:
+        None
+
+    Return value:
+        A nonunique handle string (str)
+    '''
     base_handle = (firstname + lastname).lower()
     base_handle = re.sub(r'\W+', '', base_handle)
 
@@ -79,9 +103,20 @@ def base_handle_str_generation(firstname, lastname):
 
 # helper function to handle TypeError exceptions
 def check_type(var, var_type):
-    
+    '''
+    Ensures that var is of var_type
+
+    Argument: 
+        var (arbitrary type), var_type (type)
+
+    Exceptions:
+        TypeError
+
+    Return value:
+        Returns nothing on success
+    '''
     if type(var) != var_type:
-        raise TypeError
+        raise TypeError 
 
 stream_owner = 1
 stream_member = 2
