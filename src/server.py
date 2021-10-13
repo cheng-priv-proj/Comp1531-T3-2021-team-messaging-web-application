@@ -44,11 +44,29 @@ def echo():
 @APP.route("/channel/join/v2", methods=['POST'])
 def channel_join_endpt():
     '''
+    Given a channel_id of a channel that the authorised user can join, adds them to that channel.
+    Parameters:
+    { token, channel_id }
+    
+    Return Type:
+    {}
+
+    Exceptions:
+
+      InputError when any of:
+        channel_id does not refer to a valid channel
+        the authorised user is already a member of the channel
+      
+      AccessError when:
+        channel_id refers to a channel that is private and the authorised user is not already a channel member and is not a global owner
+
     '''
+    
     join_details = request.get_json()
     auth_id = join_details['token']
     channel_id = join_details['channel_id']
     channel_join_v1(auth_id, channel_id)
+
     return {}
 
 
@@ -68,13 +86,12 @@ def channel_details_endpt():
         channel_id does not refer to a valid channel
     
     '''
+
     request_data = request.get_json()
     auth_id = request_data['token']
     channel_id = request_data['channel_id']
     return_dict = channel_details_v1(auth_id, channel_id)
-
-
-
+    return return_dict
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 
