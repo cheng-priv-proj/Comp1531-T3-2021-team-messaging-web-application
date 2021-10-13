@@ -7,7 +7,6 @@ from src import config
 
 from src.other import clear_v1
 
-#NEED TO IMPLEMENT CLEAR v2 or change clear v1
 @pytest.fixture
 def clear_server():
     requests.delete(config.url + "clear/v1")

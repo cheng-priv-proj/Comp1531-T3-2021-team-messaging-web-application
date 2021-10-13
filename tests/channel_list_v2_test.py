@@ -5,9 +5,6 @@ from src.other import clear_v1
 
 import requests
 
-# Clear_v2?
-# Error code?
-
 # Clears storage
 @pytest.fixture
 def clear():
