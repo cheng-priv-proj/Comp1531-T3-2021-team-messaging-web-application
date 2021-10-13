@@ -66,7 +66,6 @@ class Datastore:
             self.__store = json.load(FILE)
 
     def hard_reset(self):
-
         # replace json dump with a fresh copy of datastore
         with open('src/json_dump/data_store.txt', 'w') as FILE:
             json.dump(

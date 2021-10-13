@@ -1,7 +1,6 @@
 from src.data_store import data_store
 import re
 
-
 def clear_v1():
     '''
     Resets the internal data of the application to its initial state, clearing the
