@@ -228,6 +228,7 @@ def channel_list_endpt():
     
     Return Type:{ channels }
     '''
+
     list_details = request.get_json(force = True)
 
     token = list_details.get('token')
@@ -239,6 +240,17 @@ def channel_list_endpt():
 
 @APP.route('/channels/listall/v2', methods = ['GET'])
 def list_all():
+    '''
+    channels/listall/v2
+    Provide a list of all channels, including private channels, (and their associated details)
+
+    GET
+
+    Parameters:{ token }
+    
+    Return Type:
+    
+    '''
     listall_details = request.get_json(force = True)
 
     token = listall_details.get('token')
