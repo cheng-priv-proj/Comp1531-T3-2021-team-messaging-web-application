@@ -11,7 +11,8 @@ import requests
 # Clears storage
 @pytest.fixture
 def clear():
-    clear_v1()
+    requests.delete(url + "clear/v1")
+
 
 # Generates the first user
 @pytest.fixture
@@ -72,7 +73,7 @@ def test_channel_list_valid(clear, first_register, register_channel):
     token = first_register.get('token')
     channel_id1 = first_register.get('channel_id')
 
-    channel_list = requests.get(url + 'channels/list/v2', params = {token}).json()
+    channel_list = requests.get(url + 'channels/list/v2', json = {'token': token}).json()
 
     assert channel_list == { 
         'channels': [
@@ -84,7 +85,7 @@ def test_channel_list_valid(clear, first_register, register_channel):
     }
 
     channel_id2 = register_channel(token, 'channel2', True)
-    channel_list = requests.get(url + 'channels/list/v2', params = {token}).json()
+    channel_list = requests.get(url + 'channels/list/v2', json = {'token': token}).json()
 
     assert channel_list == { 
         'channels': [
@@ -102,7 +103,7 @@ def test_channel_list_valid(clear, first_register, register_channel):
 # Testing for an empty list of channels.
 def test_channel_list_nochannels(clear, register_user):
     no_server_token = register_user('noserver@test.com')
-    channel_list = requests.get(url + 'channels/list/v2', params = {no_server_token}).json()
+    channel_list = requests.get(url + 'channels/list/v2', json = {'token': no_server_token}).json()
 
     assert channel_list == { 
         'channels': [
@@ -118,8 +119,8 @@ def test_channel_list_other_owners_test(clear, first_register, register_user, re
     token2 = register_user('owner2@test.com')
     channel_id2 = register_channel(token2, 'channel2', True)
 
-    channel_list1 = requests.get(url + 'channels/list/v2', params = {token1}).json()
-    channel_list2 = requests.get(url + 'channels/list/v2', params = {token2}).json()
+    channel_list1 = requests.get(url + 'channels/list/v2', json = {'token': token1}).json()
+    channel_list2 = requests.get(url + 'channels/list/v2', json = {'token': token2}).json()
 
     assert channel_list1 == { 
         'channels': [
@@ -138,15 +139,16 @@ def test_channel_list_other_owners_test(clear, first_register, register_user, re
             }
         ]
     }
-
+@pytest.mark.skip('channel join needs to be implmented for this to work')
 # Tests the case that a user joins a new channel, and looking for an update the the list.
 def test_channel_list_after_newjoin_test(clear, first_register, register_user):
     channel_id = first_register.get('channel_id')
     token2 = register_user('user2@test.com')
 
-    requests.post(url + 'channel/join/v2', json = {token2, channel_id})
+    requests.post(url + 'channel/join/v2', json = {'token': token2, 'channel_id': channel_id})
 
-    channel_list = requests.get(url + 'channels/list/v2', params = {token2}).json()
+    channel_list = requests.get(url + 'channels/list/v2', json = {'token': token2}).json()
+    print(channel_list)
     assert channel_list == { 
         'channels': [
             {
@@ -160,7 +162,7 @@ def test_channel_list_after_newjoin_test(clear, first_register, register_user):
 def test_invalid_auth_id(clear):
     invalid_token = 1000
     
-    invalid_request = requests.get(url + 'channels/list/v2', params = {invalid_token})
+    invalid_request = requests.get(url + 'channels/list/v2', json = {'token': invalid_token})
     assert (invalid_request.status_code) == 403
 
 
@@ -178,7 +180,7 @@ def test_invalid_auth_id(clear):
 #                 'name_first': 'user' + str(i), 
 #                 'name_last': 'user'
 #             }
-#             registered = requests.get(url + 'auth/register/v2', params = register_details)
+#             registered = requests.get(url + 'auth/register/v2', json = register_details)
 #             tokens.append(registered['tokens'])
 #         return tokens
 #     return token_factory_function
@@ -194,7 +196,7 @@ def test_invalid_auth_id(clear):
 #                 'is_public': True
 #             }
 
-#             created = requests.get(url + 'channels/create/v2', params = register_details)
+#             created = requests.get(url + 'channels/create/v2', json = register_details)
 #             channel_id_list.append(created['channel_id'])
 #         return channel_id_list
 #     return channel_factory_function

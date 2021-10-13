@@ -87,6 +87,17 @@ def channel_create_ep():
 
     return {'channel_id': channel_id}
 
+@APP.route('/channels/list/v2', methods = ['GET'])
+def channel_list_endpt():
+    list_details = request.get_json(force = True)
+
+    token = list_details.get('token')
+    auth_user_id = data_store.get_u_id_from_token(token)
+
+    return channels_list_v1(auth_user_id)
+
+
+
 @APP.route('/channels/listall/v2', methods = ['GET'])
 def list_all():
     listall_details = request.get_json(force = True)
@@ -95,6 +106,12 @@ def list_all():
     auth_user_id = data_store.get_u_id_from_token(token)
 
     return channels_listall_v1(auth_user_id)
+
+
+
+
+
+
 
 # Clear 
 @APP.route("/clear/v1", methods = ['DELETE'])
