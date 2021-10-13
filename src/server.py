@@ -48,7 +48,8 @@ def register_ep():
     name_first = register_details.get('name_first')
     name_last = register_details.get('name_last')
 
-    auth_id = auth_register_v1(email, password, name_first, name_last)
+    auth_id_dict = auth_register_v1(email, password, name_first, name_last)
+    auth_id = auth_id_dict.get('auth_user_id')
     token = str(auth_id) # Change to jwt later
 
     data_store.insert_token(token, auth_id)
@@ -63,25 +64,27 @@ def login_ep():
     email = login_details.get('email')
     password = login_details.get('password')
 
-    auth_id = auth_login_v1(email, password)
+    auth_id_dict = auth_login_v1(email, password)
+    auth_id = auth_id_dict.get('auth_user_id')
     token = str(auth_id) # Change to jwt later
 
     return {'token': token, 'auth_user_id': auth_id}
 
 #### Channel ##################
 # Channel create
-@APP.route('channels/create/v2', methods = ['POST'])
-def login_ep():
+@APP.route('/channels/create/v2', methods = ['POST'])
+def channel_create_ep():
     create_details = request.get_json(force = True)
 
-    auth_user_id = data_store.get_u_id_from_token('token')
+    token = create_details.get('token')
+    auth_user_id = data_store.get_u_id_from_token(token)
     name = create_details.get('name')
     is_public = create_details.get('is_public')
 
-    auth_id = channels_create_v1(auth_user_id, name, is_public)
-    token = str(auth_id) # Change to jwt later
+    channel_id_dict = channels_create_v1(auth_user_id, name, is_public)
+    channel_id = channel_id_dict.get('channel_id')
 
-    return {'token': token, 'auth_user_id': auth_id}
+    return {'channel_id': channel_id}
 
 # Clear 
 @APP.route("/clear/v1", methods = ['DELETE'])
