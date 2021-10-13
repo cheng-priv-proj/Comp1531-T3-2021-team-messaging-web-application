@@ -7,7 +7,8 @@ from src import config
 from src.channels import channels_listall_v1, channels_list_v1
 
 from src.auth import auth_login_v1, auth_register_v1
-from src.channels import channels_create_v1
+from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
+from src.channel import channel_invite_v1, channel_messages_v1, channel_details_v1
 
 from src.data_store import data_store
 from src.error import InputError
@@ -36,7 +37,7 @@ APP.register_error_handler(Exception, defaultHandler)
 
 #### NO NEED TO MODIFY ABOVE THIS POINT, EXCEPT IMPORTS
 
-#### Auth ##################
+###################### Auth ######################
 # Auth register 
 # Change to dictionary?
 # Return errors?
@@ -71,21 +72,51 @@ def login_ep():
 
     return {'token': token, 'auth_user_id': auth_id}
 
-#### Channel ##################
+###################### Channels ######################
 # Channel create
 @APP.route('/channels/create/v2', methods = ['POST'])
 def channel_create_ep():
     create_details = request.get_json(force = True)
 
     token = create_details.get('token')
-    auth_user_id = data_store.get_u_id_from_token(token)
+    auth_user_id = data_store.get_u_id_from_token(token) # Does it return NONE?
     name = create_details.get('name')
     is_public = create_details.get('is_public')
+
+    print(auth_user_id)
 
     channel_id_dict = channels_create_v1(auth_user_id, name, is_public)
     channel_id = channel_id_dict.get('channel_id')
 
     return {'channel_id': channel_id}
+
+###################### Channel ######################
+# Channel Invite 
+@APP.route('/channel/invite/v2', methods = ['POST'])
+def channel_invite_ep():
+    invite_details = request.get_json(force = True)
+
+    token = invite_details.get('token')
+    auth_user_id = data_store.get_u_id_from_token(token)
+    channel_id = invite_details.get('channel_id')
+    u_id = invite_details.get('u_id')
+
+    channel_invite_v1(auth_user_id, channel_id, u_id)
+    return {}
+
+# Channel messages 
+@APP.route('/channel/messages/v2', methods = ['GET'])
+def channel_messages_ep():
+    message_get_details = request.get_json(force = True)
+
+    token = message_get_details.get('token')
+    auth_user_id = data_store.get_u_id_from_token(token)
+    channel_id = message_get_details.get('channel_id')
+    start = message_get_details.get('start')
+
+    print(channel_messages_v1(auth_user_id, channel_id, start))
+
+    return channel_messages_v1(auth_user_id, channel_id, start)
 
 @APP.route('/channels/list/v2', methods = ['GET'])
 def channel_list_endpt():
@@ -106,11 +137,6 @@ def list_all():
     auth_user_id = data_store.get_u_id_from_token(token)
 
     return channels_listall_v1(auth_user_id)
-
-
-
-
-
 
 
 # Clear 
