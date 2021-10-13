@@ -5,6 +5,8 @@ from flask import Flask, request
 from flask_cors import CORS
 from src.error import InputError
 from src import config
+from src.channel import channel_join_v1, channel_details_v1
+
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -39,9 +41,38 @@ def echo():
         'data': data
     })
 
-@APP.route("/channel/join/v2", method=['POST'])
+@APP.route("/channel/join/v2", methods=['POST'])
 def channel_join_endpt():
+    '''
+    '''
     join_details = request.get_json()
+    auth_id = join_details['token']
+    channel_id = join_details['channel_id']
+    channel_join_v1(auth_id, channel_id)
+    return {}
+
+
+@APP.route("channel/details/v2", methods=['get'])
+def channel_details_endpt():
+    '''
+    Given a channel with ID channel_id that the authorised user is a member of, provide basic details about the channel.
+
+    Parameters: 
+    { token, channel_id }
+
+    Return Type: 
+    { name, is_public, owner_members, all_members }
+
+    Exceptions: 
+    InputError when:
+        channel_id does not refer to a valid channel
+    
+    '''
+    request_data = request.get_json()
+    auth_id = request_data['token']
+    channel_id = request_data['channel_id']
+    return_dict = channel_details_v1(auth_id, channel_id)
+
 
 
 
