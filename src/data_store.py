@@ -90,7 +90,6 @@ class Datastore:
             json.dump(self.__store, FILE)
 
     # Get Functions ############################################################
-
     def get(self):
         return self.__store
 
