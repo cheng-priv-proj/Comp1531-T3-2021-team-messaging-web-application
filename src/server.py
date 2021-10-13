@@ -7,7 +7,7 @@ from src import config
 
 from src.auth import auth_login_v1, auth_register_v1
 from src.channels import channels_create_v1
-from src.channel import channel_invite_v1
+from src.channel import channel_invite_v1, channel_messages_v1
 
 from src.data_store import data_store
 from src.error import InputError
@@ -100,6 +100,18 @@ def channel_invite_ep():
 
     channel_invite_v1(auth_user_id, channel_id, u_id)
     return {}
+
+# Channel messages 
+@APP.route('/channel/messages/v2', methods = ['GET'])
+def channel_messages_ep():
+    message_get_details = request.get_json(force = True)
+
+    token = message_get_details.get('token')
+    auth_user_id = data_store.get_u_id_from_token(token)
+    channel_id = message_get_details.get('channel_id')
+    start = message_get_details.get('start')
+
+    return channel_messages_v1(auth_user_id, channel_id, start)
 
 # Clear 
 @APP.route("/clear/v1", methods = ['DELETE'])
