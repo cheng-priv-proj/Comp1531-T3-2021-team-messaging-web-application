@@ -120,10 +120,15 @@ def channel_create_ep():
     channels/create/v2
     POST
     Creates a new channel with the given name that is either a public or private channel. The user who created it automatically joins the channel.
-    
+
     Parameters:{ token, name, is_public }
     
     Return Type:{ channel_id }
+
+    exceptions:
+    InputError when:
+      
+        length of name is less than 1 or more than 20 characters
     '''
     create_details = request.get_json(force = True)
 
@@ -143,6 +148,17 @@ def channel_create_ep():
 # Channel Invite 
 @APP.route('/channel/invite/v2', methods = ['POST'])
 def channel_invite_ep():
+
+    '''
+    channel/invite/v2
+    POST
+
+    Invites a user with ID u_id to join a channel with ID channel_id. Once invited, the user is added to the channel immediately. In both public and private channels, all members are able to invite users.
+    
+    Parameters:{ token, channel_id, u_id }
+    
+    Return Type:{}
+    '''
     invite_details = request.get_json(force = True)
 
     token = invite_details.get('token')
