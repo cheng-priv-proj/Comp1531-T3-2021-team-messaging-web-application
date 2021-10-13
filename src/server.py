@@ -82,6 +82,24 @@ def register_ep():
 # Auth login
 @APP.route('/auth/login/v2', methods = ['POST'])
 def login_ep():
+
+    '''
+    auth/login/v2
+    POST
+
+    Given a registered user's email and password, returns their `token` value.
+
+    Parameters:{ email, password }
+    
+    Return Type:{ token, auth_user_id }
+
+    exceptions:
+    InputError when any of:
+      
+        email entered does not belong to a user
+        password is not correct
+    
+    '''
     login_details = request.get_json(force = True)
 
     email = login_details.get('email')
@@ -97,6 +115,16 @@ def login_ep():
 # Channel create
 @APP.route('/channels/create/v2', methods = ['POST'])
 def channel_create_ep():
+
+    '''
+    channels/create/v2
+    POST
+    Creates a new channel with the given name that is either a public or private channel. The user who created it automatically joins the channel.
+    
+    Parameters:{ token, name, is_public }
+    
+    Return Type:{ channel_id }
+    '''
     create_details = request.get_json(force = True)
 
     token = create_details.get('token')
