@@ -73,6 +73,7 @@ def test_user_with_no_access_to_channel(clear, first_register, register_user):
     assert (invalid_request.status_code) == 403
 
 
+
 def test_invalid_channel_id(clear, first_register):
     token = first_register.get('token')
     invalid_channel_id = 10000
@@ -98,7 +99,7 @@ def test_returns_all_info(clear, first_register):
         'is_public': True,
         'owner_members': [
             {
-                'u_id': token,
+                'u_id': int(token),
                 'email': 'globalowner@test.com',
                 'name_first': 'global',
                 'name_last': 'user',
@@ -107,7 +108,7 @@ def test_returns_all_info(clear, first_register):
         ],
         'all_members': [
             {
-                'u_id': token,
+                'u_id': int(token),
                 'email': 'globalowner@test.com',
                 'name_first': 'global',
                 'name_last': 'user',
