@@ -15,7 +15,7 @@ from src import config
 #NEED TO IMPLEMENT CLEAR v2 or change clear v1
 @pytest.fixture
 def clear_server():
-    clear_v1()
+    requests.delete(config.url + "clear/v1")
 
 # Fixture to register someone and returns a dictionary of {token, auth_user_id}
 @pytest.fixture
