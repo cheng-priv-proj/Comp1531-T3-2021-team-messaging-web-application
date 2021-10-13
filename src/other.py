@@ -1,7 +1,6 @@
 from src.data_store import data_store
 import re
 
-
 def clear_v1():
     '''
     Resets the internal data of the application to its initial state, clearing the
@@ -10,18 +9,10 @@ def clear_v1():
     Arguments:
         none
 
-    Exceptions:
-        none
-
     Return value:
-        Returns nothing on success
+    Returns nothing on success
     '''
-    store = data_store.get()
-    for element in store:
-        store[element] = {}
-    data_store.set(store)
-    
-    return {}
+    data_store.hard_reset()
 
 # helper function to generate handles for auth_register
 def handle_str_generation(firstname, lastname):
