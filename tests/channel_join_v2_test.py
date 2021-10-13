@@ -12,7 +12,8 @@ import requests
 # Clears storage
 @pytest.fixture
 def clear():
-    clear_v1()
+    requests.delete(url + "clear/v1")
+
 
 # Generates the first user
 @pytest.fixture
@@ -24,6 +25,7 @@ def first_register():
         'name_last': 'user'
     }
     token_dict = requests.post(url + 'auth/register/v2', json = user_details).json()
+    print(token_dict)
     token = token_dict.get('token')
 
     channel_details = {
@@ -70,10 +72,11 @@ def register_channel():
 def test_valid_id(clear, first_register, register_user):
     token2 = register_user('member2@test.com')
     channel_id = first_register.get('channel_id')
-
-    requests.post(url + 'channel/join/v2', json = {token2, channel_id})
-    channel_list = requests.get(url + 'channels/list/v2', params = {token2}).json()
-
+    print(token2, channel_id)
+    r = requests.post(url + 'channel/join/v2', json = {'token': token2,'channel_id': channel_id})
+    print(r)
+    channel_list = requests.get(url + 'channels/list/v2', json = {'token': token2}).json()
+    print("channel list:   ", channel_list)
     assert channel_list == {
         'channels': [
         	{
@@ -91,10 +94,10 @@ def test_multiple_servers(clear, first_register, register_user, register_channel
 
     member_token = register_user('member@test.com')
     
-    requests.post(url + 'channel/join/v2', json = {member_token, channel_id1})
-    requests.post(url + 'channel/join/v2', json = {member_token, channel_id2})
+    requests.post(url + 'channel/join/v2', json = {'token': member_token, 'channel_id': channel_id1})
+    requests.post(url + 'channel/join/v2', json = {'token': member_token, 'channel_id': channel_id2})
 
-    channel_list = requests.get(url + 'channels/list/v2', params = {member_token}).json()
+    channel_list = requests.get(url + 'channels/list/v2', json = {"token": member_token}).json()
 
     assert channel_list == {
         'channels': [
@@ -113,14 +116,14 @@ def test_invalid_channel_id(clear, first_register):
     token = first_register.get('token')
     invalid_channel_id = 10000
 
-    invalid_request = requests.get(url + 'channel/join/v2', params = {token, invalid_channel_id})
+    invalid_request = requests.post(url + 'channel/join/v2', json = {'token': token, "channel_id": invalid_channel_id})
     assert (invalid_request.status_code) == 400
 
 def test_invalid_user_id(clear, first_register):
     invalid_token = 10000
     channel_id = first_register.get('channel_id')
 
-    invalid_request = requests.get(url + 'channel/join/v2', params = {invalid_token, channel_id})
+    invalid_request = requests.post(url + 'channel/join/v2', json = {'token': invalid_token, "channel_id": channel_id})
     assert (invalid_request.status_code) == 403
 
 # Test expecting prority to AccessError when an invalid auth_id and channel_id are given.
@@ -128,23 +131,23 @@ def test_invalid_user_id_and_invalid_channel_id(clear):
     invalid_token = 10000
     invalid_channel_id = 10000
 
-    invalid_request = requests.get(url + 'channel/join/v2', params = {invalid_token, invalid_channel_id})
+    invalid_request = requests.post(url + 'channel/join/v2', json = {'token': invalid_token, "channel_id": invalid_channel_id})
     assert (invalid_request.status_code) == 403
 
 def test_already_member(clear, first_register, register_user, register_channel):
     member_token = register_user('member@test.com')
-    channel_id = first_register.get('token')
+    channel_id = first_register.get('channel_id')
 
-    requests.get(url + 'channel/join/v2', params = {member_token, channel_id})
+    requests.post(url + 'channel/join/v2', json = {'token': member_token, "channel_id": channel_id})
 
-    invalid_request = requests.get(url + 'channel/join/v2', params = {member_token, channel_id})
+    invalid_request = requests.post(url + 'channel/join/v2', json = {'token': member_token, "channel_id": channel_id})
     assert (invalid_request.status_code) == 400
 
 def test_already_owner(clear, first_register):
     token = first_register.get('token')
     channel_id = first_register.get('channel_id')
 
-    invalid_request = requests.get(url + 'channel/join/v2', params = {token, channel_id})
+    invalid_request = requests.post(url + 'channel/join/v2', json = {'token': token, "channel_id": channel_id})
     assert (invalid_request.status_code) == 400
 
 def test_private_not_owner(clear, register_user, register_channel):
@@ -153,7 +156,7 @@ def test_private_not_owner(clear, register_user, register_channel):
 
     member_token = register_user('member@test.com')
     
-    invalid_request = requests.get(url + 'channel/join/v2', params = {member_token, private_channel_id})
+    invalid_request = requests.post(url + 'channel/join/v2', json = {'token': member_token, "channel_id": private_channel_id})
     assert (invalid_request.status_code) == 403
 
 # Testing that global owner has the correct permissions.
@@ -165,8 +168,8 @@ def test_global_owner(clear, register_user, register_channel):
 
     private_channel_id = register_channel(owner_token, 'channel', False)
 
-    requests.get(url + 'channel/join/v2', params = {global_owner_token, private_channel_id})
-    channel_list = requests.get(url + 'channels/list/v2', params = {global_owner_token}).json()
+    requests.post(url + 'channel/join/v2', json = {'token': global_owner_token, "channel_id": private_channel_id})
+    channel_list = requests.get(url + 'channels/list/v2', json = {'token': global_owner_token}).json()
 
     assert channel_list == { 
         'channels': [
@@ -177,5 +180,5 @@ def test_global_owner(clear, register_user, register_channel):
         ]
     }
 
-    invalid_request = requests.get(url + 'channel/join/v2', params = {member_token, private_channel_id})
+    invalid_request = requests.post(url + 'channel/join/v2', json = {'token': member_token, "channel_id": private_channel_id})
     assert (invalid_request.status_code) == 403
