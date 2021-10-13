@@ -70,7 +70,7 @@ def channel_join_endpt():
     return {}
 
 
-@APP.route("channel/details/v2", methods=['get'])
+@APP.route("/channel/details/v2", methods=['get'])
 def channel_details_endpt():
     '''
     Given a channel with ID channel_id that the authorised user is a member of, provide basic details about the channel.
