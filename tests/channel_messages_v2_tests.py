@@ -81,7 +81,7 @@ def test_message_is_sent(clear_server, get_user_1):
     channel_dict = requests.post(config.url + 'channels/create/v2', data={'token': get_user_1['token'], 'name': 'test channel', 'is_public': True}).json()
     extracted_channel_id = channel_dict['channel_id']
 
-    msg_id = requests.post(config.url + 'message/send/v1', data={'token': get_user_1['token'], 'channel_id': extracted_channel_id, 'message': "Hello there, General Kenobi"}).json()
+    requests.post(config.url + 'message/send/v1', data={'token': get_user_1['token'], 'channel_id': extracted_channel_id, 'message': "Hello there, General Kenobi"}).json()
 
     channel_messages = requests.get(config.url + 'channel/messages/v2', data={'token': get_user_1['token'], 'channel_id': extracted_channel_id, 'start': 0}).json()
     messages_list = channel_messages['messages']
