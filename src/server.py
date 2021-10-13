@@ -179,10 +179,11 @@ def channel_join_endpt():
     '''
     
     join_details = request.get_json()
-    auth_id = join_details['token']
+    token = join_details['token']
+    auth_id = data_store.get_u_id_from_token(token)
     channel_id = join_details['channel_id']
     channel_join_v1(auth_id, channel_id)
-
+    
     return {}
 
 
@@ -204,7 +205,9 @@ def channel_details_endpt():
     '''
 
     request_data = request.get_json()
-    auth_id = request_data['token']
+    token = request_data['token']
+    auth_id = data_store.get_u_id_from_token(token)
+
     channel_id = request_data['channel_id']
     return_dict = channel_details_v1(auth_id, channel_id)
     return return_dict
