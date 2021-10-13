@@ -6,8 +6,8 @@ from flask_cors import CORS
 from src import config
 
 from src.auth import auth_login_v1, auth_register_v1
-from src.channels import channels_create_v1
-from src.channel import channel_invite_v1, channel_messages_v1
+from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
+from src.channel import channel_invite_v1, channel_messages_v1, channel_details_v1
 
 from src.data_store import data_store
 from src.error import InputError
@@ -116,6 +116,27 @@ def channel_messages_ep():
     print(channel_messages_v1(auth_user_id, channel_id, start))
 
     return channel_messages_v1(auth_user_id, channel_id, start)
+
+@APP.route('/channels/list/v2', methods = ['GET'])
+def channel_list_endpt():
+    list_details = request.get_json(force = True)
+
+    token = list_details.get('token')
+    auth_user_id = data_store.get_u_id_from_token(token)
+
+    return channels_list_v1(auth_user_id)
+
+
+
+@APP.route('/channels/listall/v2', methods = ['GET'])
+def list_all():
+    listall_details = request.get_json(force = True)
+
+    token = listall_details.get('token')
+    auth_user_id = data_store.get_u_id_from_token(token)
+
+    return channels_listall_v1(auth_user_id)
+
 
 # Clear 
 @APP.route("/clear/v1", methods = ['DELETE'])
