@@ -87,6 +87,15 @@ def channel_create_ep():
 
     return {'channel_id': channel_id}
 
+@APP.route('/channels/listall/v2', methods = ['GET'])
+def list_all():
+    listall_details = request.get_json(force = True)
+
+    token = listall_details.get('token')
+    auth_user_id = data_store.get_u_id_from_token(token)
+
+    return channels_listall_v1(auth_user_id)
+
 # Clear 
 @APP.route("/clear/v1", methods = ['DELETE'])
 def clear_ep():
@@ -102,62 +111,6 @@ def echo():
     return dumps({
         'data': data
     })
-
-
-# THIS IS TEMPORARY
-    # Considers auth_id to be the same as token.
-    # When a function that converts token to auth_id made, replace this. 
-@APP.route("channels/list/v2", methods=['GET'])
-def channel_list_endpt():
-    '''
-    Provide a list of all channels (and their associated details) that the authorised user is part of.
-
-    Parameters: 
-    { token }
-
-    Return Type: 
-    { channels }
-
-    Exceptions: N/A
-    '''
-
-    recieved_token = request.get_json()
-
-    # THIS IS TEMPORARY
-    # Considers auth_id to be the same as token.
-    # When a function that converts token to auth_id made, replace this.  
-    auth_id = recieved_token['token']
-
-    return channels_list_v1(auth_id)
-
-# THIS IS TEMPORARY
-    # Considers auth_id to be the same as token.
-    # When a function that converts token to auth_id made, replace this. 
-
-@APP.route("channels/listall/v2", methods=['GET'])
-def channel_list_endpt():
-    '''
-    Provide a list of all channels, including private channels, (and their associated details)
-
-    Parameters: 
-    { token }
-
-    Return Type: 
-    { channels }
-
-    Exceptions: N/A
-    '''
-
-    recieved_token = request.get_json()
-
-    # THIS IS TEMPORARY
-    # Considers auth_id to be the same as token.
-    # When a function that converts token to auth_id made, replace this.  
-    auth_id = recieved_token['token']
-
-    return channels_listall_v1(auth_id)
-
-
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 

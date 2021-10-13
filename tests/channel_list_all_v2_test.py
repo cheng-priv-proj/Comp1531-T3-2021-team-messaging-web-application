@@ -11,7 +11,7 @@ import requests
 # Clears storage
 @pytest.fixture
 def clear():
-    clear_v1()
+    requests.delete(url + "clear/v1")
 
 # Generates the first user
 @pytest.fixture
@@ -33,7 +33,7 @@ def first_register():
     channel_id_dict = requests.post(url + 'channels/create/v2', json = channel_details).json()
     channel_id = channel_id_dict.get('channel_id')
     
-    return {'token': token, 'channel_id': channel_id}
+    return {'token': token, 'channel_id': int(channel_id)}
 
 # Creates a user using the given details and returns the channel_id
 @pytest.fixture 
@@ -71,7 +71,7 @@ def test_channel_list_all_valid(clear, first_register, register_channel):
     token = first_register.get('token')
     channel_id1 = first_register.get('channel_id')
     
-    channel_list = requests.get(url + 'channels/listall/v2', params = {token}).json()
+    channel_list = requests.get(url + 'channels/listall/v2', json = {'token': token}).json()
 
     assert channel_list == { 
         'channels': [
@@ -83,7 +83,7 @@ def test_channel_list_all_valid(clear, first_register, register_channel):
     }
 
     channel_id2 = register_channel(token, 'channel2', True)
-    channel_list2 = requests.get(url + 'channels/listall/v2', params = {token}).json()
+    channel_list2 = requests.get(url + 'channels/listall/v2', json = {'token': token}).json()
     
     assert channel_list2 == { 
         'channels': [
@@ -101,7 +101,7 @@ def test_channel_list_all_valid(clear, first_register, register_channel):
 # Testing the case where there are no channels 
 def test_channel_list_all_nochannels(clear, register_user):
     token = register_user('noserver@test.com')
-    channel_list = requests.get(url + 'channels/listall/v2', params = {token}).json()
+    channel_list = requests.get(url + 'channels/listall/v2', json = {'token': token}).json()
 
     assert channel_list == { 
         'channels': [
@@ -117,8 +117,8 @@ def test_channel_list_all_other_owners(clear, first_register, register_user, reg
     token2 = register_user('owner2@test.com')
     channel_id2 = register_channel(token2, 'channel2', True)
 
-    channel_list = requests.get(url + 'channels/listall/v2', params = {token1}).json()
-    channel_list2 = requests.get(url + 'channels/listall/v2', params = {token2}).json()
+    channel_list = requests.get(url + 'channels/listall/v2', json = {'token': token1}).json()
+    channel_list2 = requests.get(url + 'channels/listall/v2', json = {'token': token2}).json()
 
     assert channel_list == { 
         'channels': [
@@ -157,14 +157,14 @@ def test_channel_list_all_public_private(clear, first_register, register_user, r
     token3 = register_user('owner3@test.com')
     channel_id3 = register_channel(token3, 'channel3', True)
 
-    channel_list = requests.get(url + 'channels/listall/v2', params = {token1}).json()
-    channel_list2 = requests.get(url + 'channels/listall/v2', params = {token2}).json()
-    channel_list3 = requests.get(url + 'channels/listall/v2', params = {token3}).json()
+    channel_list = requests.get(url + 'channels/listall/v2', json = {'token': token1}).json()
+    channel_list2 = requests.get(url + 'channels/listall/v2', json = {'token': token2}).json()
+    channel_list3 = requests.get(url + 'channels/listall/v2', json = {'token': token3}).json()
 
     assert channel_list == { 
         'channels': [
             {
-                'channel_id': channel_id1, 
+                'channel_id': int(channel_id1), 
                 'name': 'channel'
             }, 
             {
@@ -180,7 +180,7 @@ def test_channel_list_all_public_private(clear, first_register, register_user, r
     assert channel_list2 == { 
         'channels': [
             {
-                'channel_id': channel_id1, 
+                'channel_id': int(channel_id1), 
                 'name': 'channel'
             }, 
             {
@@ -196,7 +196,7 @@ def test_channel_list_all_public_private(clear, first_register, register_user, r
     assert channel_list3 == { 
         'channels': [
             {
-                'channel_id': channel_id1, 
+                'channel_id': int(channel_id1), 
                 'name': 'channel'
             }, 
             {
@@ -212,7 +212,7 @@ def test_channel_list_all_public_private(clear, first_register, register_user, r
 
 # Tests whether the auth id is invalid.
 def test_invalid_auth_id(clear):
-    invalid_token = 1000
+    invalid_token = '1000'
     
-    invalid_request = requests.get(url + 'channels/listall/v2', params = {invalid_token})
+    invalid_request = requests.get(url + 'channels/listall/v2', json = {'token': invalid_token})
     assert (invalid_request.status_code) == 403
