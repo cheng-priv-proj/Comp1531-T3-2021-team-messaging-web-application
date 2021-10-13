@@ -69,7 +69,7 @@ def test_user_with_no_access_to_channel(clear, first_register, register_user):
     invalid_token = register_user('user2@test.com')
     channel_id = first_register.get('channel_id')
 
-    invalid_request = requests.get(url + 'channel/details/v2', json = {invalid_token, channel_id})
+    invalid_request = requests.get(url + 'channel/details/v2', json = {'token': invalid_token, 'channel_id': channel_id})
     assert (invalid_request.status_code) == 403
 
 def test_invalid_types(clear):
@@ -80,14 +80,14 @@ def test_invalid_channel_id(clear, first_register):
     token = first_register.get('token')
     invalid_channel_id = 10000
 
-    invalid_request = requests.get(url + 'channel/details/v2', json = {token, invalid_channel_id})
+    invalid_request = requests.get(url + 'channel/details/v2', json = {'token': token, 'channel_id': invalid_channel_id})
     assert (invalid_request.status_code) == 400
 
 def test_invalid_auth_id(clear, first_register):
     invalid_token = 10000
     channel_id = first_register.get('channel_id')
 
-    invalid_request = requests.get(url + 'channel/details/v2', json = {invalid_token, channel_id})
+    invalid_request = requests.get(url + 'channel/details/v2', json = {'token': invalid_token, "channel_id": channel_id})
     assert (invalid_request.status_code) == 403
 
 def test_returns_all_info(clear, first_register):
