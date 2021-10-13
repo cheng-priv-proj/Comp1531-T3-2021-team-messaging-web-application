@@ -5,10 +5,6 @@ from src.other import clear_v1
 
 import requests
 
-# Clear_v2?
-# Error code?
-# json
-
 # Clears storage
 @pytest.fixture
 def clear():
