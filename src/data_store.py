@@ -89,7 +89,7 @@ class Datastore:
         with open('src/json_dump/data_store.txt', 'w') as FILE:
             json.dump(self.__store, FILE)
 
-    # Get Functions ############################################################
+    # Get Functions
 
     def get(self):
         return self.__store
@@ -239,6 +239,7 @@ class Datastore:
             'owner_members': owner_members,
             'all_members': all_members,
         }
+<<<<<<< HEAD
 
         self.get_messages_from_channel_or_dm_id_dict()[channel_id] = messages
         self.update_json()
@@ -249,6 +250,9 @@ class Datastore:
             'creator' : creator
         }
         self.get_messages_from_channel_or_dm_id_dict()[dm_id] = []
+=======
+        self.get_messages_from_channel_id_dict()[channel_id] = messages
+>>>>>>> 416fc6227916907fda5abf75f734b97f3a3b5919
         self.update_json()
 
     def update_value(self, dict_key, key, value):
