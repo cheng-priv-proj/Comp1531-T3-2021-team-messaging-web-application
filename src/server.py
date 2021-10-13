@@ -158,6 +158,16 @@ def channel_invite_ep():
     Parameters:{ token, channel_id, u_id }
     
     Return Type:{}
+
+    InputError when any of:
+      
+        channel_id does not refer to a valid channel
+        u_id does not refer to a valid user
+        u_id refers to a user who is already a member of the channel
+      
+      AccessError when:
+      
+        channel_id is valid and the authorised user is not a member of the channel
     '''
     invite_details = request.get_json(force = True)
 
@@ -172,6 +182,29 @@ def channel_invite_ep():
 # Channel messages 
 @APP.route('/channel/messages/v2', methods = ['GET'])
 def channel_messages_ep():
+    '''
+    channel/messages/v2
+
+    GET
+
+    Given a channel with ID channel_id that the authorised user is a member of, return up to 50 messages between index "start" and "start + 50". 
+    Message with index 0 is the most recent message in the channel. 
+    This function returns a new index "end" which is the value of "start + 50", or, if this function has returned the least recent messages in the channel, 
+    returns -1 in "end" to indicate there are no more messages to load after this return.
+
+    Parameters:{ token, channel_id, start }
+    
+    Return Type:{ messages, start, end }
+    
+    InputError when any of:
+      
+        channel_id does not refer to a valid channel
+        start is greater than the total number of messages in the channel
+      
+      AccessError when:
+      
+        channel_id is valid and the authorised user is not a member of the channel
+    '''
     message_get_details = request.get_json(force = True)
 
     token = message_get_details.get('token')
