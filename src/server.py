@@ -39,6 +39,12 @@ def echo():
         'data': data
     })
 
+@APP.route("/channel/join/v2", method=['POST'])
+def channel_join_endpt():
+    join_details = request.get_json()
+
+
+
 #### NO NEED TO MODIFY BELOW THIS POINT
 
 if __name__ == "__main__":
