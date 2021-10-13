@@ -57,5 +57,7 @@ def test_all_incorrect_v2(auth_id_v2):
     resp = requests.post(config.url + 'auth/login/v2', data={'email': 'baaaaddexample@email.com', 'password': 'naughty_potato'})
     assert(resp.status_code == 400)
 
+'''
 def test_invalid_return_token_v2():
     return
+'''
