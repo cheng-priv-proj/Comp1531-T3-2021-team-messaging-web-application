@@ -25,19 +25,17 @@ def get_valid_token():
     return token['token']
 
 # Tests that a public channel is created correctly.
-@pytest.mark.skip('Requires channel details')
 def test_public_channel_v2(clear, get_valid_token):
     channel_dict = requests.post(config.url + 'channels/create/v2', json={'token': get_valid_token, 'name': 'test channel', 'is_public': True}).json()
     extracted_channel_id = channel_dict['channel_id']
-    details = requests.get(config.url + 'channel/details/v2', params={'token': get_valid_token, 'channel_id': extracted_channel_id}).json()
+    details = requests.get(config.url + 'channel/details/v2', json={'token': get_valid_token, 'channel_id': extracted_channel_id}).json()
     assert details["is_public"] == True
 
 # Tests that a private channel is created correctly.
-@pytest.mark.skip('Requires channel details')
 def test_private_channel_v2(clear, get_valid_token):
     channel_dict = requests.post(config.url + 'channels/create/v2', json={'token': get_valid_token, 'name': 'test channel', 'is_public': False}).json()
     extracted_channel_id = channel_dict['channel_id']
-    details = requests.get(config.url + 'channel/details/v2', params={'token': get_valid_token, 'channel_id': extracted_channel_id}).json()
+    details = requests.get(config.url + 'channel/details/v2', json={'token': get_valid_token, 'channel_id': extracted_channel_id}).json()
     assert details["is_public"] == False
 
 # Tests that all generated channel id is unique
@@ -53,7 +51,6 @@ def test_unique_channel_id_v2(clear, get_valid_token):
     assert extracted_channel_id2 != extracted_channel_id1
 
 # Testing that the stream owner has correct permissions.
-@pytest.mark.skip('Requires channel details')
 def test_creator_joins_channel_v2(clear):
     response = requests.post(config.url + 'auth/register/v2', json={
         'email': 'owner@test.com', 
@@ -67,10 +64,9 @@ def test_creator_joins_channel_v2(clear):
 
     channel_dict = requests.post(config.url + 'channels/create/v2', json={'token': token, 'name': 'test channel', 'is_public': False}).json()
     extracted_channel_id = channel_dict['channel_id']
-    details = requests.get(config.url + 'channel/details/v2', params={'token': token, 'channel_id': extracted_channel_id}).json()
+    details = requests.get(config.url + 'channel/details/v2', json={'token': token, 'channel_id': extracted_channel_id}).json()
     assert details["all_members"][auth_user_id]["email"] == "owner@test.com"
 
-@pytest.mark.skip('Requires channel details')
 def test_becomes_owner_v2(clear):
     response = requests.post(config.url + 'auth/register/v2', json={
         'email': 'owner@test.com', 
@@ -84,7 +80,7 @@ def test_becomes_owner_v2(clear):
 
     channel_dict = requests.post(config.url + 'channels/create/v2', json={'token': token, 'name': 'test channel', 'is_public': False}).json()
     extracted_channel_id = channel_dict['channel_id']
-    details = requests.get(config.url + 'channel/details/v2', params={'token': token, 'channel_id': extracted_channel_id}).json()
+    details = requests.get(config.url + 'channel/details/v2', json={'token': token, 'channel_id': extracted_channel_id}).json()
     assert details["owner_members"][auth_user_id]["email"] == "owner@test.com"
 
 def test_short_channel_name_v2(clear, get_valid_token):
