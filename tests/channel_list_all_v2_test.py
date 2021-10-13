@@ -33,7 +33,7 @@ def first_register():
     channel_id_dict = requests.post(url + 'channels/create/v2', json = channel_details).json()
     channel_id = channel_id_dict.get('channel_id')
     
-    return {'token': token, 'channel_id': int(channel_id)}
+    return {'token': token, 'channel_id': channel_id}
 
 # Creates a user using the given details and returns the channel_id
 @pytest.fixture 
@@ -149,7 +149,7 @@ def test_channel_list_all_other_owners(clear, first_register, register_user, reg
 # Testing that whether a channel is public or private has no effect on the returning list
 def test_channel_list_all_public_private(clear, first_register, register_user, register_channel):
     token1 = first_register.get('token')
-    channel_id1 = first_register.get('token')
+    channel_id1 = first_register.get('channel_id')
 
     token2 = register_user('owner2@test.com')
     channel_id2 = register_channel(token2, 'channel2', True)
@@ -164,7 +164,7 @@ def test_channel_list_all_public_private(clear, first_register, register_user, r
     assert channel_list == { 
         'channels': [
             {
-                'channel_id': int(channel_id1), 
+                'channel_id': channel_id1, 
                 'name': 'channel'
             }, 
             {
@@ -180,7 +180,7 @@ def test_channel_list_all_public_private(clear, first_register, register_user, r
     assert channel_list2 == { 
         'channels': [
             {
-                'channel_id': int(channel_id1), 
+                'channel_id': channel_id1, 
                 'name': 'channel'
             }, 
             {
@@ -196,7 +196,7 @@ def test_channel_list_all_public_private(clear, first_register, register_user, r
     assert channel_list3 == { 
         'channels': [
             {
-                'channel_id': int(channel_id1), 
+                'channel_id': channel_id1, 
                 'name': 'channel'
             }, 
             {
