@@ -11,15 +11,8 @@ def clear_v1():
 
     Return value:
     Returns nothing on success
-<<<<<<< HEAD
     '''
     data_store.hard_reset()
-=======
-'''
-def clear_v1():
-    data_store.hard_reset()
-    return {}
->>>>>>> 780494c546797cae62de7f5055adffa23d91a860
 
 # helper function to generate handles for auth_register
 def handle_str_generation(firstname, lastname):
