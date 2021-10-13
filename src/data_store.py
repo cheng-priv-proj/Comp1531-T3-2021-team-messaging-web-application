@@ -1,18 +1,36 @@
+import json
+
 # Login:
 #   Key: email
 #   Value: Dictionary {
 #          password, 
-#          auth_id } 
+#          auth_user_id } 
+#
+# Tokens:
+#   Key: token (str)
+#   Value: u_id
+#
 # Channels:
 #   Key: channel_id:
 #   Value: Dictionary {
-#          channel: {
 #              name
 #              is_public
 #              owner_members
 #              all_members }
+#
+# DMs:
+#   Key: dm_id:
+#   Value: Dictionary {
+#              details : { name, members}
+#              creator }
+#
+# Message ids:
+#   Key: message_id
+#   Value: channel_id or dm_id
+# 
 # Messages:
-#   Key: channel_id
+#   (dm_ids must be negative)
+#   Key: channel_id or dm_id
 #   Value: [message]
 #               
 # Users: 
@@ -27,12 +45,15 @@
 #
 # Permissions:
 #   Key: u_id
-#   Value: {global_id : 1 or 2}
+#   Value: { 1 or 2 }
 
 ## YOU SHOULD MODIFY THIS OBJECT BELOW
 initial_object = {
-    'login': {},
-    'channels': {},
+    'login' : {},
+    'token' : {},
+    'channels' : {},
+    'dms': {},
+    'message_ids' : {},
     'messages' : {},
     'users': {},
     'perms' : {}
@@ -41,13 +62,39 @@ initial_object = {
 
 class Datastore:
     def __init__(self):
-        self.__store = initial_object
+        with open('src/json_dump/data_store.txt', 'r') as FILE:
+            self.__store = json.load(FILE)
 
+    def hard_reset(self):
+        # replace json dump with a fresh copy of datastore
+        with open('src/json_dump/data_store.txt', 'w') as FILE:
+            json.dump(
+            {
+                'login' : {},
+                'token' : {},
+                'channels' : {},
+                'dms': {},
+                'message_ids' : {},
+                'messages' : {},
+                'users': {},
+                'perms' : {}
+            }, 
+            FILE
+            )
 
-    # Get Functions
+        # re initialise the datastore
+        self.__init__()
+
+    def update_json(self):
+        with open('src/json_dump/data_store.txt', 'w') as FILE:
+            json.dump(self.__store, FILE)
+
+    # Get Functions ############################################################
 
     def get(self):
         return self.__store
+
+    # login
 
     def get_logins_from_email_dict(self):
         return self.__store['login']
@@ -55,17 +102,48 @@ class Datastore:
     def get_login_from_email(self, email):
         return self.get_logins_from_email_dict().get(email)
     
+    # tokens
+
+    def get_u_ids_from_token_dict(self):
+        return self.__store['token']
+
+    def get_u_id_from_token(self, token):
+        return self.get_u_ids_from_token_dict().get(token)
+
+    # channels
+
     def get_channels_from_channel_id_dict(self):
         return self.__store['channels']
 
     def get_channel_from_channel_id(self, channel_id):
         return self.get_channels_from_channel_id_dict().get(channel_id)
+    
+    # dms
 
-    def get_messages_from_channel_id_dict(self):
+    def get_dms_from_dm_id_dict(self):
+        return self.__store['dms']
+
+    def get_dm_from_dm_id(self, dm_id):
+        return self.get_dms_from_dm_id_dict().get(dm_id).get('details')
+
+    def get_dm_creator_from_dm_id(self, dm_id):
+        return self.get_dms_from_dm_id_dict().get(dm_id).get('creator')
+
+    # messages
+
+    def get_channels_or_dms_id_from_message_id_dict(self):
+        return self.__store['message_ids']
+
+    def get_channel_or_dm_id_from_message_id(self, message_id):
+        return self.get_channels_or_dms_id_from_message_id_dict().get(message_id)
+
+    def get_messages_from_channel_or_dm_id_dict(self):
         return self.__store['messages']
+  
+    def get_messages_from_channel_or_dm_id(self, id):
+        return self.get_messages_from_channel_or_dm_id_dict().get(id)
 
-    def get_message_from_channel_id(self, channel_id):
-        return self.get_messages_from_channel_id_dict().get(channel_id)
+    # users
 
     def get_users_from_u_id_dict(self):
         return self.__store['users']
@@ -81,6 +159,11 @@ class Datastore:
 
 
     # Check functions
+
+    def is_token_valid(self, token):
+        if token in self.get_u_ids_from_token_dict():
+            return True
+        return False
 
     def is_user_member_of_channel(self, channel_id, u_id):
 
@@ -129,6 +212,11 @@ class Datastore:
             'password': password,
             'auth_id': auth_id
         }
+        self.update_json()
+
+    def insert_token(self, token, auth_user_id):
+        self.get_u_ids_from_token_dict()[token] = auth_user_id
+        self.update_json()
 
     def insert_user(self, u_id, email, name_first, name_last, handle_str):
         self.get_users_from_u_id_dict()[u_id] = {
@@ -138,9 +226,11 @@ class Datastore:
             'name_last': name_last,
             'handle_str': handle_str
         }
+        self.update_json()
     
     def insert_user_perm(self, u_id, global_id):
         self.get_user_perms_from_u_id_dict()[u_id] = global_id
+        self.update_json()
     
     def insert_channel(self, channel_id, channel_name, is_public, messages, owner_members, all_members):
         self.get_channels_from_channel_id_dict()[channel_id] = {
@@ -149,13 +239,27 @@ class Datastore:
             'owner_members': owner_members,
             'all_members': all_members,
         }
-        self.get_messages_from_channel_id_dict()[channel_id] = messages
+
+        self.get_messages_from_channel_or_dm_id_dict()[channel_id] = messages
+        self.update_json()
+
+    def insert_dm(self, creator, dm_id, u_ids, name):
+        self.get_dms_from_dm_id_dict()[dm_id] = {
+            'details' : {'name': name, 'members': u_ids},
+            'creator' : creator
+        }
+        self.get_messages_from_channel_or_dm_id_dict()[dm_id] = []
+        self.update_json()
 
     def update_value(self, dict_key, key, value):
         self.__store[dict_key][key] = value
-
+        self.update_json()
 
     # Other
+
+    def invalidate_token(self, token):
+        tokens = self.get_u_ids_from_token_dict()
+        del tokens[token]
 
     def set(self, store):
         if not isinstance(store, dict):
