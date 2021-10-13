@@ -78,9 +78,11 @@ def channel_create_ep():
     create_details = request.get_json(force = True)
 
     token = create_details.get('token')
-    auth_user_id = data_store.get_u_id_from_token(token)
+    auth_user_id = data_store.get_u_id_from_token(token) # Does it return NONE?
     name = create_details.get('name')
     is_public = create_details.get('is_public')
+
+    print(auth_user_id)
 
     channel_id_dict = channels_create_v1(auth_user_id, name, is_public)
     channel_id = channel_id_dict.get('channel_id')
@@ -110,6 +112,8 @@ def channel_messages_ep():
     auth_user_id = data_store.get_u_id_from_token(token)
     channel_id = message_get_details.get('channel_id')
     start = message_get_details.get('start')
+
+    print(channel_messages_v1(auth_user_id, channel_id, start))
 
     return channel_messages_v1(auth_user_id, channel_id, start)
 
