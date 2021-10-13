@@ -66,7 +66,6 @@ class Datastore:
             self.__store = json.load(FILE)
 
     def hard_reset(self):
-
         # replace json dump with a fresh copy of datastore
         with open('src/json_dump/data_store.txt', 'w') as FILE:
             json.dump(
@@ -240,6 +239,7 @@ class Datastore:
             'owner_members': owner_members,
             'all_members': all_members,
         }
+
         self.get_messages_from_channel_or_dm_id_dict()[channel_id] = messages
         self.update_json()
 
