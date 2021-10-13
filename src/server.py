@@ -45,6 +45,25 @@ APP.register_error_handler(Exception, defaultHandler)
 # Return errors?
 @APP.route('/auth/register/v2', methods = ['POST'])
 def register_ep():
+    '''
+    Given a user's first and last name, email address, and password, create a new account for them and return a new `token`.
+
+    Parameters: { email, password, name_first, name_last }
+
+    Return Type: { token, auth_user_id }
+    
+    Exceptions:
+
+    InputError when any of:
+      
+        email entered is not a valid email (more in section 6.4)
+        email address is already being used by another user
+        length of password is less than 6 characters
+        length of name_first is not between 1 and 50 characters inclusive
+        length of name_last is not between 1 and 50 characters inclusive
+    
+    
+    '''
     register_details = request.get_json(force = True)
 
     email = register_details.get('email')
