@@ -5,19 +5,12 @@ import flask
 from requests.models import Response
 from src import config
 
-from src.auth import *
-from src.error import InputError
-from src.other import clear_v2
-
-from src.auth import *
 from src.other import clear_v1
-from src.channel import channel_details_v1
-from src.channels import channels_create_v1
 
 #NEED TO IMPLEMENT CLEAR v2 or change clear v1
 @pytest.fixture
 def clear_server():
-    clear_v2()
+    clear_v1()
 
 # Fixture to register someone and returns a dictionary of {token, auth_user_id}
 @pytest.fixture

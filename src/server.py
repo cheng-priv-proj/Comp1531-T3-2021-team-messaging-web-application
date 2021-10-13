@@ -5,6 +5,8 @@ from flask import Flask, request
 from flask_cors import CORS
 from src.error import InputError
 from src import config
+from src.auth import auth_register_v1
+from src.data_store import data_store
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -28,6 +30,25 @@ APP.config['TRAP_HTTP_EXCEPTIONS'] = True
 APP.register_error_handler(Exception, defaultHandler)
 
 #### NO NEED TO MODIFY ABOVE THIS POINT, EXCEPT IMPORTS
+
+# Auth register 
+# Change to dictionary?
+# Return errors?
+@APP.route('auth/register/v2', methods = ['POST'])
+def register_ep():
+    register_details = request.get_json(force = True)
+
+    email = register_details.get('email')
+    password = register_details.get('password')
+    name_first = register_details.get('name_first')
+    name_last = register_details.get('name_last')
+
+    auth_id = auth_register_v1(email, password, name_first, name_last)
+    token = str(auth_id) # Change to jwt later
+
+    data_store.insert_token(token, auth_id)
+
+    return {'token': token, 'auth_user_id': auth_id}
 
 # Example
 @APP.route("/echo", methods=['GET'])

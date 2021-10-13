@@ -1,1 +1,2 @@
-{"login": {}, "channels": {}, "messages": {}, "users": {}, "perms": {}}
+{"login": {}, "token": {}, "channels": {}, "dms": {}, "message_ids": {}, "messages": {}, "users": {}, "perms": {}}
+
