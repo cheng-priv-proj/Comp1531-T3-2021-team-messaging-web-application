@@ -89,8 +89,7 @@ class Datastore:
         with open('src/json_dump/data_store.txt', 'w') as FILE:
             json.dump(self.__store, FILE)
 
-    # Get Functions
-
+    # Get Functions ############################################################
     def get(self):
         return self.__store
 
@@ -108,7 +107,9 @@ class Datastore:
         return self.__store['token']
 
     def get_u_id_from_token(self, token):
-        return self.get_u_ids_from_token_dict().get(token)
+        check_none = self.get_u_ids_from_token_dict().get(token)
+
+        return -1 if check_none == None else check_none
 
     # channels
 
