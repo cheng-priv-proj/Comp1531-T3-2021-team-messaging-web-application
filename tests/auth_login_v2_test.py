@@ -5,7 +5,6 @@ import flask
 from src import config
 
 from src.auth import *
-from src.error import InputError
 from src.other import clear_v1
 
 # clear_v2
