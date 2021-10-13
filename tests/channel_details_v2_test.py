@@ -5,13 +5,11 @@ from src.other import clear_v1
 
 import requests
 
-# Clear_v2?
-# Error code?
-
 # Clears storage
 @pytest.fixture
 def clear():
-    clear_v1()
+    requests.delete(url + "clear/v1")
+
 
 # Generates the first user
 @pytest.fixture
