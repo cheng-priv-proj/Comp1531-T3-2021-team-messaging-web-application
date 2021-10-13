@@ -139,7 +139,7 @@ def test_channel_list_other_owners_test(clear, first_register, register_user, re
             }
         ]
     }
-@pytest.mark.skip('channel join needs to be implmented for this to work')
+
 # Tests the case that a user joins a new channel, and looking for an update the the list.
 def test_channel_list_after_newjoin_test(clear, first_register, register_user):
     channel_id = first_register.get('channel_id')
@@ -148,7 +148,6 @@ def test_channel_list_after_newjoin_test(clear, first_register, register_user):
     requests.post(url + 'channel/join/v2', json = {'token': token2, 'channel_id': channel_id})
 
     channel_list = requests.get(url + 'channels/list/v2', json = {'token': token2}).json()
-    print(channel_list)
     assert channel_list == { 
         'channels': [
             {
