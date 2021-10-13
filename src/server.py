@@ -193,7 +193,7 @@ def channel_messages_ep():
     returns -1 in "end" to indicate there are no more messages to load after this return.
 
     Parameters:{ token, channel_id, start }
-    
+
     Return Type:{ messages, start, end }
     
     InputError when any of:
@@ -218,6 +218,16 @@ def channel_messages_ep():
 
 @APP.route('/channels/list/v2', methods = ['GET'])
 def channel_list_endpt():
+    '''
+    channels/list/v2
+    Provide a list of all channels (and their associated details) that the authorised user is part of.
+
+    GET
+
+    Parameters:{ token }
+    
+    Return Type:{ channels }
+    '''
     list_details = request.get_json(force = True)
 
     token = list_details.get('token')
