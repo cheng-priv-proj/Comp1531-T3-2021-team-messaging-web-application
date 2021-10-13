@@ -207,9 +207,10 @@ def channel_details_endpt():
     request_data = request.get_json()
     token = request_data['token']
     auth_id = data_store.get_u_id_from_token(token)
-
     channel_id = request_data['channel_id']
+
     return_dict = channel_details_v1(auth_id, channel_id)
+    print(return_dict)
     return return_dict
 
 #### NO NEED TO MODIFY BELOW THIS POINT
