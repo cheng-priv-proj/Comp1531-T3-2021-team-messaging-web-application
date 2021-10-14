@@ -146,10 +146,7 @@ def test_send_invalid_message_to_long(clear, register, extract_token, extract_ch
     assert requests.post(url + 'message/send/v1', json = {
         'token': owner_token,
         'channel_id': channel_id,
-        'message': """aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-        aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-        aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-        aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"""
+        'message': 'a' * 1001
     }).status_code == 400
 
 def test_send_valid_message_unauthorized_user(clear, register, extract_token, extract_channel):
