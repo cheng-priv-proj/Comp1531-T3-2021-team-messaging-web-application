@@ -57,6 +57,7 @@ def test_send_one_valid_message(clear, register, extract_token, extract_user, ex
     channel_id = extract_channel(register)
     owner_token = extract_token(register)
     now = datetime.now()
+    print(owner_token)
     message_id = extract_message(requests.post(url + 'message/send/v1', json = {
         'token': owner_token,
         'channel_id': channel_id,
@@ -132,7 +133,7 @@ def test_send_invalid_message_to_short(clear, register, extract_token, extract_c
     channel_id = extract_channel(register)
     owner_token = extract_token(register)
 
-    assert requests.post(url + 'messages/send/v1', json = {
+    assert requests.post(url + 'message/send/v1', json = {
         'token': owner_token,
         'channel_id': channel_id,
         'message': ''
@@ -142,7 +143,7 @@ def test_send_invalid_message_to_long(clear, register, extract_token, extract_ch
     channel_id = extract_channel(register)
     owner_token = extract_token(register)
     
-    assert requests.post(url + 'messages/send/v1', json = {
+    assert requests.post(url + 'message/send/v1', json = {
         'token': owner_token,
         'channel_id': channel_id,
         'message': """aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
@@ -159,7 +160,7 @@ def test_send_valid_message_unauthorized_user(clear, register, extract_token, ex
     'name_first': 'user',
     'name_last': 'one' }
     ).json())
-    assert requests.post(url + 'messages/send/v1', json = {
+    assert requests.post(url + 'message/send/v1', json = {
         'token': user_token,
         'channel_id': channel_id,
         'message': '123456'
@@ -167,7 +168,7 @@ def test_send_valid_message_unauthorized_user(clear, register, extract_token, ex
 
 def test_send_message_invalid_channel_id(clear, register, extract_token, extract_user, extract_message):
     owner_token = extract_token(register)
-    assert requests.post(url + 'messages/send/v1', json = {
+    assert requests.post(url + 'message/send/v1', json = {
         'token': owner_token,
         'channel_id': 123123,
         'message': '123123'
@@ -175,14 +176,14 @@ def test_send_message_invalid_channel_id(clear, register, extract_token, extract
 
 def test_send_valid_message_invalid_token(clear, register, extract_token):
     channel_id = extract_token(register)
-    assert requests.post(url + 'messages/send/v1', json = {
+    assert requests.post(url + 'message/send/v1', json = {
         'token': '123123414',
         'channel_id': channel_id,
         'message': 'asds'
     }).status_code == 403
 
 def test_send_invalid_message_invalid_token(clear, register):
-    assert requests.post(url + 'messages/send/v1', json = {
+    assert requests.post(url + 'message/send/v1', json = {
         'token': '123123414',
         'channel_id': 23423,
         'message': ''
