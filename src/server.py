@@ -327,18 +327,14 @@ def channel_details_endpt():
     '''
 
     request_data = request.get_json()
-<<<<<<< HEAD
+
     token = request_data['token']
     auth_id = token_to_auth_id(token)
     channel_id = request_data['channel_id']
 
     return_dict = channel_details_v1(auth_id, channel_id)
     print(return_dict)
-=======
-    auth_id = request_data['token']
-    channel_id = request_data['channel_id']
-    return_dict = channel_details_v1(auth_id, channel_id)
->>>>>>> db1e8d902144be033cca8406330222d0f6999af7
+
     return return_dict
 
 #### NO NEED TO MODIFY BELOW THIS POINT
