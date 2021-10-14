@@ -62,7 +62,7 @@ def test_send_one_valid_message(clear, register, extract_token, extract_user, ex
         'token': owner_token,
         'channel_id': channel_id,
         'message': 'testmessage' }).json())
-    messages = requests.get(url + 'channel/messages/v2', params = {
+    messages = requests.get(url + 'channel/messages/v2', json = {
         'token': owner_token,
         'channel_id': channel_id, 
         'start': 0 }).json()
@@ -97,7 +97,7 @@ def test_send_multiple_valid_messages(clear, register, extract_token, extract_us
         'token': owner_token,
         'channel_id': channel_id,
         'message': 'testmessage2' }).json())
-    messages = requests.get(url + 'channel/messages/v2', params = {
+    messages = requests.get(url + 'channel/messages/v2', json = {
         'token': owner_token,
         'channel_id': channel_id, 
         'start': 0 }).json()
