@@ -47,10 +47,34 @@ def auth_id_v2(clear_server):
         })
     return response.json()
 
+# spec says that the token will be active so there are no excpetional cases
 
-# Test that expects an input error when a logged out user token is used to try and access channel_list
+# Test that expects an input error when a logged out user token is used to try and access channel_list_all
+# Not sure if return type is access or input error
 def test_standard_token_invalidation(clear_server, get_user_1):
     requests.post(config.url + 'auth/logout/v1', json={'token': get_user_1['token']}).json()
     resp = requests.get(config.url + 'channels/listall/v2', json = {'token': get_user_1['token']})
     assert(resp.status_code == 400)
 
+# 
+def test_standard_token_invalidation_2(clear_server, get_user_1):
+    requests.post(config.url + 'auth/logout/v1', json={'token': get_user_1['token']}).json()
+    resp = requests.get(config.url + 'channels/list/v2', json = {'token': get_user_1['token']})
+    assert(resp.status_code == 400)
+
+
+def test_standard_token_invalidation_3(clear_server, get_user_1):
+    requests.post(config.url + 'auth/logout/v1', json={'token': get_user_1['token']}).json()
+    resp = requests.post(config.url + 'channels/create/v2', json={'token': get_user_1['token'], 'name': 'randomtest', 'is_public': True}).json()
+    assert(resp.status_code == 400)
+
+# This one should be access error - 
+# "AccessError when:"
+#        "channel_id is valid and the authorised user is not a member of the channel"
+
+def test_standard_token_invalidation_4(clear_server, get_user_1):
+    c_id = requests.post(config.url + 'channels/create/v2', json={'token': get_user_1['token'], 'name': 'randomtest', 'is_public': True}).json()
+    requests.post(config.url + 'auth/logout/v1', json={'token': get_user_1['token']}).json()
+
+    resp = requests.get(config.url + 'channel/details/v2', json = {'token': get_user_1['token'], 'channel_id': c_id})
+    assert(resp.status_code == 403)
