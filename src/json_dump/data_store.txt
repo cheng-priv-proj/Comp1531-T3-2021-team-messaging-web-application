@@ -1,5 +1,1 @@
-<<<<<<< HEAD
-{"login": {}, "channels": {}, "dms": {}, "message_ids": {}, "messages": {}, "users": {}, "perms": {}}
-=======
 {"login": {}, "token": {}, "channels": {}, "dms": {}, "message_ids": {}, "messages": {}, "users": {}, "perms": {}}
->>>>>>> 55bb6d6c46ff9da6798200047d3a652d4dcfa943
