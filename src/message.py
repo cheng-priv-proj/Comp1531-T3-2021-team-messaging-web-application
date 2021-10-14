@@ -48,7 +48,7 @@ def message_send_v1(auth_user_id, channel_id, message):
         'message_id': message_id,
         'u_id': auth_user_id,
         'message': message,
-        'time_created': datetime.now
+        'time_created': datetime.utcnow().timestamp()
     }
 
     data_store.insert_message(channel_id, message_dict)
@@ -99,7 +99,7 @@ def message_senddm_v1(auth_user_id, dm_id, message):
         'message_id': message_id,
         'u_id': auth_user_id,
         'message': message,
-        'time_created': datetime.now
+        'time_created': datetime.utcnow().timestamp()
     }
 
     data_store.insert_message(dm_id, message_dict)

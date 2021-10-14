@@ -73,7 +73,7 @@ def register():
 def test_senddm_one_valid_message(clear, register, extract_token, extract_user, extract_dm, extract_message):
     dm_id = extract_dm(register)
     owner_token = extract_token(register)
-    now = datetime.now()
+    now = datetime.utcnow().timestamp()
     message_id = extract_message(requests.post(url + 'message/senddm/v1', json = {
         'token': owner_token,
         'dm_id': dm_id,
@@ -100,7 +100,7 @@ def test_senddm_multiple_valid_messages(clear, register, extract_token, extract_
     dm_id = extract_dm(register)
     owner_token = extract_token(register)
     owner_id = extract_user(register)
-    now = datetime.now()
+    now = datetime.utcnow().timestamp()
     message_id0 = extract_message(requests.post(url + 'message/senddm/v1', json = {
         'token': owner_token,
         'dm_id': dm_id,
@@ -149,7 +149,7 @@ def test_senddm_invalid_message_to_short(clear, register, extract_token, extract
     dm_id = extract_dm(register)
     owner_token = extract_token(register)
 
-    assert requests.post(url + 'messages/senddm/v1', json = {
+    assert requests.post(url + 'message/senddm/v1', json = {
         'token': owner_token,
         'dm_id': dm_id,
         'message': ''
@@ -159,13 +159,10 @@ def test_senddm_invalid_message_to_long(clear, register, extract_token, extract_
     dm_id = extract_dm(register)
     owner_token = extract_token(register)
     
-    assert requests.post(url + 'messages/senddm/v1', json = {
+    assert requests.post(url + 'message/senddm/v1', json = {
         'token': owner_token,
         'dm_id': dm_id,
-        'message': """aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-        aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-        aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-        aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"""
+        'message': 'a' * 1001
     }).status_code == 400
 @pytest.mark.skip
 def test_senddm_valid_message_unauthorized_user(clear, register, extract_token, extract_dm):
@@ -176,7 +173,7 @@ def test_senddm_valid_message_unauthorized_user(clear, register, extract_token, 
     'name_first': 'user',
     'name_last': 'one' }
     ).json())
-    assert requests.post(url + 'messages/senddm/v1', json = {
+    assert requests.post(url + 'message/senddm/v1', json = {
         'token': user_token,
         'dm_id': dm_id,
         'message': '123456'
@@ -184,7 +181,7 @@ def test_senddm_valid_message_unauthorized_user(clear, register, extract_token, 
 @pytest.mark.skip
 def test_senddm_message_invalid_dm_id(clear, register, extract_token, extract_user, extract_message):
     owner_token = extract_token(register)
-    assert requests.post(url + 'messages/senddm/v1', json = {
+    assert requests.post(url + 'message/senddm/v1', json = {
         'token': owner_token,
         'dm_id': 123123,
         'message': '123123'
@@ -192,14 +189,14 @@ def test_senddm_message_invalid_dm_id(clear, register, extract_token, extract_us
 @pytest.mark.skip
 def test_senddm_valid_message_invalid_token(clear, register, extract_token):
     dm_id = extract_token(register)
-    assert requests.post(url + 'messages/senddm/v1', json = {
+    assert requests.post(url + 'message/senddm/v1', json = {
         'token': '123123414',
         'dm_id': dm_id,
         'message': 'asds'
     }).status_code == 403
 @pytest.mark.skip
 def test_senddm_invalid__invalid_token(clear, register):
-    assert requests.post(url + 'messages/senddm/v1', json = {
+    assert requests.post(url + 'message/senddm/v1', json = {
         'token': '123123414',
         'dm_id': 23423,
         'message': ''
