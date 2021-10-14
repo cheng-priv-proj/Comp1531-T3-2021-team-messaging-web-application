@@ -38,7 +38,7 @@ def extract_id():
 @pytest.fixture
 def user1():
     response = requests.post(config.url + 'auth/register/v2', json={
-        'email': 'user@email.com', 
+        'email': 'user1@test.com', 
         'password': 'potato', 
         'name_first': 'a', 
         'name_last' : 'one'
@@ -48,7 +48,7 @@ def user1():
 @pytest.fixture
 def user2():
     response = requests.post(config.url + 'auth/register/v2', json={
-        'email': 'user2@email.com', 
+        'email': 'user2@test.com', 
         'password': 'spotato', 
         'name_first': 'b', 
         'name_last' : 'two'
@@ -58,7 +58,7 @@ def user2():
 @pytest.fixture
 def user3():
     response = requests.post(config.url + 'auth/register/v2', json={
-            'email': 'user3@email.com',
+            'email': 'user3@test.com',
             'password': 'spotatoo', 
             'name_first': 'c',
             'name_last': 'three',
