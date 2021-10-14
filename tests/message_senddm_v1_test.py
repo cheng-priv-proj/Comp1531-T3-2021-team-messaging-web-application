@@ -124,19 +124,19 @@ def test_senddm_multiple_valid_messages(clear, register, extract_token, extract_
             {
                 'message_id': message_id2,
                 'u_id': owner_id,
-                'message': 'testmessage1',
+                'message': 'testmessage2',
                 'time_created': pytest.approx(now, rel=2)
             },
             {
                 'message_id': message_id1,
                 'u_id': owner_id,
-                'message': 'testmessage0',
+                'message': 'testmessage1',
                 'time_created': pytest.approx(now, rel=2)
             },
             {
                 'message_id': message_id0,
                 'u_id': owner_id,
-                'message': 'testmessage',
+                'message': 'testmessage0',
                 'time_created':  pytest.approx(now, rel=2)
             }
             ],
