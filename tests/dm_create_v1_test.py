@@ -210,7 +210,7 @@ def test_multiple_handles(clear, user1, user2, extract_dm, extract_id, extract_t
     }
 
 # Test alphabetically sorted
-def test_alphabetically_sorted(clear, user1, user2, user3, extract_dm, extract_id, extract_token):
+def test_name_alphabetically_sorted(clear, user1, user2, user3, extract_dm, extract_id, extract_token):
     user1_id = extract_id(user1)
     token1 = extract_token(user1)
     user2_id = extract_id(user2)
@@ -229,29 +229,6 @@ def test_alphabetically_sorted(clear, user1, user2, user3, extract_dm, extract_i
     }).json()
     
     # Find all members
-    assert dm_details == {
-        'name': 'aone, btwo, cthree',
-        'members': [
-            {
-                'u_id': user1_id,
-                'email': 'user1@test.com',
-                'name_first': 'a',
-                'name_last': 'one',
-                'handle_str': 'aone'
-            },
-            {
-                'u_id': user2_id,
-                'email': 'user2@test.com',
-                'name_first': 'b',
-                'name_last': 'two',
-                'handle_str': 'btwo'
-            },
-            {
-                'u_id': user3_id,
-                'email': 'user3@test.com',
-                'name_first': 'c',
-                'name_last': 'three',
-                'handle_str': 'cthree'
-            },
-        ]
+    assert dm_details['name'] == {
+        'name': 'aone, btwo, cthree'
     }
