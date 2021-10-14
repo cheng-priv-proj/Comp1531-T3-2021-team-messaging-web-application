@@ -20,36 +20,50 @@ def extract_dm():
         return dm_id_dict.get('dm_id')
     return extract_dm_function
 
+# Extract token from channel details
+@pytest.fixture
+def extract_token():
+    def extract_token_function(auth_details):
+        return auth_details.get('token')
+    return extract_token_function
+
+# Extract id from channel details
+@pytest.fixture
+def extract_id():
+    def extract_token_function(auth_details):
+        return auth_details.get('auth_user_id')
+    return extract_token_function
+
 # Fixture to register someone and returns a dictionary of {token, auth_user_id}
 @pytest.fixture
-def token1():
+def user1():
     response = requests.post(config.url + 'auth/register/v2', json={
-        'email': 'example@email.com', 
+        'email': 'user@email.com', 
         'password': 'potato', 
-        'name_first': 'apple', 
+        'name_first': 'a', 
         'name_last' : 'one'
     }).json()
-    return response.get('token')
+    return response
 
 @pytest.fixture
-def token2():
+def user2():
     response = requests.post(config.url + 'auth/register/v2', json={
-        'email': 'owner@test.com', 
+        'email': 'user2@email.com', 
         'password': 'spotato', 
-        'name_first': 'banana', 
+        'name_first': 'b', 
         'name_last' : 'two'
     }).json()
-    return response.get('token')
+    return response
 
 @pytest.fixture
-def token3():
+def user3():
     response = requests.post(config.url + 'auth/register/v2', json={
-            'email': 'eexample@email.com',
+            'email': 'user3@email.com',
             'password': 'spotatoo', 
-            'name_first': 'crabapple',
+            'name_first': 'c',
             'name_last': 'three',
     }).json()
-    return response.get('token')
+    return response
 
 # Might add test with valid_u_id some other time too tho
 # Test access error priority
@@ -67,7 +81,9 @@ def test_invalid_token(clear):
     assert resp.status_code == 403
 
 # Test Invalid u_id
-def test_invalid_u_id(clear, token1):
+def test_invalid_u_id(clear, user1, extract_token):
+    token1 = extract_token(user1)
+
     invalid_u_id = -1000
     invalid_u_ids = [invalid_u_id]
     resp = requests.post(config.url + 'dm/create/v1', json={
@@ -78,10 +94,14 @@ def test_invalid_u_id(clear, token1):
     assert resp.status_code == 400
 
 # Test multiple Invalid u_id
-def test_multiple_invalid_u_ids(clear, token1):
+def test_multiple_invalid_u_ids(clear, user1, user2):
+    token1 = extract_token(user1)
+
     invalid_u_id1 = -1000
-    invalid_u_id2 = -2000
-    invalid_u_ids = [invalid_u_id1, invalid_u_id2]
+    valid_u_id2 = extract_id(user2)
+
+    invalid_u_ids = [invalid_u_id1, valid_u_id2]
+
     resp = requests.post(config.url + 'dm/create/v1', json={
         'token': token1, 
         'u_ids': invalid_u_ids
@@ -89,8 +109,10 @@ def test_multiple_invalid_u_ids(clear, token1):
     
     assert resp.status_code == 400
 
-# Test only one person
-def test_only_creator_dm(clear, token1, extract_dm):
+def test_dm_id_correct(clear, user1, extract_dm, extract_token, extract_id):
+    auth1 = extract_id(user1)
+    token1 = extract_token(user1)
+
     u_ids = []
 
     dm_id = extract_dm(requests.post(config.url + 'dm/create/v1', json={
@@ -102,49 +124,134 @@ def test_only_creator_dm(clear, token1, extract_dm):
         'token': token1,
         'dm_id': dm_id
     }).json()
-
+    
+    # Find all members
     assert dm_details == {
-        'name': 'appleone',
-        'members': 'Start here' # This isn't finished go from here
+        'name': 'aone',
+        'members': [
+            {
+                'u_id': auth1,
+                'email': 'user1@test.com',
+                'name_first': 'a',
+                'name_last': 'one',
+                'handle_str': 'aone'
+            }
+        ]
     }
 
-# Test returns correct dm_id
-def test_returns_id(clear, get_valid_token, get_valid_token_2, get_valid_token_3):
-    auth_ids = [get_valid_token['auth_user_id'], get_valid_token_2['auth_user_id']]
-    resp = requests.post(config.url + 'dm/create/v1', json={'token': get_valid_token_3['token'], 'u_ids': auth_ids}).json()
+# Test only one person
+def test_only_creator_dm(clear, user1, extract_dm, extract_token, extract_id):
+    auth1 = extract_id(user1)
+    token1 = extract_token(user1)
 
-    assert resp['dm_id'] == 1
+    u_ids = []
 
-# Test create multiple dm
-def test_returns_unique_ids(clear, get_valid_token, get_valid_token_2, get_valid_token_3):
-    user1 = get_valid_token['auth_user_id']
-    user2 = get_valid_token_2['auth_user_id']
-    user3 = get_valid_token_3['auth_user_id']
+    dm_id = extract_dm(requests.post(config.url + 'dm/create/v1', json={
+        'token': token1, 
+        'u_ids': u_ids
+    }).json())
+
+    dm_details = requests.get(config.url + 'dm/details/v1', json = {
+        'token': token1,
+        'dm_id': dm_id
+    }).json()
     
-    resp1 = requests.post(config.url + 'dm/create/v1', json={'token': user1['token'], 'u_ids': [user2, user3]}).json()
-    resp2 = requests.post(config.url + 'dm/create/v1', json={'token': user3['token'], 'u_ids': [user1, user2]}).json()
-
-    assert resp1['dm_id'] != resp2['dm_id']
-
-# Test create dm name
-def test_name(clear, get_valid_token, get_valid_token_2, get_valid_token_3):
-    auth_ids = [get_valid_token['auth_user_id'], get_valid_token_2['auth_user_id']]
-
-    resp = requests.post(config.url + 'dm/create/v1', json={'token': get_valid_token_3['token'], 'u_ids': auth_ids}).json()
-    resp_details = requests.get(config.url + 'dm/details/v1', json={'token': get_valid_token_3, 'dm_id': resp['dm_id']}).json()
-
-    assert resp_details['name'] == ['Johnsmith', 'ownerone']
-
-def test_members(clear, get_valid_token, get_valid_token_2, get_valid_token_3):
-    auth_ids = [get_valid_token['auth_user_id'], get_valid_token_2['auth_user_id']]
-    resp = requests.post(config.url + 'dm/create/v1', json={'token': get_valid_token_3['token'], 'u_ids': auth_ids}).json()
-    resp_details = requests.get(config.url + 'dm/details/v1', json={'token': get_valid_token_3, 'dm_id': resp['dm_id']}).json()
-
-    #not sure what members looks like
-    assert resp_details['members'] == ''
+    # Find all members
+    assert dm_details == {
+        'name': 'aone',
+        'members': [
+            {
+                'u_id': auth1,
+                'email': 'user1@test.com',
+                'name_first': 'a',
+                'name_last': 'one',
+                'handle_str': 'aone'
+            }
+        ]
+    }
 
 # Test multiple handles
+def test_multiple_handles(clear, user1, user2, extract_dm, extract_id, extract_token):
+    user1_id = extract_id(user1)
+    token1 = extract_token(user1)
+    user2_id = extract_id(user2)
+
+    u_ids = [user2_id]
+
+    dm_id = extract_dm(requests.post(config.url + 'dm/create/v1', json={
+        'token': token1, 
+        'u_ids': u_ids
+    }).json())
+
+    dm_details = requests.get(config.url + 'dm/details/v1', json = {
+        'token': token1,
+        'dm_id': dm_id
+    }).json()
+    
+    # Find all members
+    assert dm_details == {
+        'name': 'aone, btwo',
+        'members': [
+            {
+                'u_id': user1_id,
+                'email': 'user1@test.com',
+                'name_first': 'a',
+                'name_last': 'one',
+                'handle_str': 'aone'
+            },
+            {
+                'u_id': user2_id,
+                'email': 'user2@test.com',
+                'name_first': 'b',
+                'name_last': 'two',
+                'handle_str': 'atwo'
+            },
+        ]
+    }
 
 # Test alphabetically sorted
+def test_alphabetically_sorted(clear, user1, user2, user3, extract_dm, extract_id, extract_token):
+    user1_id = extract_id(user1)
+    token1 = extract_token(user1)
+    user2_id = extract_id(user2)
+    user3_id = extract_id(user3)
 
-# Test owner created (Not yet implemented)
+    u_ids = [user2_id, user3]
+
+    dm_id = extract_dm(requests.post(config.url + 'dm/create/v1', json={
+        'token': token1, 
+        'u_ids': u_ids
+    }).json())
+
+    dm_details = requests.get(config.url + 'dm/details/v1', json = {
+        'token': token1,
+        'dm_id': dm_id
+    }).json()
+    
+    # Find all members
+    assert dm_details == {
+        'name': 'aone, btwo, cthree',
+        'members': [
+            {
+                'u_id': user1_id,
+                'email': 'user1@test.com',
+                'name_first': 'a',
+                'name_last': 'one',
+                'handle_str': 'aone'
+            },
+            {
+                'u_id': user2_id,
+                'email': 'user2@test.com',
+                'name_first': 'b',
+                'name_last': 'two',
+                'handle_str': 'btwo'
+            },
+            {
+                'u_id': user3_id,
+                'email': 'user3@test.com',
+                'name_first': 'c',
+                'name_last': 'three',
+                'handle_str': 'cthree'
+            },
+        ]
+    }
