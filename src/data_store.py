@@ -132,11 +132,11 @@ class Datastore:
 
     # messages
 
-    def get_channels_or_dms_id_from_message_id_dict(self):
+    def get_channel_or_dm_id_from_message_id_dict(self):
         return self.__store['message_ids']
 
     def get_channel_or_dm_id_from_message_id(self, message_id):
-        return self.get_channels_or_dms_id_from_message_id_dict().get(message_id)
+        return self.get_channel_or_dm_id_from_message_id_dict().get(message_id)
 
     def get_messages_from_channel_or_dm_id_dict(self):
         return self.__store['messages']
@@ -270,7 +270,7 @@ class Datastore:
         self.get_messages_from_channel_or_dm_id(id).insert(0, message)
         self.get_channel_or_dm_id_from_message_id_dict()[message.get('message_id')] = id
         self.update_json()
-
+        
     def update_value(self, dict_key, key, value):
         self.__store[dict_key][key] = value
         self.update_json()
