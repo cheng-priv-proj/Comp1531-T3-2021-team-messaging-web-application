@@ -144,21 +144,6 @@ class Datastore:
     def get_messages_from_channel_or_dm_id(self, id):
         return self.get_messages_from_channel_or_dm_id_dict().get(id)
 
-
-    # messages
-
-    def get_channel_or_dm_id_from_message_id_dict(self):
-        return self.__store['message_ids']
-
-    def get_channel_or_dm_id_from_message_id(self, message_id):
-        return self.get_channel_or_dm_id_from_message_id_dict().get(message_id)
-
-    def get_messages_from_channel_or_dm_id_dict(self):
-        return self.__store['messages']
-  
-    def get_messages_from_channel_or_dm_id(self, id):
-        return self.get_messages_from_channel_or_dm_id_dict().get(id)
-
     # users
 
     def get_users_from_u_id_dict(self):
@@ -191,7 +176,7 @@ class Datastore:
         
     def is_user_member_of_dm(self, dm_id, u_id):
 
-        dm = self.get_dms_from_dm_id(dm_id)
+        dm = self.get_dm_from_dm_id(dm_id)
         if u_id not in dm.get('details').get('members'):
             return False
         
@@ -284,6 +269,7 @@ class Datastore:
     def insert_message(self, id, message):
         self.get_messages_from_channel_or_dm_id(id).insert(0, message)
         self.get_channel_or_dm_id_from_message_id_dict()[message.get('message_id')] = id
+        self.update_json()
 
     def update_value(self, dict_key, key, value):
         self.__store[dict_key][key] = value

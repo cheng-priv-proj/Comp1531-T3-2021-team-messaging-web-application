@@ -60,7 +60,7 @@ def test_no_messages(register, dm_factory):
         'start': 0
     }).json()
 
-    assert messages_dict is {
+    assert messages_dict == {
         'messages': [],
         'start': 0,
         'end': -1
@@ -69,11 +69,11 @@ def test_no_messages(register, dm_factory):
 def test_invalid_token_valid_dm_id(register):
     dm_id = dm_factory(register[0]['token'], [])
 
-    messages_dict = requests.get(url + 'dm/messages/v1', json = {
+    assert requests.get(url + 'dm/messages/v1', json = {
         'token': register[1]['token'],
         'dm_id': dm_id,
         'start': 0
-    }).status_code is 403
+    }).status_code == 403
 @pytest.mark.skip
 def test_invalid_dm_id(register):
 
@@ -81,7 +81,7 @@ def test_invalid_dm_id(register):
         'token': register[0]['token'],
         'dm_id': 0,
         'start': 0
-    }).status_code is 400
+    }).status_code == 400
 @pytest.mark.skip
 def test_invalid_start(register, dm_factory):
     dm_id = dm_factory(register[0]['token'], [])
@@ -90,7 +90,7 @@ def test_invalid_start(register, dm_factory):
         'token': register[0]['token'],
         'dm_id': dm_id,
         'start': 50
-    }).status_code is 400
+    }).status_code == 400
     pass
 @pytest.mark.skip
 def test_invalid_dm_and_token(clear):
@@ -98,4 +98,4 @@ def test_invalid_dm_and_token(clear):
         'token': 'no token has been registered',
         'dm_id': 1,
         'start': 0
-    }).status_code is 400
+    }).status_code == 400
