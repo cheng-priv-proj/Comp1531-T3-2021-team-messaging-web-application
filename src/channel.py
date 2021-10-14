@@ -141,16 +141,17 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     no_of_messages = len(messages)
 
     end = start + 50
-
+    slice_end = end + 1
     if start > no_of_messages:
         raise InputError('start is greater than the total number of messages in the channel')
 
     # accounts for when given empty channel and start = 0
     elif  start + 50 >= no_of_messages:
         end = -1
+        slice_end = None
     
     return {
-        'messages' : messages[start:end],
+        'messages' : messages[start:slice_end],
         'start': start,
         'end' : end
         }
