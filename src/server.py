@@ -15,6 +15,7 @@ from src.channel import channel_invite_v1, channel_messages_v1, channel_details_
 from src.data_store import data_store
 from src.error import InputError
 from src.other import clear_v1
+from src.other import token_to_auth_id
 
 def quit_gracefully(*args):
     '''For coverage'''
