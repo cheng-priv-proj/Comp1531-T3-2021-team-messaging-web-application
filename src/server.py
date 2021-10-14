@@ -4,6 +4,8 @@ from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
 from src import config
+from src.channel import channel_join_v1, channel_details_v1
+
 
 from src.channel import channel_join_v1, channel_details_v1
 from src.channels import channels_listall_v1, channels_list_v1
@@ -298,6 +300,7 @@ def channel_join_endpt():
     '''
     
     join_details = request.get_json()
+
     token = join_details['token']
     auth_id = token_to_auth_id(token)
     channel_id = join_details['channel_id']
@@ -324,12 +327,18 @@ def channel_details_endpt():
     '''
 
     request_data = request.get_json()
+<<<<<<< HEAD
     token = request_data['token']
     auth_id = token_to_auth_id(token)
     channel_id = request_data['channel_id']
 
     return_dict = channel_details_v1(auth_id, channel_id)
     print(return_dict)
+=======
+    auth_id = request_data['token']
+    channel_id = request_data['channel_id']
+    return_dict = channel_details_v1(auth_id, channel_id)
+>>>>>>> db1e8d902144be033cca8406330222d0f6999af7
     return return_dict
 
 #### NO NEED TO MODIFY BELOW THIS POINT
