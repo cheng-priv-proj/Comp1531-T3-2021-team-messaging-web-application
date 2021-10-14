@@ -84,3 +84,59 @@ def dm_details_v1(auth_id, dm_id):
 
     return data_store.get_dm_from_dm_id(dm_id).get('details')
         
+
+def dm_list_v1(token):
+    '''
+    Returns a list of DMs that the user is a member of
+    '''
+    dm_list = { 'dms': [] }
+
+    u_id = data_store.get_uid_from_token(token)
+    if u_id == -1:
+        raise AccessError("Invalid auth user id")
+
+    dms = data_store.get_dms_from_dm_id_dict()
+
+    for dm_id in dms:
+        for member in dm_id['details']['members']:
+            if member['u_id'] == u_id:
+                dm_list['dms'].append(
+                    {
+                        'dm_id': dm_id
+                        'name': dm_id['details']['name']
+                    }
+                )
+
+    return dm_list
+
+def dm_messages_v1(token, dm_id, start):
+    '''
+    Returns a list of messages between index 'start' and up to 'start' + 50 from a
+    given DM that the authorised user has access to. Additionally returns
+    'start', and 'end' = 'start' + 50
+
+    '''
+
+    if start < 0:
+        raise InputError('start is a negative integer')
+
+    # need to check if dm id exists and auth_id is in dm
+
+    messages = data_store.get_messages_from_channel_or_dm_id(dm_id)
+    no_of_messages = len(messages)
+
+    end = start + 50
+
+    if start > no_of_messages:
+        raise InputError('start is greater than the total number of messages in the channel')
+
+    # accounts for when given empty channel and start = 0
+    elif start + 50 >= no_of_messages:
+        end = -1
+    
+    return {
+        'messages' : messages,
+        'start': start,
+        'end' : end
+        }
+
