@@ -127,7 +127,7 @@ def test_send_multiple_valid_messages(clear, register, extract_token, extract_us
         'end': -1
     }
 
-    assert extract_message(messages[0]) != extract_message(messages[1]) != extract_message(messages[2])
+    assert extract_message(messages['messages'][0]) != extract_message(messages['messages'][1]) != extract_message(messages['messages'][2])
     
 def test_send_invalid_message_to_short(clear, register, extract_token, extract_channel):
     channel_id = extract_channel(register)

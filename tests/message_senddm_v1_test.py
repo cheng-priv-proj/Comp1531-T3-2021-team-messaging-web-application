@@ -144,7 +144,7 @@ def test_senddm_multiple_valid_messages(clear, register, extract_token, extract_
         'end': -1
     }
 
-    assert extract_message(messages[0]) != extract_message(messages[1]) != extract_message(messages[2])
+    assert extract_message(messages['messages'][0]) != extract_message(messages['messages'][1]) != extract_message(messages['messages'][2])
 @pytest.mark.skip
 def test_senddm_invalid_message_to_short(clear, register, extract_token, extract_dm):
     dm_id = extract_dm(register)
