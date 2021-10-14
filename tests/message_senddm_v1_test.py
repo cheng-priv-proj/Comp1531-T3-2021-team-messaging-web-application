@@ -196,14 +196,14 @@ def test_senddm_valid_message_invalid_token(clear, register, extract_token):
         'token': '123123414',
         'dm_id': dm_id,
         'message': 'asds'
-    }) == 403
+    }).status_code == 403
 
 def test_senddm_invalid__invalid_token(clear, register):
     assert requests.post(url + 'messages/senddm/v1', json = {
         'token': '123123414',
         'dm_id': 23423,
         'message': ''
-    }) == 403
+    }).status_code == 403
 
 # valid dm id
 # valid length of message too small and too long
