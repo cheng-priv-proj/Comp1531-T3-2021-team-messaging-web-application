@@ -105,10 +105,10 @@ def test_send_multiple_valid_messages(clear, register, extract_token, extract_us
     assert messages == {
         'messages': [
             {
-                'message_id': message_id0,
+                'message_id': message_id2,
                 'u_id': owner_id,
-                'message': 'testmessage',
-                'time_created':  pytest.approx(now, rel=2)
+                'message': 'testmessage1',
+                'time_created': pytest.approx(now, rel=2)
             },
             {
                 'message_id': message_id1,
@@ -117,10 +117,10 @@ def test_send_multiple_valid_messages(clear, register, extract_token, extract_us
                 'time_created': pytest.approx(now, rel=2)
             },
             {
-                'message_id': message_id2,
+                'message_id': message_id0,
                 'u_id': owner_id,
-                'message': 'testmessage1',
-                'time_created': pytest.approx(now, rel=2)
+                'message': 'testmessage',
+                'time_created':  pytest.approx(now, rel=2)
             }
             ],
         'start': 0,
