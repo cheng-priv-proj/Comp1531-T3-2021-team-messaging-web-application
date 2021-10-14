@@ -167,13 +167,19 @@ class Datastore:
         return True
 
     def is_user_member_of_channel(self, channel_id, u_id):
-
         channels = self.get_channels_from_channel_id_dict().get(channel_id)
         if not any (member['u_id'] == u_id for member in channels['all_members']):
             return False
         
         return True
     
+    def is_user_member_of_dm(self, dm_id, u_id):
+        dms = self.get_dm_from_dm_id(dm_id)
+        if any (member['u_id'] == u_id for member in dms['members']):
+            return True
+        
+        return False
+
     def is_stream_owner(self, u_id):
         return self.get_user_perms_from_u_id_dict().get(u_id) == 1
 
@@ -201,6 +207,13 @@ class Datastore:
     def is_invalid_channel_id(self, channel_id):
         channels = self.get_channels_from_channel_id_dict()
         if channel_id not in channels:
+            return True
+        
+        return False
+
+    def is_invalid_dm_id(self, dm_id):
+        dms = self.get_dms_from_dm_id_dict()
+        if dm_id not in dms:
             return True
         
         return False
