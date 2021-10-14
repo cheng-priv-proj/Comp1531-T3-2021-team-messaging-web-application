@@ -35,7 +35,7 @@ def message_send_v1(auth_user_id, channel_id, message):
     if data_store.is_invalid_channel_id(channel_id):
         raise InputError('invalid channel_id')
 
-    if data_store.is_user_member_of_channel(channel_id, auth_user_id):
+    if not data_store.is_user_member_of_channel(channel_id, auth_user_id):
         raise AccessError('channel_id is valid but the authorised user is not a member of the channel')
 
     if len(message) < 1 or len(message) > 1000:
@@ -86,7 +86,7 @@ def message_senddm_v1(auth_user_id, dm_id, message):
     if data_store.is_invalid_dm_id(dm_id):
         raise InputError('invalid dm_id')
 
-    if data_store.is_user_member_of_dm(dm_id, auth_user_id):
+    if not data_store.is_user_member_of_dm(dm_id, auth_user_id):
         raise AccessError('channel_id is valid but the authorised user is not a member of the dm')
 
     if len(message) < 1 or len(message) > 1000:
