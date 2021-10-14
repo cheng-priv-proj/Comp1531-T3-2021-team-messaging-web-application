@@ -7,28 +7,28 @@ from src.config import url
 @pytest.fixture
 def register(clear):
     owner_id = requests.post(url + 'auth/register/v2', json = {
-        'username': 'owner@test.com', 
+        'email': 'owner@test.com', 
         'password': 'password', 
         'name_first': 'owner',
         'name_last': 'one' }
         ).json()
 
     user1_id = requests.post(url + 'auth/register/v2', json = {
-        'username': 'user@test.com', 
+        'email': 'user@test.com', 
         'password': 'password', 
         'name_first': 'user',
         'name_last': 'one' }
     ).json()
 
     user2_id = requests.post(url + 'auth/register/v2', json = {
-        'username': 'user@test.com', 
+        'email': 'user@test.com', 
         'password': 'password', 
         'name_first': 'user',
         'name_last': 'two' }
     ).json()
 
     user3_id = requests.post(url + 'auth/register/v2', json = {
-        'username': 'user@test.com', 
+        'email': 'user@test.com', 
         'password': 'password', 
         'name_first': 'user',
         'name_last': 'three' }

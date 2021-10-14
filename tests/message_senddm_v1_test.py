@@ -50,14 +50,14 @@ def clear():
 @pytest.fixture
 def register():
     owner_id_dict = requests.post(url + 'auth/register/v2', json = {
-        'username': 'owner@test.com', 
+        'email': 'owner@test.com', 
         'password': 'password', 
         'name_first': 'owner',
         'name_last': 'one' }
         ).json()
     owner_user_token = owner_id_dict['token']
     user_id_dict = requests.post(url + 'auth/register/v2', json = {
-        'username': 'user@test.com', 
+        'email': 'user@test.com', 
         'password': 'password', 
         'name_first': 'user',
         'name_last': 'one' }
@@ -171,7 +171,7 @@ def test_senddm_invalid_message_to_long(clear, register, extract_token, extract_
 def test_senddm_valid_message_unauthorized_user(clear, register, extract_token, extract_dm):
     dm_id = extract_dm(register)
     user_token = extract_token(requests.post(url + 'auth/register/v2', json = {
-    'username': 'user@test.com', 
+    'email': 'user@test.com', 
     'password': 'password', 
     'name_first': 'user',
     'name_last': 'one' }

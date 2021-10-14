@@ -40,7 +40,7 @@ def clear():
 @pytest.fixture
 def register():
     owner_id_dict = requests.post(url + 'auth/register/v2', json = {
-        'username': 'owner@test.com', 
+        'email': 'owner@test.com', 
         'password': 'password', 
         'name_first': 'owner',
         'name_last': 'one' }
