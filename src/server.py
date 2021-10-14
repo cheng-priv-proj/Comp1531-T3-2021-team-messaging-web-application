@@ -134,7 +134,7 @@ def channel_create_ep():
     create_details = request.get_json(force = True)
 
     token = create_details.get('token')
-    auth_user_id = data_store.get_u_id_from_token(token) # Does it return NONE?
+    auth_user_id = token_to_auth_id(token)
     name = create_details.get('name')
     is_public = create_details.get('is_public')
 
@@ -173,7 +173,7 @@ def channel_invite_ep():
     invite_details = request.get_json(force = True)
 
     token = invite_details.get('token')
-    auth_user_id = data_store.get_u_id_from_token(token)
+    auth_user_id = token_to_auth_id(token)
     channel_id = invite_details.get('channel_id')
     u_id = invite_details.get('u_id')
 
@@ -209,7 +209,7 @@ def channel_messages_ep():
     message_get_details = request.get_json(force = True)
 
     token = message_get_details.get('token')
-    auth_user_id = data_store.get_u_id_from_token(token)
+    auth_user_id = token_to_auth_id(token)
     channel_id = message_get_details.get('channel_id')
     start = message_get_details.get('start')
 
@@ -233,7 +233,7 @@ def channel_list_endpt():
     list_details = request.get_json(force = True)
 
     token = list_details.get('token')
-    auth_user_id = data_store.get_u_id_from_token(token)
+    auth_user_id = token_to_auth_id(token)
 
     return channels_list_v1(auth_user_id)
 
@@ -255,7 +255,7 @@ def list_all():
     listall_details = request.get_json(force = True)
 
     token = listall_details.get('token')
-    auth_user_id = data_store.get_u_id_from_token(token)
+    auth_user_id = token_to_auth_id(token)
 
     return channels_listall_v1(auth_user_id)
 
@@ -299,7 +299,7 @@ def channel_join_endpt():
     
     join_details = request.get_json()
     token = join_details['token']
-    auth_id = data_store.get_u_id_from_token(token)
+    auth_id = token_to_auth_id(token)
     channel_id = join_details['channel_id']
     channel_join_v1(auth_id, channel_id)
     
@@ -325,7 +325,7 @@ def channel_details_endpt():
 
     request_data = request.get_json()
     token = request_data['token']
-    auth_id = data_store.get_u_id_from_token(token)
+    auth_id = token_to_auth_id(token)
     channel_id = request_data['channel_id']
 
     return_dict = channel_details_v1(auth_id, channel_id)
