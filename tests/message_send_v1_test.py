@@ -73,7 +73,7 @@ def test_send_one_valid_message(clear, register, extract_token, extract_user, ex
                 'message_id': message_id,
                 'u_id': extract_user(register),
                 'message': 'testmessage',
-                'time_created':  now
+                'time_created':  pytest.approx(now)
             }
         ],
         'start': 0,
@@ -108,19 +108,19 @@ def test_send_multiple_valid_messages(clear, register, extract_token, extract_us
                 'message_id': message_id0,
                 'u_id': owner_id,
                 'message': 'testmessage',
-                'time_created':  now
+                'time_created':  pytest.approx(now)
             },
             {
                 'message_id': message_id1,
                 'u_id': owner_id,
                 'message': 'testmessage0',
-                'time_created': now
+                'time_created': pytest.approx(now)
             },
             {
                 'message_id': message_id2,
                 'u_id': owner_id,
                 'message': 'testmessage1',
-                'time_created': now
+                'time_created': pytest.approx(now)
             }
             ],
         'start': 0,

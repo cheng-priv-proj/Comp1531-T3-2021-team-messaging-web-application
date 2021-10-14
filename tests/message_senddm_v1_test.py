@@ -1,3 +1,4 @@
+from _pytest.python_api import approx
 import pytest
 import requests
 from datetime import datetime
@@ -89,7 +90,7 @@ def test_senddm_one_valid_message(clear, register, extract_token, extract_user, 
                 'message_id': message_id,
                 'u_id': extract_user(register),
                 'message': 'testmessage',
-                'time_created':  now
+                'time_created': pytest.approx(pytest.approx(now))
             }
         ],
         'start': 0,
@@ -124,19 +125,19 @@ def test_senddm_multiple_valid_messages(clear, register, extract_token, extract_
                 'message_id': message_id0,
                 'u_id': owner_id,
                 'message': 'testmessage',
-                'time_created':  now
+                'time_created':  pytest.approx(now)
             },
             {
                 'message_id': message_id1,
                 'u_id': owner_id,
                 'message': 'testmessage0',
-                'time_created': now
+                'time_created': pytest.approx(now)
             },
             {
                 'message_id': message_id2,
                 'u_id': owner_id,
                 'message': 'testmessage1',
-                'time_created': now
+                'time_created': pytest.approx(now)
             }
             ],
         'start': 0,
