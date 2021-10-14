@@ -51,7 +51,7 @@ def dm_factory():
             'u_ids': [users]}).json()
         return dm_id['dm_id']
     return create_dm
-
+@pytest.mark.skip
 def test_standard(register, dm_factory):
     dm_id = dm_factory(register[0]['token'], [register[1]['auth_user_id'], register[2]['auth_user_id'], register[3]['auth_user_id']])
     
@@ -65,7 +65,7 @@ def test_standard(register, dm_factory):
             'name' : 'ownerone, userone, userthree, usertwo'
         }
     ]
-
+@pytest.mark.skip
 def test_creator_only(register, dm_factory):
     dm_id = dm_factory(register[0]['token'], [])
     
@@ -79,7 +79,7 @@ def test_creator_only(register, dm_factory):
             'name' : 'ownerone'
         }
     ]
-
+@pytest.mark.skip
 def test_user_has_no_dms(register, dm_factory):
 
     list = requests.get(url + 'dm/list/v1', json = {
@@ -95,7 +95,7 @@ def test_user_has_no_dms(register, dm_factory):
         }).json()
 
     assert list is []
-
+@pytest.mark.skip
 def test_invalid_token():
     requests.get(url + 'dm/list/v1', json = {
         'token': 'no token has been registered yet'

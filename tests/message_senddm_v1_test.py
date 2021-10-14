@@ -69,7 +69,7 @@ def register():
         ).json()
 
     return {**owner_id_dict, **dm_id_dict}
-
+@pytest.mark.skip
 def test_senddm_one_valid_message(clear, register, extract_token, extract_user, extract_dm, extract_message):
     dm_id = extract_dm(register)
     owner_token = extract_token(register)
@@ -95,7 +95,7 @@ def test_senddm_one_valid_message(clear, register, extract_token, extract_user, 
         'start': 0,
         'end': -1
     }
-
+@pytest.mark.skip
 def test_senddm_multiple_valid_messages(clear, register, extract_token, extract_user, extract_dm, extract_message):
     dm_id = extract_dm(register)
     owner_token = extract_token(register)
@@ -144,7 +144,7 @@ def test_senddm_multiple_valid_messages(clear, register, extract_token, extract_
     }
 
     assert extract_message(messages[0]) != extract_message(messages[1]) != extract_message(messages[2])
-    
+@pytest.mark.skip
 def test_senddm_invalid_message_to_short(clear, register, extract_token, extract_dm):
     dm_id = extract_dm(register)
     owner_token = extract_token(register)
@@ -154,7 +154,7 @@ def test_senddm_invalid_message_to_short(clear, register, extract_token, extract
         'dm_id': dm_id,
         'message': ''
     }).status_code == 400
-
+@pytest.mark.skip
 def test_senddm_invalid_message_to_long(clear, register, extract_token, extract_dm):
     dm_id = extract_dm(register)
     owner_token = extract_token(register)
@@ -167,7 +167,7 @@ def test_senddm_invalid_message_to_long(clear, register, extract_token, extract_
         aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
         aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"""
     }).status_code == 400
-
+@pytest.mark.skip
 def test_senddm_valid_message_unauthorized_user(clear, register, extract_token, extract_dm):
     dm_id = extract_dm(register)
     user_token = extract_token(requests.post(url + 'auth/register/v2', json = {
@@ -181,7 +181,7 @@ def test_senddm_valid_message_unauthorized_user(clear, register, extract_token, 
         'dm_id': dm_id,
         'message': '123456'
     }).status_code == 403
-
+@pytest.mark.skip
 def test_senddm_message_invalid_dm_id(clear, register, extract_token, extract_user, extract_message):
     owner_token = extract_token(register)
     assert requests.post(url + 'messages/senddm/v1', json = {
@@ -189,7 +189,7 @@ def test_senddm_message_invalid_dm_id(clear, register, extract_token, extract_us
         'dm_id': 123123,
         'message': '123123'
     })
-
+@pytest.mark.skip
 def test_senddm_valid_message_invalid_token(clear, register, extract_token):
     dm_id = extract_token(register)
     assert requests.post(url + 'messages/senddm/v1', json = {
@@ -197,7 +197,7 @@ def test_senddm_valid_message_invalid_token(clear, register, extract_token):
         'dm_id': dm_id,
         'message': 'asds'
     }).status_code == 403
-
+@pytest.mark.skip
 def test_senddm_invalid__invalid_token(clear, register):
     assert requests.post(url + 'messages/senddm/v1', json = {
         'token': '123123414',
