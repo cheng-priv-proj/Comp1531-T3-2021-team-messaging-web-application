@@ -154,7 +154,7 @@ def test_send_invalid_message_to_long(clear, register, extract_token, extract_ch
 def test_send_valid_message_unauthorized_user(clear, register, extract_token, extract_channel):
     channel_id = extract_channel(register)
     user_token = extract_token(requests.post(url + 'auth/register/v2', json = {
-    'username': 'user@test.com', 
+    'email': 'user@test.com', 
     'password': 'password', 
     'name_first': 'user',
     'name_last': 'one' }
@@ -171,7 +171,7 @@ def test_send_message_invalid_channel_id(clear, register, extract_token, extract
         'token': owner_token,
         'channel_id': 123123,
         'message': '123123'
-    })
+    }).status_code == 400
 
 def test_send_valid_message_invalid_token(clear, register, extract_token):
     channel_id = extract_token(register)
@@ -179,13 +179,13 @@ def test_send_valid_message_invalid_token(clear, register, extract_token):
         'token': '123123414',
         'channel_id': channel_id,
         'message': 'asds'
-    }) == 403
+    }).status_code == 403
 
 def test_send_invalid_message_invalid_token(clear, register):
     assert requests.post(url + 'messages/send/v1', json = {
         'token': '123123414',
         'channel_id': 23423,
         'message': ''
-    }) == 403
+    }).status_code == 403
 
 
