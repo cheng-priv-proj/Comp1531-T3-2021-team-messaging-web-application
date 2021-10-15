@@ -140,3 +140,27 @@ def dm_messages_v1(token, dm_id, start):
         'end' : end
         }
 
+def dm_leave_v1():
+    '''
+    dm/leave/v1
+    Given a DM ID, the user is removed as a member of this DM. 
+    The creator is allowed to leave and the DM will still exist if this happens. 
+    This does not update the name of the DM.
+
+    POST
+
+    Parameters:
+        { token, dm_id }
+    Return Type:
+        {}
+
+    InputError when:
+      
+        dm_id does not refer to a valid DM
+      
+    AccessError when:
+      
+        dm_id is valid and the authorised user is not a member of the DM
+
+    '''
+    
