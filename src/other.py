@@ -1,6 +1,6 @@
 from src.data_store import data_store
 import re
-
+from src.error import AccessError
 def clear_v1():
     '''
     Resets the internal data of the application to its initial state, clearing the
@@ -108,6 +108,28 @@ def check_type(var, var_type):
     '''
     if type(var) != var_type:
         raise TypeError 
+
+# helper function to handle token to auth_id conversion
+# raises an AccessError if token is invalid
+def token_to_auth_id(token):
+    '''
+    Returns the corresponding auth_user_id of a token.
+
+    Argument: 
+        var (arbitrary type), var_type (type)
+
+    Exceptions:
+        AccessError     - occurs when token is invalid
+
+    Return value:
+        Returns auth_user_id on success
+    '''
+
+    if data_store.is_token_invalid(token):
+        raise AccessError
+    
+    return data_store.get_u_id_from_token(token)
+
 
 stream_owner = 1
 stream_member = 2
