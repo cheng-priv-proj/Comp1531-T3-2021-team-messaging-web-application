@@ -19,7 +19,7 @@ import flask
 from src import config
 
 from src.auth import *
-from src.other import clear_v1
+from src.data_store import data_store
 
 @pytest.fixture
 def clear_server():
@@ -62,10 +62,9 @@ def test_standard_token_invalidation_2(clear_server, get_user_1):
     resp = requests.get(config.url + 'channels/list/v2', json = {'token': get_user_1['token']})
     assert(resp.status_code == 403)
 
-
 def test_standard_token_invalidation_3(clear_server, get_user_1):
     requests.post(config.url + 'auth/logout/v1', json={'token': get_user_1['token']}).json()
-    resp = requests.post(config.url + 'channels/create/v2', json={'token': get_user_1['token'], 'name': 'randomtest', 'is_public': True}).json()
+    resp = requests.post(config.url + 'channels/create/v2', json={'token': get_user_1['token'], 'name': 'randomtest', 'is_public': True})
     assert(resp.status_code == 403)
 
 # This one should be access error - 
@@ -92,14 +91,17 @@ def test_standard_token_invalidation_4(clear_server, get_user_1):
 # TEsts the case where one user logs in multiple times
 def test_multiple_logins(clear_server, get_user_1):
     token_1 = get_user_1['token']
-    token_2  = requests.post(config.url + 'auth/login/v2', json={'email': 'owner@test.com', 'password': 'spotato'}).json()
-    requests.post(config.url + 'auth/logout/v1', json={'token': token_1}).json()
-    c_id = requests.post(config.url + 'channels/create/v2', json={'token': get_user_1['token'], 'name': 'channel', 'is_public': True}).json()
+    token_2  = requests.post(config.url + 'auth/login/v2', json={'email': 'owner@test.com', 'password': 'spotato'}).json().get('token')
 
+    c_id = requests.post(config.url + 'channels/create/v2', json={'token': get_user_1['token'], 'name': 'channel', 'is_public': True}).json().get('channel_id')
+    requests.post(config.url + 'auth/logout/v1', json={'token': token_1}).json()
     resp_1 = requests.get(config.url + 'channels/listall/v2', json = {'token': token_1})
     assert(resp_1.status_code == 403)
 
-    resp_2 = requests.get(config.url + 'channels/listall/v2', json = {'token': token_2})
+    print(token_1)
+    print(token_2)
+    resp_2 = requests.get(config.url + 'channels/listall/v2', json = {'token': token_2}).json()
+    print(resp_2)
     assert resp_2 == { 
         'channels': [
             {
