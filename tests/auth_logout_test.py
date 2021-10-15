@@ -73,8 +73,18 @@ def test_standard_token_invalidation_3(clear_server, get_user_1):
 #        "channel_id is valid and the authorised user is not a member of the channel"
 
 def test_standard_token_invalidation_4(clear_server, get_user_1):
-    c_id = requests.post(config.url + 'channels/create/v2', json={'token': get_user_1['token'], 'name': 'randomtest', 'is_public': True}).json()
-    requests.post(config.url + 'auth/logout/v1', json={'token': get_user_1['token']}).json()
+
+    c_id = requests.post(config.url + 'channels/create/v2', json=
+    {
+        'token': get_user_1['token'], 
+        'name': 'randomtest', 
+        'is_public': True
+    }).json()
+
+    requests.post(config.url + 'auth/logout/v1', json=
+    {
+        'token': get_user_1['token']
+    }).json()
 
     resp = requests.get(config.url + 'channel/details/v2', json = {'token': get_user_1['token'], 'channel_id': c_id})
     assert(resp.status_code == 403)
@@ -98,4 +108,17 @@ def test_multiple_logins(clear_server, get_user_1):
             }
         ]
     }
+
+def test_logout_interference(clear_server, get_user_1):
+    response = requests.post(config.url + 'auth/register/v2', json={
+        'email': 'example@email.com', 
+        'password': 'potato', 
+        'name_first': 'John', 
+        'name_last' : 'smith'
+    })
+    user_2 = response.json()
+    requests.post(config.url + 'auth/logout/v1', json=
+    {
+        'token': get_user_1['token']
+    }).json()
 
