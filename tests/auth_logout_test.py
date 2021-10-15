@@ -122,3 +122,6 @@ def test_logout_interference(clear_server, get_user_1):
         'token': get_user_1['token']
     }).json()
 
+    resp = requests.get(config.url + 'channels/listall/v2', json = {'token': user_2['token']})
+    assert (resp.status_code != 403)
+
