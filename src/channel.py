@@ -277,7 +277,7 @@ def channel_addowner_v1(auth_user_id, channel_id, u_id):
     if not (data_store.is_channel_owner(channel_id, auth_user_id) or data_store.is_stream_owner(auth_user_id)):
         raise AccessError ('channel_id is valid and the authorised user does not have owner permissions in the channel')
     
-    if data_store.is_invalid_channel_id(u_id):
+    if data_store.is_invalid_user_id(u_id):
         raise InputError ('u_id does not refer to a valid user')
 
     if not data_store.is_user_member_of_channel(channel_id, u_id):

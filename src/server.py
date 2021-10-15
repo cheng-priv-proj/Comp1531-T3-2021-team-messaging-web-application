@@ -380,14 +380,16 @@ def channel_addowner_endpt():
         InputError  - occurs when u_id refers to a user who is already an owner of the channel
 
     Returns:
-        Returns nothing on success'''
+        Returns nothing on success
+    '''
+    
     request_data = request.get_json()
     token = request_data['token']
     auth_id = token_to_auth_id(token)
     channel_id = request_data.get('channel_id')
     u_id = request_data.get('u_id')
 
-    return channel_addowner_v1({'auth_id': auth_id, 'channel_id': channel_id, 'u_id': u_id})
+    return channel_addowner_v1(auth_id, channel_id, u_id)
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 

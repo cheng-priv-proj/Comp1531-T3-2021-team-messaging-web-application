@@ -251,7 +251,7 @@ class Datastore:
         self.update_json()
 
     def insert_channel_owner(self, channel_id, u_id):
-        self.get_channel_from_channel_id(channel_id)['owner_members'].append(data_store.get_user_from_u_id(u_id))
+        self.get_channel_from_channel_id(channel_id).get('owner_members').append(data_store.get_user_from_u_id(u_id))
 
     def insert_dm(self, creator, dm_id, u_ids, name):
         self.get_dms_from_dm_id_dict()[dm_id] = {
