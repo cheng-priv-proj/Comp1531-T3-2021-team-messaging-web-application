@@ -3,12 +3,19 @@ import requests
 import json
 import flask
 from requests.api import request
+from src import config
 
 from src.other import clear_v1
 from src.config import url
 # Create an owner and some users
+
 @pytest.fixture
-def register(clear):
+def clear_server():
+    requests.delete(config.url + "clear/v1")
+
+
+@pytest.fixture
+def register(clear_server):
     owner_id = requests.post(url + 'auth/register/v2', json = {
         'username': 'owner@test.com', 
         'password': 'password', 
@@ -92,7 +99,7 @@ def test_creator_leaves(register, dm_factory):
             }
         ]
 
-def test_invalid_dm_id(clear):
+def test_invalid_dm_id(clear_server):
     assert requests.post(url + 'dm/leave/v1', json = {
         'token': register[1]['token'],
         'dm_id': 1
