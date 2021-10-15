@@ -174,6 +174,13 @@ class Datastore:
         
         return True
     
+    def is_channel_owner(self, channel_id, u_id):
+        channels = self.get_channels_from_channel_id_dict().get(channel_id)
+        if not any (member['u_id'] == u_id for member in channels['owner_members']):
+            return False
+        
+        return True        
+
     def is_stream_owner(self, u_id):
         return self.get_user_perms_from_u_id_dict().get(u_id) == 1
 

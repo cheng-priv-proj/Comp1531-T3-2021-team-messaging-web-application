@@ -197,3 +197,49 @@ def channel_join_v1(auth_user_id, channel_id):
     channel.get('all_members').append(user)
 
     return {}
+
+def channel_leave_v1(auth_user_id, channel_id):
+    '''
+    Given a channel with ID channel_id that the authorised user is a member of,
+    remove them as a member of the channel.
+
+    Arguments:
+        auth_user_id    (int)   - authorised user id
+        channel_id      (int)   - unique channel id
+
+    Exceptions:
+        TypeError   - occurs when auth_user_id, channel_id are not ints
+        AccessError - occurs when auth_id is invalid
+        InputError  - occurs when channel_id is invalid
+        AccessError - occurs when channel_id is valid and the authorised user is
+                      not a member of the channel
+
+    Return value:
+        Returns nothing on success
+    '''
+
+    check_type(auth_user_id, int)
+    check_type(channel_id, int)
+
+    if data_store.is_invalid_user_id(auth_user_id):
+        raise AccessError('auth_id is invalid')
+    
+    if data_store.is_invalid_channel_id(channel_id):
+        raise InputError('channel_id is invalid')
+
+    if data_store.is_user_member_of_channel(channel_id, auth_user_id):
+        raise AccessError('channel_id is valid and the authorised user is not a member of the channel')
+
+    # move everything below into a data_store method?
+    channel = data_store.get_channel_from_channel_id(channel_id)
+
+    members = channel.get('all_members')
+
+    channel.get('all_members') = [member for member in members if member.get('u_id') != auth_user_id]
+
+    if data_store.is_channel_owner(channel_id, auth_user_id):
+        owners = channel.get('owner_members')
+
+        channel.get('owner_members') = [owner for owner in members if owner.get('u_id') != auth_user_id]
+    
+    return {}
