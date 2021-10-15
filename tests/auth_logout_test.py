@@ -54,19 +54,19 @@ def auth_id_v2(clear_server):
 def test_standard_token_invalidation(clear_server, get_user_1):
     requests.post(config.url + 'auth/logout/v1', json={'token': get_user_1['token']}).json()
     resp = requests.get(config.url + 'channels/listall/v2', json = {'token': get_user_1['token']})
-    assert(resp.status_code == 400)
+    assert(resp.status_code == 403)
 
 # 
 def test_standard_token_invalidation_2(clear_server, get_user_1):
     requests.post(config.url + 'auth/logout/v1', json={'token': get_user_1['token']}).json()
     resp = requests.get(config.url + 'channels/list/v2', json = {'token': get_user_1['token']})
-    assert(resp.status_code == 400)
+    assert(resp.status_code == 403)
 
 
 def test_standard_token_invalidation_3(clear_server, get_user_1):
     requests.post(config.url + 'auth/logout/v1', json={'token': get_user_1['token']}).json()
     resp = requests.post(config.url + 'channels/create/v2', json={'token': get_user_1['token'], 'name': 'randomtest', 'is_public': True}).json()
-    assert(resp.status_code == 400)
+    assert(resp.status_code == 403)
 
 # This one should be access error - 
 # "AccessError when:"
