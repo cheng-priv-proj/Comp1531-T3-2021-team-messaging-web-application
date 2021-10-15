@@ -157,7 +157,9 @@ def channel_invite_ep():
     channel/invite/v2
     POST
 
-    Invites a user with ID u_id to join a channel with ID channel_id. Once invited, the user is added to the channel immediately. In both public and private channels, all members are able to invite users.
+    Invites a user with ID u_id to join a channel with ID channel_id. 
+    Once invited, the user is added to the channel immediately. 
+    In both public and private channels, all members are able to invite users.
     
     Parameters:{ token, channel_id, u_id }
     
@@ -399,6 +401,41 @@ def dm_details_endpt():
 
     return_dict = dm_details_v1(auth_user_id, dm_id)
     return return_dict
+
+
+
+@APP.route("/dm/leave/v1", methods=['POST'])
+def dm_leave_endpt():
+    '''
+    dm/leave/v1
+    Given a DM ID, the user is removed as a member of this DM. 
+    The creator is allowed to leave and the DM will still exist if this happens. 
+    This does not update the name of the DM.
+
+    POST
+
+    Parameters:
+        { token, dm_id }
+    Return Type:
+        {}
+
+    InputError when:
+      
+        dm_id does not refer to a valid DM
+      
+    AccessError when:
+      
+        dm_id is valid and the authorised user is not a member of the DM
+
+    '''
+    req_details = request.get_json(force = True)
+
+    token = req_details.get('token')
+    auth_user_id = token_to_auth_id(token)
+    dm_id = req_details['dm_id']
+    dm_details_v1(auth_user_id, dm_id)
+
+    return {}
 
 
 
