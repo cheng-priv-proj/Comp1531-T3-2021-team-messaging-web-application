@@ -235,11 +235,11 @@ def channel_leave_v1(auth_user_id, channel_id):
 
     members = channel.get('all_members')
 
-    channel['all_members'] = [member for member in members if member.get('u_id') != auth_user_id]
+    channel.['all_members'] = [member for member in members if member.get('u_id') != auth_user_id]
 
     if data_store.is_channel_owner(channel_id, auth_user_id):
-        owners = channel['owner_members']
+        owners = channel.get('owner_members')
 
-        channel.get('owner_members') = [owner for owner in members if owner.get('u_id') != auth_user_id]
+        channel['owner_members'] = [owner for owner in members if owner.get('u_id') != auth_user_id]
     
     return {}
