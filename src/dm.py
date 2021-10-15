@@ -140,7 +140,7 @@ def dm_messages_v1(token, dm_id, start):
         'end' : end
         }
 
-def dm_leave_v1():
+def dm_leave_v1(auth_id, dm_id):
     '''
     dm/leave/v1
     Given a DM ID, the user is removed as a member of this DM. 
@@ -163,4 +163,18 @@ def dm_leave_v1():
         dm_id is valid and the authorised user is not a member of the DM
 
     '''
+
+    check_type(auth_id, int)
+    check_type(dm_id, int)
+
+    if data_store.is_invalid_user_id(auth_id):
+        raise AccessError ('Invalid auth_user_id')
+
+    if data_store.is_invalid_dm(dm_id):
+        raise InputError ('dm_id does not refer to valid DM')
+
+    if data_store.is_user_member_of_dm(dm_id, auth_id):
+        raise AccessError ('dm_id is valid and the authorised user is not a member of the DM')
+
+    # ^^ yo inked from aleks code. if this is boken check his code.
     
