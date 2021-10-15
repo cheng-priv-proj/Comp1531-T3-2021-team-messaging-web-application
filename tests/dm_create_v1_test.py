@@ -1,26 +1,13 @@
 import pytest
 import requests
-<<<<<<< HEAD
 from src import config
 
-=======
-import json
-import flask
-from src import config
-
-from src.other import clear_v1
-
->>>>>>> 11d38800ddd4345c94f59ec602aab842ea630d15
 # Generate invalid tokens some other time
 
 # Fixture to reset data store
 @pytest.fixture
 def clear():
-<<<<<<< HEAD
     requests.delete(config.url + 'clear/v1')
-=======
-    clear_v1()
->>>>>>> 11d38800ddd4345c94f59ec602aab842ea630d15
 
 # Extracts the dm_id from a dictionary
 @pytest.fixture 
@@ -44,10 +31,7 @@ def extract_id():
     return extract_token_function
 
 # Fixture to register someone and returns a dictionary of {token, auth_user_id}
-<<<<<<< HEAD
-=======
 @pytest.fixture
->>>>>>> 11d38800ddd4345c94f59ec602aab842ea630d15
 def user1():
     response = requests.post(config.url + 'auth/register/v2', json={
         'email': 'user1@test.com', 
@@ -77,10 +61,6 @@ def user3():
     }).json()
     return response
 
-<<<<<<< HEAD
-@pytest.mark.skip
-=======
->>>>>>> 11d38800ddd4345c94f59ec602aab842ea630d15
 # Might add test with valid_u_id some other time too tho
 # Test access error priority
 def test_invalid_token(clear):
@@ -106,18 +86,11 @@ def test_invalid_u_id(clear, user1, extract_token):
         'token': token1, 
         'u_ids': invalid_u_ids
     })
-<<<<<<< HEAD
+
     assert resp.status_code == 400
 
 # Test multiple Invalid u_id
 def test_multiple_invalid_u_ids(clear, user1, user2, extract_token, extract_id):
-=======
-    
-    assert resp.status_code == 400
-
-# Test multiple Invalid u_id
-def test_multiple_invalid_u_ids(clear, user1, user2):
->>>>>>> 11d38800ddd4345c94f59ec602aab842ea630d15
     token1 = extract_token(user1)
 
     invalid_u_id1 = -1000
@@ -149,10 +122,6 @@ def test_dm_id_correct(clear, user1, extract_dm, extract_token, extract_id):
     }).json()
     
     # Find all members
-<<<<<<< HEAD
-    print(dm_details)
-=======
->>>>>>> 11d38800ddd4345c94f59ec602aab842ea630d15
     assert dm_details == {
         'name': 'aone',
         'members': [
@@ -220,7 +189,6 @@ def test_multiple_handles(clear, user1, user2, extract_dm, extract_id, extract_t
         'name': 'aone, btwo',
         'members': [
             {
-<<<<<<< HEAD
                 'u_id': user2_id,
                 'email': 'user2@test.com',
                 'name_first': 'b',
@@ -228,31 +196,15 @@ def test_multiple_handles(clear, user1, user2, extract_dm, extract_id, extract_t
                 'handle_str': 'btwo'
             },
             {
-=======
->>>>>>> 11d38800ddd4345c94f59ec602aab842ea630d15
                 'u_id': user1_id,
                 'email': 'user1@test.com',
                 'name_first': 'a',
                 'name_last': 'one',
                 'handle_str': 'aone'
             },
-<<<<<<< HEAD
         ]
     }
 
-
-=======
-            {
-                'u_id': user2_id,
-                'email': 'user2@test.com',
-                'name_first': 'b',
-                'name_last': 'two',
-                'handle_str': 'atwo'
-            },
-        ]
-    }
-
->>>>>>> 11d38800ddd4345c94f59ec602aab842ea630d15
 # Test alphabetically sorted
 def test_name_alphabetically_sorted(clear, user1, user2, user3, extract_dm, extract_id, extract_token):
     user1_id = extract_id(user1)
@@ -260,20 +212,12 @@ def test_name_alphabetically_sorted(clear, user1, user2, user3, extract_dm, extr
     user2_id = extract_id(user2)
     user3_id = extract_id(user3)
 
-<<<<<<< HEAD
     u_ids = [user2_id, user3_id]
-=======
-    u_ids = [user2_id, user3]
->>>>>>> 11d38800ddd4345c94f59ec602aab842ea630d15
 
     dm_id = extract_dm(requests.post(config.url + 'dm/create/v1', json={
         'token': token1, 
         'u_ids': u_ids
     }).json())
-<<<<<<< HEAD
-    print(dm_id)
-=======
->>>>>>> 11d38800ddd4345c94f59ec602aab842ea630d15
 
     dm_details = requests.get(config.url + 'dm/details/v1', json = {
         'token': token1,
@@ -281,10 +225,6 @@ def test_name_alphabetically_sorted(clear, user1, user2, user3, extract_dm, extr
     }).json()
     
     # Find all members
-<<<<<<< HEAD
-    assert dm_details['name'] == 'aone, btwo, cthree'
-=======
     assert dm_details['name'] == {
         'name': 'aone, btwo, cthree'
     }
->>>>>>> 11d38800ddd4345c94f59ec602aab842ea630d15
