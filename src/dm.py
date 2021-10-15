@@ -177,4 +177,12 @@ def dm_leave_v1(auth_id, dm_id):
         raise AccessError ('dm_id is valid and the authorised user is not a member of the DM')
 
     # ^^ yo inked from aleks code. if this is boken check his code.
-    
+
+    details_dict = data_store.get_dm_from_dm_id(dm_id).get('details')
+    members = details_dict['members']
+    for person in members:
+        if person['u_id'] == auth_id:
+            person.clear()
+            return {}
+
+
