@@ -78,3 +78,24 @@ def test_standard_token_invalidation_4(clear_server, get_user_1):
 
     resp = requests.get(config.url + 'channel/details/v2', json = {'token': get_user_1['token'], 'channel_id': c_id})
     assert(resp.status_code == 403)
+
+# TEsts the case where one user logs in multiple times
+def test_multiple_logins(clear_server, get_user_1):
+    token_1 = get_user_1['token']
+    token_2  = requests.post(config.url + 'auth/login/v2', json={'email': 'owner@test.com', 'password': 'spotato'}).json()
+    requests.post(config.url + 'auth/logout/v1', json={'token': token_1}).json()
+    c_id = requests.post(config.url + 'channels/create/v2', json={'token': get_user_1['token'], 'name': 'channel', 'is_public': True}).json()
+
+    resp_1 = requests.get(config.url + 'channels/listall/v2', json = {'token': token_1})
+    assert(resp_1.status_code == 403)
+
+    resp_2 = requests.get(config.url + 'channels/listall/v2', json = {'token': token_2})
+    assert resp_2 == { 
+        'channels': [
+            {
+                'channel_id': c_id, 
+                'name': 'channel'
+            }
+        ]
+    }
+
