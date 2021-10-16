@@ -4,7 +4,11 @@ import json
 #   Key: email
 #   Value: Dictionary {
 #          password, 
-#          auth_id } 
+#          auth_user_id } 
+#
+# Tokens:
+#   Key: token (str)
+#   Value: u_id
 #
 # Channels:
 #   Key: channel_id:
@@ -47,6 +51,7 @@ import json
 ## YOU SHOULD MODIFY THIS OBJECT BELOW
 initial_object = {
     'login' : {},
+    'token' : {},
     'channels' : {},
     'dms': {},
     'message_ids' : {},
@@ -62,12 +67,12 @@ class Datastore:
             self.__store = json.load(FILE)
 
     def hard_reset(self):
-
         # replace json dump with a fresh copy of datastore
         with open('json_dump/data_store.txt', 'w') as FILE:
             json.dump(
             {
                 'login' : {},
+                'token' : {},
                 'channels' : {},
                 'dms': {},
                 'message_ids' : {},
@@ -86,7 +91,6 @@ class Datastore:
             json.dump(self.__store, FILE)
 
     # Get Functions ############################################################
-
     def get(self):
         return self.__store
 
@@ -97,7 +101,16 @@ class Datastore:
     
     def get_login_from_email(self, email):
         return self.get_logins_from_email_dict().get(email)
-    
+    # tokens
+
+    def get_u_ids_from_token_dict(self):
+        return self.__store['token']
+
+    def get_u_id_from_token(self, token):
+        check_none = self.get_u_ids_from_token_dict().get(token)
+
+        return -1 if check_none == None else check_none
+
     # channels
 
     def get_channels_from_channel_id_dict(self):
@@ -117,13 +130,20 @@ class Datastore:
     def get_dm_creator_from_dm_id(self, dm_id):
         return self.get_dms_from_dm_id_dict().get(dm_id).get('creator')
 
-    # DEPRECATED, PLEASE CHANGE TO UPDATED FUNCTION
-    def get_messages_from_channel_id_dict(self):
-        return self.__store['messages']
+    # messages
 
-    # DEPRECATED, PLEASE CHANGE TO UPDATED FUNCTION    
-    def get_message_from_channel_id(self, channel_id):
-        return self.get_messages_from_channel_id_dict().get(channel_id)
+    def get_channels_or_dms_id_from_message_id_dict(self):
+        return self.__store['message_ids']
+
+    def get_channel_or_dm_id_from_message_id(self, message_id):
+        return self.get_channels_or_dms_id_from_message_id_dict().get(message_id)
+
+    def get_messages_from_channel_or_dm_id_dict(self):
+        return self.__store['messages']
+  
+    def get_messages_from_channel_or_dm_id(self, id):
+        return self.get_messages_from_channel_or_dm_id_dict().get(id)
+    # users
 
     # messages
 
@@ -154,7 +174,12 @@ class Datastore:
         return self.get_user_perms_from_u_id_dict().get(u_id)
 
 
-    # Check functions
+    # Check functions ##########################################################
+
+    def is_token_invalid(self, token):
+        if token in self.get_u_ids_from_token_dict():
+            return False
+        return True
 
     def is_user_member_of_channel(self, channel_id, u_id):
 
@@ -196,13 +221,17 @@ class Datastore:
         return False
 
 
-    # Insertion functions
+    # Insertion functions ######################################################
 
     def insert_login(self, email, password, auth_id):
         self.get_logins_from_email_dict()[email] = {
             'password': password,
             'auth_id': auth_id
         }
+        self.update_json()
+
+    def insert_token(self, token, auth_user_id):
+        self.get_u_ids_from_token_dict()[token] = auth_user_id
         self.update_json()
 
     def insert_user(self, u_id, email, name_first, name_last, handle_str):
@@ -241,7 +270,11 @@ class Datastore:
         self.__store[dict_key][key] = value
         self.update_json()
 
-    # Other
+    # Other ####################################################################
+
+    def invalidate_token(self, token):
+        tokens = self.get_u_ids_from_token_dict()
+        del tokens[token]
 
     def set(self, store):
         if not isinstance(store, dict):
