@@ -38,11 +38,13 @@ def clear():
 def register_user():
     def register_user_function(email, name_first, name_last):
         registration_info = {
-            'username': email, 
+            'email': email, 
             'password': 'password', 
             'name_first': name_first,
             'name_last': name_last }
+        print(registration_info)
         owner_id_dict = requests.post(url + 'auth/register/v2', json = registration_info).json()
+        print(owner_id_dict)
         if owner_id_dict.status_code == 400 or owner_id_dict.status_code == 403:
             return {}
         
@@ -61,7 +63,8 @@ def user_info_to_user_datatype():
     return user_info_to_user_datatype_function
 
 
-def user_profile_test_valid(clear, register_user, user_info_to_user_datatype, extract_user, extract_token, user_profile):
+def test_user_profile_test_valid(clear, register_user, user_info_to_user_datatype, extract_user, extract_token, user_profile):
+    print("AAAAAAAAAAAAAAAAAAA")
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     userone_info = register_user('user1@gmail.com', 'user', 'one')
     userone_profile = user_profile(extract_token(owner_info), extract_user(userone_info)).json()
@@ -74,24 +77,24 @@ def user_profile_test_valid(clear, register_user, user_info_to_user_datatype, ex
         'handle_str': 'userone'
     }
 
-def user_profile_invalid_token(clear, register_user, user_info_to_user_datatype, extract_user, extract_token, user_profile):
+def test_user_profile_invalid_token(clear, register_user, user_info_to_user_datatype, extract_user, extract_token, user_profile):
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     owner_profile = user_profile('123123123', extract_user(owner_info))
 
     assert owner_profile.status_code == 403
 
-def user_profile_invalid_u_id(clear, register_user, user_info_to_user_datatype, extract_user, extract_token, user_profile):
+def test_user_profile_invalid_u_id(clear, register_user, user_info_to_user_datatype, extract_user, extract_token, user_profile):
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     invalid_profile = user_profile(extract_token(owner_info), 123123123)
 
     assert invalid_profile.status_code == 400
 
-def user_profile_invalid_id_and_token(clear, register_user, user_info_to_user_datatype, extract_user, extract_token, user_profile):
+def test_user_profile_invalid_id_and_token(clear, register_user, user_info_to_user_datatype, extract_user, extract_token, user_profile):
     invalid_profile = user_profile('123123', 212312)
     
     assert invalid_profile.status_code == 403
 
-def user_profile_get_your_own_profile(clear, register_user, user_info_to_user_datatype, extract_user, extract_token, user_profile):
+def test_user_profile_get_your_own_profile(clear, register_user, user_info_to_user_datatype, extract_user, extract_token, user_profile):
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     owner_profile = user_profile(extract_token(owner_info), extract_user(owner_info)).json()
 

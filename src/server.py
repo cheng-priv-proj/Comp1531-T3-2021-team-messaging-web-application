@@ -73,11 +73,12 @@ def register_ep():
     password = register_details.get('password')
     name_first = register_details.get('name_first')
     name_last = register_details.get('name_last')
-
+    
     auth_id_dict = auth_register_v1(email, password, name_first, name_last)
+    print("THIS IS NOOTT WORKINNNGG")
     auth_id = auth_id_dict.get('auth_user_id')
     token = str(auth_id) # Change to jwt later
-
+    print("THIS IS WORKINNNGG")
     data_store.insert_token(token, auth_id)
 
     return {'token': token, 'auth_user_id': auth_id}
