@@ -67,11 +67,13 @@ AccessError when message_id refers to a valid message in a joined channel/DM and
 
 # does not test global owner
 def test_normal_case_channel(clear_server, get_user_1, auth_id_v2):
-    dm_id = requests.post(config.url + 'dm/create/v1', json= {
+    dm_id_dict = requests.post(config.url + 'dm/create/v1', json= {
         'token': get_user_1['token'], 
         'u_ids': [auth_id_v2["auth_user_id"]]
     }).json()
     
+    dm_id = dm_id_dict['dm_id']
+
     message_dict = (requests.post(config.url + 'message/senddm/v1', json = {
         'token': get_user_1['token'],
         'dm_id': dm_id,
@@ -95,11 +97,12 @@ def test_normal_case_channel(clear_server, get_user_1, auth_id_v2):
     assert message['message'] == "GENERAL KENOBI"
 
 def test_normal_case_non_owner(clear_server, get_user_1, auth_id_v2):
-    dm_id = requests.post(config.url + 'dm/create/v1', json= {
+    dm_id_dict = requests.post(config.url + 'dm/create/v1', json= {
         'token': get_user_1['token'], 
         'u_ids': [auth_id_v2["auth_user_id"]]
     }).json()
     
+    dm_id = dm_id_dict['dm_id']
     message_dict = (requests.post(config.url + 'message/senddm/v1', json = {
         'token': auth_id_v2['token'],
         'dm_id': dm_id,
@@ -124,13 +127,15 @@ def test_normal_case_non_owner(clear_server, get_user_1, auth_id_v2):
 
 # testing owner can edit other peoples messages
 def test_owner_perms(clear_server, get_user_1, auth_id_v2):
-    dm_id = requests.post(config.url + 'dm/create/v1', json= {
+    dm_id_dict = requests.post(config.url + 'dm/create/v1', json= {
         'token': get_user_1['token'], 
         'u_ids': [auth_id_v2["auth_user_id"]]
     }).json()
+
+    dm_id = dm_id_dict['dm_id']
     
     message_dict = (requests.post(config.url + 'message/senddm/v1', json = {
-        'token': get_user_1['token'],
+        'token': auth_id_v2['token'],
         'dm_id': dm_id,
         'message': 'Hello there' }).json())    
 
@@ -153,17 +158,18 @@ def test_owner_perms(clear_server, get_user_1, auth_id_v2):
 
 # Over 100 char message
 def test_long_edit_channel(clear_server, get_user_1):
-    channel_dict = requests.post(config.url + 'channels/create/v2', json= {
+    dm_id_dict = requests.post(config.url + 'dm/create/v1', json= {
         'token': get_user_1['token'], 
-        'name': 'test channel', 
-        'is_public': True
+        'u_ids': [auth_id_v2["auth_user_id"]]
     }).json()
 
-    extracted_channel_id = channel_dict['channel_id']
-    message_dict = requests.post(config.url + 'message/send/v1', json = {
+    dm_id = dm_id_dict['dm_id']
+
+    message_dict = (requests.post(config.url + 'message/senddm/v1', json = {
         'token': get_user_1['token'],
-        'channel_id': extracted_channel_id,
-        'message': 'Hello there' }).json()
+        'dm_id': dm_id,
+        'message': 'Hello there' }).json()) 
+    
 
     message_id = message_dict['message_id']
 
@@ -176,29 +182,29 @@ def test_long_edit_channel(clear_server, get_user_1):
 # message edit with empty string 
 # same behavoiur as removing
 def test_empty_edit_channel(clear_server, get_user_1):
-    channel_dict = requests.post(config.url + 'channels/create/v2', json= {
+    dm_id_dict = requests.post(config.url + 'dm/create/v1', json= {
         'token': get_user_1['token'], 
-        'name': 'test channel', 
-        'is_public': True
+        'u_ids': [auth_id_v2["auth_user_id"]]
     }).json()
 
-    extracted_channel_id = channel_dict['channel_id']
-    message_dict = requests.post(config.url + 'message/send/v1', json = {
-        'token': get_user_1['token'],
-        'channel_id': extracted_channel_id,
-        'message': 'Hello there' }).json()
+    dm_id = dm_id_dict['dm_id']
 
+    message_dict = (requests.post(config.url + 'message/senddm/v1', json = {
+        'token': get_user_1['token'],
+        'dm_id': dm_id,
+        'message': 'Hello there' }).json()) 
+    
     message_id = message_dict['message_id']
 
     requests.post(config.url + 'message/edit/v1', json = {
         'token' : get_user_1['token'],
         'message_id': message_id,
-        'message' : "" 
+        'message' : ""
     })
 
-    message_dict = requests.get(config.url + 'channel/messages/v2', json = {
+    message_dict = requests.get(config.url + 'dm/messages/v1', json = {
         'token': get_user_1['token'],
-        'channel_id': extracted_channel_id, 
+        'dm_id': dm_id, 
         'start': 0 }).json()
 
     assert message_dict == {
@@ -209,19 +215,20 @@ def test_empty_edit_channel(clear_server, get_user_1):
 
 # message_id does not refer to a valid message within a channel/DM that the authorised user has joined
 def test_invalid_message_id(clear_server, get_user_1):
-    channel_dict = requests.post(config.url + 'channels/create/v2', json= {
+    dm_id_dict = requests.post(config.url + 'dm/create/v1', json= {
         'token': get_user_1['token'], 
-        'name': 'test channel', 
-        'is_public': True
+        'u_ids': [auth_id_v2["auth_user_id"]]
     }).json()
 
-    extracted_channel_id = channel_dict['channel_id']
-    message_dict = requests.post(config.url + 'message/send/v1', json = {
+    dm_id = dm_id_dict['dm_id']
+    
+    requests.post(config.url + 'message/senddm/v1', json = {
         'token': get_user_1['token'],
-        'channel_id': extracted_channel_id,
+        'dm_id': dm_id,
         'message': 'Hello there' }).json()
 
     message_id = 123213123
+
     assert requests.post(config.url + 'message/edit/v1', json = {
         'token' : get_user_1['token'],
         'message_id': message_id,
@@ -235,25 +242,20 @@ def test_invalid_message_id(clear_server, get_user_1):
         the authorised user has owner permissions in the channel/DM
 '''
 def test_edit_acess_error(clear_server, get_user_1, auth_id_v2):
-    channel_dict = requests.post(config.url + 'channels/create/v2', json= {
+    dm_id_dict = requests.post(config.url + 'dm/create/v1', json= {
         'token': get_user_1['token'], 
-        'name': 'test channel', 
-        'is_public': True
+        'u_ids': [auth_id_v2["auth_user_id"]]
     }).json()
 
-    extracted_channel_id = channel_dict['channel_id']
-    message_dict = requests.post(config.url + 'message/send/v1', json = {
+    dm_id = dm_id_dict['dm_id']
+
+    message_dict = (requests.post(config.url + 'message/senddm/v1', json = {
         'token': get_user_1['token'],
-        'channel_id': extracted_channel_id,
-        'message': 'Hello there' }).json()
+        'dm_id': dm_id,
+        'message': 'Hello there' }).json())    
 
     message_id = message_dict['message_id']
-
-    requests.post(config.url + 'channel/join/v2', json = {
-        'token': auth_id_v2['token'],
-        'channel_id': extracted_channel_id
-    })
-
+    
     assert requests.post(config.url + 'message/edit/v1', json = {
         'token' : auth_id_v2['token'],
         'message_id': message_id,
