@@ -61,6 +61,7 @@ AccessError when message_id refers to a valid message in a joined channel/DM and
 
 # TO GET MORE COVERAGE, MAYBE DO THE SMAE TESTS WITH THE CHANNELS BUT CHANGE IS_PUBLIC TO PRIVATE and vice versa
 # same tests but send more than 50 messages.
+# test with non owner member
 
 def test_normal_case_channel(clear_server, get_user_1, auth_id_v2):
     channel_dict = requests.post(config.url + 'channels/create/v2', json= {
@@ -72,6 +73,81 @@ def test_normal_case_channel(clear_server, get_user_1, auth_id_v2):
     extracted_channel_id = channel_dict['channel_id']
     message_dict = requests.post(config.url + 'message/send/v1', json = {
         'token': get_user_1['token'],
+        'channel_id': extracted_channel_id,
+        'message': 'Hello there' }).json()
+
+    message_id = message_dict['message_id']
+
+    requests.post(config.url + 'message/edit/v1', json = {
+        'token' : get_user_1['token'],
+        'message_id': message_id,
+        'message' : "GENERAL KENOBI"
+    })
+
+    message_dict = requests.get(config.url + 'channel/messages/v2', json = {
+        'token': get_user_1['token'],
+        'channel_id': extracted_channel_id, 
+        'start': 0 }).json()
+    messages = message_dict['messages']
+    message = messages[0]
+
+
+    assert message['message'] == "GENERAL KENOBI"
+
+def test_normal_case_non_owner(clear_server, get_user_1, auth_id_v2):
+    channel_dict = requests.post(config.url + 'channels/create/v2', json= {
+        'token': get_user_1['token'], 
+        'name': 'test channel', 
+        'is_public': True
+    }).json()
+
+    extracted_channel_id = channel_dict['channel_id']
+
+    requests.post(config.url + 'channel/join/v2', json = {
+        'token': auth_id_v2['token'],
+        'channel_id': extracted_channel_id
+    })
+
+    message_dict = requests.post(config.url + 'message/send/v1', json = {
+        'token': auth_id_v2['token'],
+        'channel_id': extracted_channel_id,
+        'message': 'Hello there' }).json()
+
+    message_id = message_dict['message_id']
+
+    requests.post(config.url + 'message/edit/v1', json = {
+        'token' : auth_id_v2['token'],
+        'message_id': message_id,
+        'message' : "GENERAL KENOBI"
+    })
+
+    message_dict = requests.get(config.url + 'channel/messages/v2', json = {
+        'token': get_user_1['token'],
+        'channel_id': extracted_channel_id, 
+        'start': 0 }).json()
+    messages = message_dict['messages']
+    message = messages[0]
+
+
+    assert message['message'] == "GENERAL KENOBI"
+
+# testing owner can edit other peoples messages
+def test_owner_perms(clear_server, get_user_1, auth_id_v2):
+    channel_dict = requests.post(config.url + 'channels/create/v2', json= {
+        'token': get_user_1['token'], 
+        'name': 'test channel', 
+        'is_public': True
+    }).json()
+
+    extracted_channel_id = channel_dict['channel_id']
+
+    requests.post(config.url + 'channel/join/v2', json = {
+        'token': auth_id_v2['token'],
+        'channel_id': extracted_channel_id
+    })
+
+    message_dict = requests.post(config.url + 'message/send/v1', json = {
+        'token': auth_id_v2['token'],
         'channel_id': extracted_channel_id,
         'message': 'Hello there' }).json()
 
