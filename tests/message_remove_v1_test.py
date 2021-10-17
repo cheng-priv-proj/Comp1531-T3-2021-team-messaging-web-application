@@ -233,30 +233,29 @@ def test_normal_case_dms(clear_server, get_user_1, auth_id_v2):
         'token': get_user_1['token'], 
         'u_ids': [auth_id_v2["auth_user_id"]]
     }).json()
-    
     dm_id = dm_id_dict['dm_id']
 
     message_dict = (requests.post(config.url + 'message/senddm/v1', json = {
         'token': get_user_1['token'],
         'dm_id': dm_id,
         'message': 'Hello there' }).json())    
-
     message_id = message_dict['message_id']
 
-    requests.post(config.url + 'message/edit/v1', json = {
+    requests.delete(config.url + 'message/remove/v1', json = {
         'token' : get_user_1['token'],
-        'message_id': message_id,
-        'message' : "GENERAL KENOBI"
+        'message_id': message_id
     })
 
     message_dict = requests.get(config.url + 'dm/messages/v1', json = {
         'token': get_user_1['token'],
         'dm_id': dm_id, 
         'start': 0 }).json()
-    messages = message_dict['messages']
-    message = messages[0]
 
-    assert message['message'] == "GENERAL KENOBI"
+    assert message_dict == {
+        'messages': [], 
+        'start': 0, 
+        'end': -1
+    }
 
 def test_normal_case_non_owner_dms(clear_server, get_user_1, auth_id_v2):
     dm_id_dict = requests.post(config.url + 'dm/create/v1', json= {
@@ -272,20 +271,21 @@ def test_normal_case_non_owner_dms(clear_server, get_user_1, auth_id_v2):
 
     message_id = message_dict['message_id']
 
-    requests.post(config.url + 'message/edit/v1', json = {
+    requests.delete(config.url + 'message/remove/v1', json = {
         'token' : auth_id_v2['token'],
-        'message_id': message_id,
-        'message' : "GENERAL KENOBI"
+        'message_id': message_id
     })
 
     message_dict = requests.get(config.url + 'dm/messages/v1', json = {
-        'token': get_user_1['token'],
+        'token': auth_id_v2['token'],
         'dm_id': dm_id, 
         'start': 0 }).json()
-    messages = message_dict['messages']
-    message = messages[0]
 
-    assert message['message'] == "GENERAL KENOBI"
+    assert message_dict == {
+        'messages': [], 
+        'start': 0, 
+        'end': -1
+    }
 
 # testing owner can edit other peoples messages
 def test_owner_perms_dms(clear_server, get_user_1, auth_id_v2):
@@ -303,65 +303,9 @@ def test_owner_perms_dms(clear_server, get_user_1, auth_id_v2):
 
     message_id = message_dict['message_id']
 
-    requests.post(config.url + 'message/edit/v1', json = {
+    requests.delete(config.url + 'message/remove/v1', json = {
         'token' : get_user_1['token'],
-        'message_id': message_id,
-        'message' : "GENERAL KENOBI"
-    })
-
-    message_dict = requests.get(config.url + 'dm/messages/v1', json = {
-        'token': get_user_1['token'],
-        'dm_id': dm_id, 
-        'start': 0 }).json()
-    messages = message_dict['messages']
-    message = messages[0]
-
-    assert message['message'] == "GENERAL KENOBI"
-
-# Over 100 char message
-def test_long_edit_dms(clear_server, get_user_1):
-    dm_id_dict = requests.post(config.url + 'dm/create/v1', json= {
-        'token': get_user_1['token'], 
-        'u_ids': [auth_id_v2["auth_user_id"]]
-    }).json()
-
-    dm_id = dm_id_dict['dm_id']
-
-    message_dict = (requests.post(config.url + 'message/senddm/v1', json = {
-        'token': get_user_1['token'],
-        'dm_id': dm_id,
-        'message': 'Hello there' }).json()) 
-    
-
-    message_id = message_dict['message_id']
-
-    assert requests.post(config.url + 'message/edit/v1', json = {
-        'token' : get_user_1['token'],
-        'message_id': message_id,
-        'message' : "a" * 1001
-    }).status_code == 400
-
-# message edit with empty string 
-# same behavoiur as removing
-def test_empty_edit_dms(clear_server, get_user_1):
-    dm_id_dict = requests.post(config.url + 'dm/create/v1', json= {
-        'token': get_user_1['token'], 
-        'u_ids': [auth_id_v2["auth_user_id"]]
-    }).json()
-
-    dm_id = dm_id_dict['dm_id']
-
-    message_dict = (requests.post(config.url + 'message/senddm/v1', json = {
-        'token': get_user_1['token'],
-        'dm_id': dm_id,
-        'message': 'Hello there' }).json()) 
-    
-    message_id = message_dict['message_id']
-
-    requests.post(config.url + 'message/edit/v1', json = {
-        'token' : get_user_1['token'],
-        'message_id': message_id,
-        'message' : ""
+        'message_id': message_id
     })
 
     message_dict = requests.get(config.url + 'dm/messages/v1', json = {
@@ -374,6 +318,7 @@ def test_empty_edit_dms(clear_server, get_user_1):
         'start': 0, 
         'end': -1
     }
+
 
 # message_id does not refer to a valid message within a channel/DM that the authorised user has joined
 def test_invalid_message_id_dms(clear_server, get_user_1):
@@ -391,10 +336,9 @@ def test_invalid_message_id_dms(clear_server, get_user_1):
 
     message_id = 123213123
 
-    assert requests.post(config.url + 'message/edit/v1', json = {
+    assert requests.delete(config.url + 'message/remove/v1', json = {
         'token' : get_user_1['token'],
-        'message_id': message_id,
-        'message' : "" 
+        'message_id': message_id
     }).status_code == 400
 
 '''
@@ -403,6 +347,7 @@ def test_invalid_message_id_dms(clear_server, get_user_1):
         the message was sent by the authorised user making this request
         the authorised user has owner permissions in the channel/DM
 '''
+# non owner tries to dlelete other members messages
 def test_edit_acess_error_dms(clear_server, get_user_1, auth_id_v2):
     dm_id_dict = requests.post(config.url + 'dm/create/v1', json= {
         'token': get_user_1['token'], 
