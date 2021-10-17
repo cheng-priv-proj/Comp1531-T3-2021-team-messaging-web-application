@@ -60,7 +60,7 @@ AccessError when message_id refers to a valid message in a joined channel/DM and
 '''
 
 # TO GET MORE COVERAGE, MAYBE DO THE SMAE TESTS WITH THE CHANNELS BUT CHANGE IS_PUBLIC TO PRIVATE and vice versa
-
+# same tests but send more than 50 messages.
 
 def test_normal_case_channel(clear_server, get_user_1, auth_id_v2):
     channel_dict = requests.post(config.url + 'channels/create/v2', json= {
@@ -132,13 +132,50 @@ def test_empty_edit_channel(clear_server, get_user_1, auth_id_v):
 
     message_id = message_dict['message_id']
 
-    message_id = message_dict['message_id']
-
-     requests.post(config.url + 'message/edit/v1', json = {
+    requests.post(config.url + 'message/edit/v1', json = {
         'token' : get_user_1['token'],
         'message_id': message_id,
         'message' : "" 
     })
 
+    message_dict = requests.get(config.url + 'channel/messages/v2', json = {
+        'token': get_user_1['token'],
+        'channel_id': extracted_channel_id, 
+        'start': 0 }).json()
+
+    assert message_dict == {
+        'messages': [], 
+        'start': 0, 
+        'end': -1
+    }
 
 # message_id does not refer to a valid message within a channel/DM that the authorised user has joined
+def test_invalid_message_id(clear_server, get_user_1, auth_id_v):
+    channel_dict = requests.post(config.url + 'channels/create/v2', json= {
+        'token': get_user_1['token'], 
+        'name': 'test channel', 
+        'is_public': True
+    }).json()
+
+    extracted_channel_id = channel_dict['channel_id']
+    message_dict = requests.post(config.url + 'message/send/v1', json = {
+        'token': get_user_1['token'],
+        'channel_id': extracted_channel_id,
+        'message': 'Hello there' }).json()
+
+    message_id = 123213123
+    assert requests.post(config.url + 'message/edit/v1', json = {
+        'token' : get_user_1['token'],
+        'message_id': message_id,
+        'message' : "" 
+    }).json() == 400
+
+'''
+# AccessError when message_id refers to a valid message in a joined channel/DM and none of the following are true:
+      
+        the message was sent by the authorised user making this request
+        the authorised user has owner permissions in the channel/DM
+'''
+def test_edit_acess_error(clear_server, get_user_1, auth_id_v):
+    
+
