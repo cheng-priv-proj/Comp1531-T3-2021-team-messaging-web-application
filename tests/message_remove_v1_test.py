@@ -179,7 +179,7 @@ def test_invalid_message_id(clear_server, get_user_1):
     }).json()
 
     extracted_channel_id = channel_dict['channel_id']
-    
+
     requests.post(config.url + 'message/send/v1', json = {
         'token': get_user_1['token'],
         'channel_id': extracted_channel_id,
@@ -199,6 +199,7 @@ def test_invalid_message_id(clear_server, get_user_1):
         the message was sent by the authorised user making this request
         the authorised user has owner permissions in the channel/DM
 '''
+# non owner removing someone elses message
 def test_edit_acess_error(clear_server, get_user_1, auth_id_v2):
     channel_dict = requests.post(config.url + 'channels/create/v2', json= {
         'token': get_user_1['token'], 
@@ -219,10 +220,9 @@ def test_edit_acess_error(clear_server, get_user_1, auth_id_v2):
         'channel_id': extracted_channel_id
     })
 
-    assert requests.post(config.url + 'message/edit/v1', json = {
+    assert requests.delete(config.url + 'message/remove/v1', json = {
         'token' : auth_id_v2['token'],
         'message_id': message_id,
-        'message' : "GENERAL KENOBI"
     }).status_code == 400
 
 
