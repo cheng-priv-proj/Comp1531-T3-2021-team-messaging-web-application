@@ -64,7 +64,7 @@ AccessError when message_id refers to a valid message in a joined channel/DM and
 # test with non owner member
 # need to add test multple messages
 
-
+# tests owner case
 def test_normal_case_channel(clear_server, get_user_1, auth_id_v2):
     channel_dict = requests.post(config.url + 'channels/create/v2', json= {
         'token': get_user_1['token'], 
