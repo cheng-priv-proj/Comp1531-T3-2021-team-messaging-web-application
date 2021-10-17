@@ -1,6 +1,5 @@
 import pytest
 import requests
-import operator
 
 from src.config import url
 
