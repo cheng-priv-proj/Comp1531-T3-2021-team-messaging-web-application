@@ -363,10 +363,9 @@ def test_edit_acess_error_dms(clear_server, get_user_1, auth_id_v2):
 
     message_id = message_dict['message_id']
 
-    assert requests.post(config.url + 'message/edit/v1', json = {
+    assert requests.delete(config.url + 'message/remove/v1', json = {
         'token' : auth_id_v2['token'],
-        'message_id': message_id,
-        'message' : "GENERAL KENOBI"
+        'message_id': message_id
     }).status_code == 400
 
 
