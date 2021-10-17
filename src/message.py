@@ -42,7 +42,8 @@ def message_send_v1(auth_user_id, channel_id, message):
         raise InputError('message has invalid length')
 
     # message ids will start from 0
-    message_id = len(data_store.get_channel_or_dm_id_from_message_id_dict())
+    data_store.insert_message_count()
+    message_id = data_store.get_messages_count()
 
     message_dict = {
         'message_id': message_id,
@@ -93,7 +94,8 @@ def message_senddm_v1(auth_user_id, dm_id, message):
         raise InputError('message has invalid length')
 
     # message ids will start from 0
-    message_id = len(data_store.get_channel_or_dm_id_from_message_id_dict())
+    data_store.insert_message_count()
+    message_id = data_store.get_messages_count()
 
     message_dict = {
         'message_id': message_id,
@@ -105,3 +107,42 @@ def message_senddm_v1(auth_user_id, dm_id, message):
     data_store.insert_message(dm_id, message_dict)
 
     return { 'message_id' : message_id }
+
+def message_remove_v1(auth_user_id, message_id):
+    '''
+    Given a message_id for a message, this message is removed from the channel/DM
+
+    Arguments:
+        auth_user_id    (int)   - authorised user id
+        message_id      (int)   - unique message id
+
+    Exceptions:
+        AccessError - occurs when auth_user_id is invalid
+        InputError  - occurs when message_id does not refer to a valid message within a channel/DM
+        InputError  - occurs when user is not a member of channel
+        AccessError - occurs when user does not have proper permissions
+
+    Return Value:
+        Returns nothing on success
+    '''
+    check_type(auth_user_id, int)
+    check_type(message_id, int)
+
+    if data_store.is_invalid_user_id(auth_user_id):
+        raise AccessError ('auth_user_id is invalid')
+
+    if data_store.is_invalid_message_id(message_id):
+        raise InputError ('message_id does not refer to a valid message within a channel/DM')
+
+    channel_or_dm_id = data_store.get_channel_or_dm_id_from_message_id(message_id)    
+    if data_store.is_user_member_of_channel_or_dm(auth_user_id, channel_or_dm_id, auth_user_id):
+        raise InputError ('user is not a member of channel')
+
+    if not (data_store.is_user_owner_of_channel_or_dm(channel_or_dm_id, auth_user_id) and 
+        data_store.is_user_sender_of_message(auth_user_id, message_id)):
+        raise AccessError ('user does not have proper permissions')
+
+    data_store.remove_message(message_id)
+
+    return {}
+
