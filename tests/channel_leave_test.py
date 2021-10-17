@@ -90,7 +90,7 @@ def test_leave_member(clear, first_register, register_user):
     response = requests.get(url + 'channel/details/v2', json = {
         'token': member_token, 
         'channel_id': channel_id}
-    )
+    ).json()
 
     assert response.status_code == 403
 
@@ -117,7 +117,7 @@ def test_multiple_leavers(clear, first_register, register_user):
     channel_details = requests.get(url + 'channel/details/v2', json = {
         'token': member_token1, 
         'channel_id': channel_id}
-    )
+    ).json()
 
     assert channel_details.get('name') == 'channel'
 
@@ -125,7 +125,7 @@ def test_multiple_leavers(clear, first_register, register_user):
     channel_details = requests.get(url + 'channel/details/v2', json = {
         'token': member_token2, 
         'channel_id': channel_id}
-    )
+    ).json()
 
     assert channel_details.get('name') == 'channel'
 
@@ -138,7 +138,7 @@ def test_multiple_leavers(clear, first_register, register_user):
     response = requests.get(url + 'channel/details/v2', json = {
         'token': member_token1, 
         'channel_id': channel_id}
-    )
+    ).json()
 
     assert response.status_code == 403
 
@@ -151,7 +151,7 @@ def test_multiple_leavers(clear, first_register, register_user):
     response = requests.get(url + 'channel/details/v2', json = {
         'token': member_token2, 
         'channel_id': channel_id}
-    )
+    ).json()
 
     assert response.status_code == 403
 
@@ -164,7 +164,7 @@ def test_not_in_channel(clear, first_register, register_user):
     response = requests.post(url + 'channel/leave/v1', json = {
         'token': member_token, 
         'channel_id': channel_id}
-    )
+    ).json()
 
     assert response.status_code == 403
 
@@ -177,7 +177,7 @@ def test_invalid_token(clear, first_register, register_user):
     response = requests.post(url + 'channel/leave/v1', json = {
         'token': member_token, 
         'channel_id': channel_id}
-    )
+    ).json()
 
     assert response.status_code == 403
 
