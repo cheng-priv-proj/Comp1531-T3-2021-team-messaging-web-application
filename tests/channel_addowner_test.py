@@ -46,32 +46,71 @@ def first_register():
     
     return {'u_id': u_id, 'token': token, 'channel_id': channel_id}
 
+
+def test_channel_addowner_v1_invalid_token(clear, first_register, get_valid_token):
+    details = first_register
+    new_user = get_valid_token
+    resp = requests.post(config.url + 'channel/addowner/v1', json={
+        'token': -1,
+        'channel_id': details['channel_id'],
+        'u_id': new_user['auth_user_id']
+    })
+
+    assert resp.status_code == 403
+
 def test_channel_addowner_v1_invalid_channel_id(clear, first_register, get_valid_token):
     details = first_register
     new_user = get_valid_token
-    resp = requests.post(config.url + 'channel/addowner/v1', json={'token': details['token'], 'channel_id': -1, 'u_id': new_user['auth_user_id']})
+    resp = requests.post(config.url + 'channel/addowner/v1', json={
+        'token': details['token'], 
+        'channel_id': -1, 
+        'u_id': new_user['auth_user_id']
+    })
 
     assert resp.status_code == 400
 
-def test_channel_addowner_v1_invalid_u_id(clear, first_register, get_valid_token):
-    details = first_register
+# make sure access error has priority
+def test_channel_addowner_v1_invalid_token_and_channel_id(clear, get_valid_token):
     new_user = get_valid_token
-    resp = requests.post(config.url + 'channel/addowner/v1', json={'token': details['token'], 'channel_id': details['channel_id'], 'u_id': -1})
+    resp = requests.post(config.url + 'channel/addowner/v1', json={
+        'token': -1, 
+        'channel_id': -1, 
+        'u_id': new_user['auth_user_id']
+    })
+
+    assert resp.status_code == 403
+
+def test_channel_addowner_v1_invalid_u_id(clear, first_register):
+    details = first_register
+    resp = requests.post(config.url + 'channel/addowner/v1', json={
+        'token': details['token'], 
+        'channel_id': details['channel_id'], 
+        'u_id': -1})
 
     assert resp.status_code == 400
 
 def test_channel_addowner_v1_user_not_member_of_channel(clear, first_register, get_valid_token):
     details = first_register
     new_user = get_valid_token
-    resp = requests.post(config.url + 'channel/addowner/v1', json={'token': new_user['token'], 'channel_id': details['channel_id'], 'u_id': new_user['auth_user_id']})
+    resp = requests.post(config.url + 'channel/addowner/v1', json={
+        'token': new_user['token'], 
+        'channel_id': details['channel_id'], 
+        'u_id': new_user['auth_user_id']})
 
-    assert resp.status_code == 403
+    assert resp.status_code == 400
 
 def test_channel_addowner_v1_user_already_owner_of_channel(clear, first_register):
     details = first_register
-    requests.post(config.url + 'channel/join/v2', json={'token': details['token'], 'channel_id': details['channel_id']})
-    resp = requests.post(config.url + 'channel/addowner/v1', json={'token': details['token'], 'channel_id': details['channel_id'], 'u_id': details['u_id']})
-    print(resp)
+    requests.post(config.url + 'channel/join/v2', json={
+        'token': details['token'], 
+        'channel_id': details['channel_id']
+    })
+    resp = requests.post(config.url + 'channel/addowner/v1', json={
+        'token': details['token'], 
+        'channel_id': details['channel_id'], 
+        'u_id': details['u_id']
+    })
+    
     assert resp.status_code == 400
 
 def test_channel_addowner_v1_user_without_owner_permissions(clear, first_register):
@@ -81,11 +120,18 @@ def test_channel_addowner_v1_user_without_owner_permissions(clear, first_registe
 def test_channel_addowner_v1_works(clear, first_register, get_valid_token):
     details = first_register
     new_user = get_valid_token
-    requests.post(config.url + 'channel/join/v2', json={'token': new_user['token'], 'channel_id': details['channel_id']})
-    channel_details = requests.get(config.url + 'channel/details/v2', json={'token': new_user['token'], 'channel_id': details['channel_id']}).json()
-    print(channel_details)
-    requests.post(config.url + 'channel/addowner/v1', json={'token': details['token'], 'channel_id': details['channel_id'], 'u_id': new_user['auth_user_id']})
+    requests.post(config.url + 'channel/join/v2', json={
+        'token': new_user['token'], 
+        'channel_id': details['channel_id']
+    })
+    requests.post(config.url + 'channel/addowner/v1', json={
+        'token': details['token'], 
+        'channel_id': details['channel_id'], 
+        'u_id': new_user['auth_user_id']
+    })
+    channel_details = requests.get(config.url + 'channel/details/v2', json={
+        'token': new_user['token'], 
+        'channel_id': details['channel_id']
+    }).json()
 
-    channel_details = requests.get(config.url + 'channel/details/v2', json={'token': new_user['token'], 'channel_id': details['channel_id']}).json()
-    print(channel_details)
     assert new_user['auth_user_id'] in [user['u_id'] for user in channel_details['owner_members']]
