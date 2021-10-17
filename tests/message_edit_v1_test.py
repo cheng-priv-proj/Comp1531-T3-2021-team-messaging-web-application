@@ -62,7 +62,6 @@ AccessError when message_id refers to a valid message in a joined channel/DM and
 # TO GET MORE COVERAGE, MAYBE DO THE SMAE TESTS WITH THE CHANNELS BUT CHANGE IS_PUBLIC TO PRIVATE and vice versa
 
 
-
 def test_normal_case_channel(clear_server, get_user_1, auth_id_v2):
     channel_dict = requests.post(config.url + 'channels/create/v2', json= {
         'token': get_user_1['token'], 
@@ -92,5 +91,54 @@ def test_normal_case_channel(clear_server, get_user_1, auth_id_v2):
     message = messages[0]
 
 
-    assert messages['message'] == "GENERAL KENOBI"
+    assert message['message'] == "GENERAL KENOBI"
 
+# Over 100 char message
+def test_long_edit_channel(clear_server, get_user_1, auth_id_v):
+    channel_dict = requests.post(config.url + 'channels/create/v2', json= {
+        'token': get_user_1['token'], 
+        'name': 'test channel', 
+        'is_public': True
+    }).json()
+
+    extracted_channel_id = channel_dict['channel_id']
+    message_dict = requests.post(config.url + 'message/send/v1', json = {
+        'token': get_user_1['token'],
+        'channel_id': extracted_channel_id,
+        'message': 'Hello there' }).json()
+
+    message_id = message_dict['message_id']
+
+    assert requests.post(config.url + 'message/edit/v1', json = {
+        'token' : get_user_1['token'],
+        'message_id': message_id,
+        'message' : "a" * 1001
+    }).status_code == 400
+
+# message edit with empty string 
+# same behavoiur as removing
+def test_empty_edit_channel(clear_server, get_user_1, auth_id_v):
+    channel_dict = requests.post(config.url + 'channels/create/v2', json= {
+        'token': get_user_1['token'], 
+        'name': 'test channel', 
+        'is_public': True
+    }).json()
+
+    extracted_channel_id = channel_dict['channel_id']
+    message_dict = requests.post(config.url + 'message/send/v1', json = {
+        'token': get_user_1['token'],
+        'channel_id': extracted_channel_id,
+        'message': 'Hello there' }).json()
+
+    message_id = message_dict['message_id']
+
+    message_id = message_dict['message_id']
+
+     requests.post(config.url + 'message/edit/v1', json = {
+        'token' : get_user_1['token'],
+        'message_id': message_id,
+        'message' : "" 
+    })
+
+
+# message_id does not refer to a valid message within a channel/DM that the authorised user has joined
