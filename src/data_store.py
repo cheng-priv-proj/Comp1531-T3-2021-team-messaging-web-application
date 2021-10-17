@@ -167,7 +167,6 @@ class Datastore:
         return True
 
     def is_user_member_of_channel(self, channel_id, u_id):
-
         channels = self.get_channels_from_channel_id_dict().get(channel_id)
         if not any (member['u_id'] == u_id for member in channels['all_members']):
             return False
@@ -250,6 +249,9 @@ class Datastore:
 
         self.get_messages_from_channel_or_dm_id_dict()[channel_id] = messages
         self.update_json()
+
+    def insert_channel_owner(self, channel_id, u_id):
+        self.get_channel_from_channel_id(channel_id).get('owner_members').append(data_store.get_user_from_u_id(u_id))
 
     def insert_dm(self, creator, dm_id, u_ids, name):
         self.get_dms_from_dm_id_dict()[dm_id] = {

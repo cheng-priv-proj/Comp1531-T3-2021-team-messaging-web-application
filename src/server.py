@@ -10,7 +10,7 @@ from src.channels import channels_listall_v1, channels_list_v1
 
 from src.auth import auth_login_v1, auth_register_v1
 from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
-from src.channel import channel_invite_v1, channel_messages_v1, channel_details_v1, channel_leave_v1
+from src.channel import channel_invite_v1, channel_messages_v1, channel_details_v1, channel_leave_v1, channel_addowner_v1
 
 from src.data_store import data_store
 from src.error import InputError
@@ -358,9 +358,38 @@ def channel_details_endpt():
     auth_id = token_to_auth_id(token)
     channel_id = request_data['channel_id']
 
-    return_dict = channel_details_v1(auth_id, channel_id)
-    print(return_dict)
-    return return_dict
+    return channel_details_v1(auth_id, channel_id)
+
+@APP.route('/channel/addowner/v1', methods=['POST'])
+def channel_addowner_endpt():
+    '''
+    Make user with user id u_id an owner of the channel.
+
+    Arguments:
+        token           (int)   - unique user token
+        channel_id      (int)   - unique channel id
+        u_id            (int)   - unique user id
+
+    Exceptions:
+        AccessError - occurs when token is invalid
+        AccessError - occurs when auth_user_id is invalid
+        InputError  - occurs when channel_id is invalid
+        AccessError - occurs when channel_id is valid and the authorised user does not have owner permissions in the channel
+        InputError  - occurs when u_id does not refer to a valid user
+        InputError  - occurs when u_id refers to a user who is not a member of the channel
+        InputError  - occurs when u_id refers to a user who is already an owner of the channel
+
+    Returns:
+        Returns nothing on success
+    '''
+    
+    request_data = request.get_json()
+    token = request_data['token']
+    auth_id = token_to_auth_id(token)
+    channel_id = request_data.get('channel_id')
+    u_id = request_data.get('u_id')
+
+    return channel_addowner_v1(auth_id, channel_id, u_id)
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 
