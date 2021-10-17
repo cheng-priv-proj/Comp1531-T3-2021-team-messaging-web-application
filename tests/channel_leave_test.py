@@ -87,12 +87,10 @@ def test_leave_member(clear, first_register, register_user):
         'channel_id': channel_id}
     )
 
-    response = requests.get(url + 'channel/details/v2', json = {
+    assert requests.get(url + 'channel/details/v2', json = {
         'token': member_token, 
         'channel_id': channel_id}
-    ).json()
-
-    assert response.status_code == 403
+    ).status_code == 403
 
 # Test multiple leavers
 def test_multiple_leavers(clear, first_register, register_user):
@@ -135,12 +133,10 @@ def test_multiple_leavers(clear, first_register, register_user):
         'channel_id': channel_id}
     )
 
-    response = requests.get(url + 'channel/details/v2', json = {
+    assert requests.get(url + 'channel/details/v2', json = {
         'token': member_token1, 
         'channel_id': channel_id}
-    ).json()
-
-    assert response.status_code == 403
+    ).status_code == 403
 
     # Try again after leaving
     requests.post(url + 'channel/leave/v1', json = {
