@@ -227,7 +227,7 @@ def channel_leave_v1(auth_user_id, channel_id):
     if data_store.is_invalid_channel_id(channel_id):
         raise InputError('channel_id is invalid')
 
-    if data_store.is_user_member_of_channel(channel_id, auth_user_id):
+    if not data_store.is_user_member_of_channel(channel_id, auth_user_id):
         raise AccessError('channel_id is valid and the authorised user is not a member of the channel')
 
     # move everything below into a data_store method?
