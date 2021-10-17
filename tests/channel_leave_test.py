@@ -172,7 +172,8 @@ def test_invalid_token(clear, first_register, register_user):
     ).status_code == 403
 
 # Test messages remain
-def test_messages_remain(clear, first_register):
+@pytest.mark.skip('This will work when the messages branch is merged in')
+def test_messages_remain(clear, first_register, register_user):
     owner_token = first_register.get('token')
     channel_id = first_register.get('channel_id')
 
@@ -194,13 +195,14 @@ def test_messages_remain(clear, first_register):
         'channel_id': channel_id
     })
 
-    messages_list = requests.post(url + 'channel/messages/v2', json = {
+    messages_list = requests.get(url + 'channel/messages/v2', json = {
         'token': owner_token, 
         'channel_id': channel_id,
         'start': 0
     }).json()
     # Dunno if this is correct
-    assert messages_list[0].get('message') == 'i like eating apples'
+    print(messages_list)
+    assert messages_list.get('messages')[0].get('message') == 'i like eating apples'
 
 # Test only channel owner leaves still remains
 def test_channel_owner_leaves(clear, first_register):
