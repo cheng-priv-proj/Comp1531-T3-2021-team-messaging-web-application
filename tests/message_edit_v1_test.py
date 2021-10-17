@@ -62,6 +62,8 @@ AccessError when message_id refers to a valid message in a joined channel/DM and
 # TO GET MORE COVERAGE, MAYBE DO THE SMAE TESTS WITH THE CHANNELS BUT CHANGE IS_PUBLIC TO PRIVATE and vice versa
 # same tests but send more than 50 messages.
 # test with non owner member
+# need to add test multple messages
+
 
 def test_normal_case_channel(clear_server, get_user_1, auth_id_v2):
     channel_dict = requests.post(config.url + 'channels/create/v2', json= {
