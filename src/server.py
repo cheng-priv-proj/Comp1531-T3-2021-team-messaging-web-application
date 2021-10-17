@@ -398,6 +398,14 @@ def message_senddm_endpt():
     return_dict = message_senddm_v1(auth_user_id, dm_id, message)
     return return_dict
 
+@APP.route("/message/edit/v1", methods=['POST'])
+def message_edit_endpt():
+    return {}
+
+@APP.route("/message/remove/v1", methods=['DELETE'])
+def message_remove_endpt():
+    return {}
+
 #### NO NEED TO MODIFY BELOW THIS POINT
 
 if __name__ == "__main__":
