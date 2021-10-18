@@ -1,3 +1,4 @@
+from re import T
 import sys
 import signal
 from json import dumps
@@ -14,6 +15,8 @@ from src.auth import auth_login_v1, auth_register_v1
 from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
 from src.channel import channel_invite_v1, channel_messages_v1, channel_details_v1
 from src.dm import dm_create_v1, dm_details_v1
+
+from src.dm import dm_remove_v1, dm_details_v1, dm_create_v1
 
 from src.data_store import data_store
 from src.error import InputError
@@ -340,6 +343,7 @@ def channel_details_endpt():
 
     return return_dict
 
+################################ DM #########################################
 
 @APP.route("/dm/create/v1", methods=['POST'])
 def dm_create_endpt():
@@ -394,15 +398,13 @@ def dm_details_endpt():
     Return value:
         Returns {name, members} on success
     '''
-    print('3')
+
     request_data = request.get_json(force = True)
     auth_user_id = token_to_auth_id(request_data['token'])
     dm_id = request_data['dm_id']
 
     return_dict = dm_details_v1(auth_user_id, dm_id)
     return return_dict
-
-
 
 @APP.route("/dm/leave/v1", methods=['POST'])
 def dm_leave_endpt():
@@ -437,7 +439,28 @@ def dm_leave_endpt():
 
     return {}
 
+@APP.route("/dm/remove/v1", methods=['DELETE'])
+def dm_remove_endpt():
+    '''
+    Remove an existing DM, so all members are no longer in the DM. This can only be done by the original creator of the DM.
 
+    Arguments:
+        token       (string)    - unique user token
+        dm_id       (int)       - refers to a dm
+
+    Exceptions:
+        AccessError - Occurs when token is invalid
+        InputError  - Occurs when dm_id does refer to a valid DM
+        AccessError - Occurs when dm_id is valid but auth_id is not a creator of the DM
+
+    Return Value:
+        Returns nothing on success
+    '''
+    request_data = request.get_json(force = True)
+    auth_id = token_to_auth_id(request_data['token'])
+    dm_id = request_data['dm_id']
+
+    return dm_remove_v1(auth_id, dm_id)
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 

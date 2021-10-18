@@ -185,12 +185,17 @@ class Datastore:
             return True
 
         return False
-    
-    def is_user_member_of_dm(self, dm_id, u_id):
-        dms = self.get_dm_from_dm_id(dm_id)
-        if any (member['u_id'] == u_id for member in dms['members']):
+
+    def is_user_owner_of_channel_or_dm(self, channel_or_dm_id, u_id):
+        if channel_or_dm_id <= -1:
+            if u_id == self.get_dm_creator_from_dm_id(channel_or_dm_id):
+                return True
+
+            return False
+        channel = self.get_channel_from_channel_id(channel_or_dm_id)
+        if any (member['u_id'] == u_id for member in channel['owner_members']):
             return True
-        
+
         return False
 
     def is_stream_owner(self, u_id):
@@ -280,6 +285,13 @@ class Datastore:
     def update_value(self, dict_key, key, value):
         self.__store[dict_key][key] = value
         self.update_json()
+
+    # Remove ###################################################################
+
+    def remove_dm(self, dm_id):
+        self.get_dm_from_dm_id(dm_id)['creator'] = None
+        self.get_dm_from_dm_id(dm_id)['details']['members'] = None
+
 
     # Other ####################################################################
 
