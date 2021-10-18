@@ -98,10 +98,7 @@ def test_multiple_logins(clear_server, get_user_1):
     resp_1 = requests.get(config.url + 'channels/listall/v2', json = {'token': token_1})
     assert(resp_1.status_code == 403)
 
-    print(token_1)
-    print(token_2)
     resp_2 = requests.get(config.url + 'channels/listall/v2', json = {'token': token_2}).json()
-    print(resp_2)
     assert resp_2 == { 
         'channels': [
             {

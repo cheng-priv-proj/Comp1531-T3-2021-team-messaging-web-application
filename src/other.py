@@ -36,7 +36,6 @@ def handle_str_generation(firstname, lastname):
 
     base_handle_str = base_handle_str_generation(firstname, lastname)
     handle_str = handle_prevent_duplicates(base_handle_str)
-    print(handle_str)
     return handle_str
 
 # Returns a nonduplicate handle_str

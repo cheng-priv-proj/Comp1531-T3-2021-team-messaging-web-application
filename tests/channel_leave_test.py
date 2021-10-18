@@ -19,7 +19,6 @@ def first_register():
         'name_last': 'user'
     }
     token_dict = requests.post(url + 'auth/register/v2', json = user_details).json()
-    print(token_dict)
     token = token_dict.get('token')
 
     channel_details = {
@@ -199,7 +198,6 @@ def test_messages_remain(clear, first_register, register_user):
         'start': 0
     }).json()
     # Dunno if this is correct
-    print(messages_list)
     assert messages_list.get('messages')[0].get('message') == 'i like eating apples'
 
 # Test only channel owner leaves still remains
