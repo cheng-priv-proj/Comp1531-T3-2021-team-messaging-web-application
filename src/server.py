@@ -4,6 +4,7 @@ from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
 from src import config
+from src.channels import channels_listall_v1, channels_list_v1
 
 from src.channel import channel_join_v1, channel_details_v1
 from src.channels import channels_listall_v1, channels_list_v1
