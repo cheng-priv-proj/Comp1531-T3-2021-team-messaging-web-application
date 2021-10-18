@@ -11,7 +11,7 @@ def test_clearv1_functionality():
             'password': 'password', 
             'name_first': 'name_first',
             'name_last': 'name_last' }
-    owner_id_dict = requests.post(url + 'auth/register/v2', json = registration_info)
+    requests.post(url + 'auth/register/v2', json = registration_info)
     requests.delete(url + 'clear/v1')
     assert requests.post(url + 'auth/login/v2', json = {'email': 'email@gmail.com', 'password': 'password'}).status_code == 400
 
