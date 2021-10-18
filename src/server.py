@@ -1,3 +1,4 @@
+from re import T
 import sys
 import signal
 from json import dumps
@@ -13,6 +14,8 @@ from src.channels import channels_listall_v1, channels_list_v1
 from src.auth import auth_login_v1, auth_register_v1
 from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
 from src.channel import channel_invite_v1, channel_messages_v1, channel_details_v1
+
+from src.dm import dm_remove_v1, dm_details_v1, dm_create_v1
 
 from src.data_store import data_store
 from src.error import InputError
@@ -336,6 +339,92 @@ def channel_details_endpt():
     print(return_dict)
 
     return return_dict
+
+################################ DM #########################################
+
+
+@APP.route("/dm/create/v1", methods=['POST'])
+def dm_create_endpt():
+    '''
+    Create a DM an invite a list of users to that dm
+
+    Methods:
+        Post
+
+    Arguments:
+        token           (int)   - unique user token
+        u_ids           (int)   - list of unique user tokens
+
+    Exceptions:
+        AccessError - occurs when token is inavlid
+        TypeError   - occurs when auth_user_id is not an int
+        TypeError   - occurs when u_id is not a list
+        AccessError - occurs when auth_user_id is invalid
+        InputError  - occurs when invalid u_id in u_ids
+
+    Return value:
+        Returns {dm_id} on success
+    '''
+    request_data = request.get_json(force = True)
+    auth_user_id = token_to_auth_id(request_data['token'])
+    u_ids = request_data['u_ids']
+
+    return_dict = dm_create_v1(auth_user_id, u_ids)
+    return return_dict
+
+@APP.route("/dm/details/v1", methods=['GET'])
+def dm_details_endpt():
+    '''
+    Given a DM with ID dm_id that the authorised user is a member of, 
+    provide basic details about the DM.
+
+    Methods:
+        Get
+
+    Arguments:
+        token           (int)   - unique user token
+        dm_id           (int)   - unique dm id
+
+    Exceptions:
+        AccessError - occurs when token is invalid
+        TypeError   - occurs when auth_user_id is not an int
+        TypeError   - occurs when dm_id is not an int
+        AccessError - occurs when auth_user_id is invalid
+        InputError  - occurs when dm_id does not refer to a valid DM
+        AccessError - occurs when dm_id is valid and the authorised user is not a member of the DM
+
+    Return value:
+        Returns {name, members} on success
+    '''
+    request_data = request.get_json(force = True)
+    auth_user_id = token_to_auth_id(request_data['token'])
+    dm_id = request_data['dm_id']
+
+    return_dict = dm_details_v1(auth_user_id, dm_id)
+    return return_dict
+
+@APP.route("/dm/remove/v1", methods=['DELETE'])
+def dm_remove_endpt():
+    '''
+    Remove an existing DM, so all members are no longer in the DM. This can only be done by the original creator of the DM.
+
+    Arguments:
+        token       (string)    - unique user token
+        dm_id       (int)       - refers to a dm
+
+    Exceptions:
+        AccessError - Occurs when token is invalid
+        InputError  - Occurs when dm_id does refer to a valid DM
+        AccessError - Occurs when dm_id is valid but auth_id is not a creator of the DM
+
+    Return Value:
+        Returns nothing on success
+    '''
+    request_data = request.get_json(force = True)
+    auth_id = token_to_auth_id(request_data['token'])
+    dm_id = request_data['dm_id']
+
+    return dm_remove_v1(auth_id, dm_id)
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 

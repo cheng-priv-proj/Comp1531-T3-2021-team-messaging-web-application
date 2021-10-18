@@ -140,3 +140,36 @@ def dm_messages_v1(token, dm_id, start):
         'end' : end
         }
 
+def dm_remove_v1(auth_id, dm_id):
+    '''
+    Remove an existing DM, so all members are no longer in the DM. This can only be done by the original creator of the DM.
+
+    Arguments:
+        auth_id     (int)   - authorized user id
+        dm_id       (int)   - refers to a dm
+
+    Exceptions:
+        TypeError   - Occurs when auth_id is not an int
+        TypeError   - Occurs when dm_id is not an int
+        AccessError - Occurs when auth_id is invalid
+        InputError  - Occurs when dm_id does refer to a valid DM
+        AccessError - Occurs when dm_id is valid but auth_id is not a creator of the DM
+
+    Return Value:
+        Retursn nothing on success
+    '''
+    check_type(auth_id, int)
+    check_type(dm_id, int)
+
+    if data_store.is_invalid_user_id(auth_id):
+        raise AccessError ('Invalid auth_user_id')
+
+    if data_store.is_invalid_dm(dm_id):
+        raise InputError ('dm_id does not refer to valid DM')
+
+    if not data_store.is_user_owner_of_channel_or_dm(auth_id, dm_id):
+        raise AccessError ('dm_id is valid and the authorised user is not creator of the DM')
+
+    data_store.remove_dm(dm_id)
+
+    return {}
