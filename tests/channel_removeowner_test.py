@@ -115,9 +115,21 @@ def test_channel_removeowner_v1_user_only_owner_of_channel(clear, first_register
     assert resp.status_code == 400
     
 @pytest.mark.skip
-def test_channel_removeowner_v1_user_without_owner_permissions(clear, first_register):
-    # access error
-    pass
+def test_channel_removeowner_v1_user_without_owner_permissions(clear, first_register, get_valid_token):
+    details = first_register
+    new_user = get_valid_token
+    requests.post(config.url + 'channel/join/v2', json={
+        'token': details['token'], 
+        'channel_id': details['channel_id']
+    })
+
+    resp = requests.post(config.url + 'channel/removeowner/v1', json={
+        'token': new_user['token'], 
+        'channel_id': details['channel_id'], 
+        'u_id': new_user['auth_user_id']
+    })
+
+    assert resp.status_code == 403
 
 def test_channel_removeowner_v1_works(clear, first_register, get_valid_token):
     details = first_register
