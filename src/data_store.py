@@ -181,11 +181,12 @@ class Datastore:
         return True
 
     def is_user_member_of_channel(self, channel_id, u_id):
-        channel = self.get_channel_from_channel_id(channel_id)
-        if not any (member['u_id'] == u_id for member in channel['all_members']):
+        channels = self.get_channels_from_channel_id_dict().get(channel_id)
+        if not any (member['u_id'] == u_id for member in channels['all_members']):
             return False
         
         return True
+
         
     def is_user_member_of_dm(self, dm_id, u_id):
         dm = self.get_dm_from_dm_id(dm_id)
@@ -194,11 +195,11 @@ class Datastore:
         
         return True
 
-    def is_user_member_of_dm_or_channel(self, channel_or_dm_id, u_id):
+    def is_user_member_of_channel_or_dm(self, channel_or_dm_id, u_id):
         if channel_or_dm_id <= -1:
             return self.is_user_member_of_dm(channel_or_dm_id, u_id)
         
-        return self.is_user_member_of_channel(channel_or_dm_id)
+        return self.is_user_member_of_channel(channel_or_dm_id, u_id)
 
     def is_user_owner_of_channel_or_dm(self, channel_or_dm_id, u_id):
         if channel_or_dm_id <= -1:
@@ -327,9 +328,9 @@ class Datastore:
 
     def remove_message(self, message_id):
         channel_or_dm_id = self.get_channel_or_dm_id_from_message_id(message_id)
-        del self.get_channel_or_dm_id_from_message_id_dict()[message_id]
-
         self.get_messages_from_channel_or_dm_id(channel_or_dm_id).remove(self.get_message_from_message_id(message_id))
+        del self.get_channel_or_dm_id_from_message_id_dict()[message_id]
+    
 
     # Other ####################################################################
 

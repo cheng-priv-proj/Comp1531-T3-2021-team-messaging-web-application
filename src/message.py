@@ -135,11 +135,12 @@ def message_remove_v1(auth_user_id, message_id):
         raise InputError ('message_id does not refer to a valid message within a channel/DM')
 
     channel_or_dm_id = data_store.get_channel_or_dm_id_from_message_id(message_id)    
-    if data_store.is_user_member_of_channel_or_dm(auth_user_id, channel_or_dm_id, auth_user_id):
+    if not data_store.is_user_member_of_channel_or_dm(channel_or_dm_id, auth_user_id):
         raise InputError ('user is not a member of channel')
 
-    if not (data_store.is_user_owner_of_channel_or_dm(channel_or_dm_id, auth_user_id) and 
-        data_store.is_user_sender_of_message(auth_user_id, message_id)):
+    if not (data_store.is_user_owner_of_channel_or_dm(channel_or_dm_id, auth_user_id) or 
+        data_store.is_user_sender_of_message(auth_user_id, message_id) or 
+        data_store.is_stream_owner(auth_user_id)):
         raise AccessError ('user does not have proper permissions')
 
     data_store.remove_message(message_id)
