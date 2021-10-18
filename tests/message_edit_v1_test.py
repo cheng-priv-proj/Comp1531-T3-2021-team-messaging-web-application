@@ -195,7 +195,6 @@ def test_long_edit_channel(clear_server, get_user_1):
 
 # message edit with empty string 
 # same behavoiur as removing
-@pytest.mark.skip('Not yet implemented')
 def test_empty_edit_channel(clear_server, get_user_1):
     channel_dict = requests.post(config.url + 'channels/create/v2', json= {
         'token': get_user_1['token'], 

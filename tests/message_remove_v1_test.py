@@ -200,7 +200,6 @@ def test_invalid_message_id(clear_server, get_user_1):
         the message was sent by the authorised user making this request
         the authorised user has owner permissions in the channel/DM
 '''
-@pytest.mark.skip
 # non owner removing someone elses message
 def test_edit_acess_error(clear_server, get_user_1, auth_id_v2):
     channel_dict = requests.post(config.url + 'channels/create/v2', json= {
@@ -225,7 +224,7 @@ def test_edit_acess_error(clear_server, get_user_1, auth_id_v2):
     assert requests.delete(config.url + 'message/remove/v1', json = {
         'token' : auth_id_v2['token'],
         'message_id': message_id,
-    }).status_code == 400
+    }).status_code == 403
 
 
 # does not test global owner
