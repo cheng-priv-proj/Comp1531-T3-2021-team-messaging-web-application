@@ -76,10 +76,8 @@ def register_ep():
     name_last = register_details.get('name_last')
     
     auth_id_dict = auth_register_v1(email, password, name_first, name_last)
-    print("THIS IS NOOTT WORKINNNGG")
     auth_id = auth_id_dict.get('auth_user_id')
     token = str(auth_id) # Change to jwt later
-    print("THIS IS WORKINNNGG")
     data_store.insert_token(token, auth_id)
 
     return {'token': token, 'auth_user_id': auth_id}
@@ -157,7 +155,6 @@ def channel_create_ep():
     name = create_details.get('name')
     is_public = create_details.get('is_public')
 
-    print(auth_user_id)
 
     channel_id_dict = channels_create_v1(auth_user_id, name, is_public)
     channel_id = channel_id_dict.get('channel_id')
@@ -231,8 +228,6 @@ def channel_messages_ep():
     auth_user_id = token_to_auth_id(token)
     channel_id = message_get_details.get('channel_id')
     start = message_get_details.get('start')
-
-    print(channel_messages_v1(auth_user_id, channel_id, start))
 
     return channel_messages_v1(auth_user_id, channel_id, start)
 
