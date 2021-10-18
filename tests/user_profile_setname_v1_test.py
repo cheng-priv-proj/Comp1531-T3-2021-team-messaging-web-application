@@ -66,7 +66,8 @@ def test_user_profile_setname_basic_functionality(clear, register_user, user_pro
         'u_id': extract_user(owner_info),
         'handle_str': 'ownerone',
         'name_first': 'ownera',
-        'name_last': 'asdd'
+        'name_last': 'asdd',
+        'email': 'owner@gmail.com',
     }
 
 def test_user_profile_setname_invalid_token(clear, user_profile_setname):

@@ -65,7 +65,8 @@ def test_user_profile_sethandle_basic_functionality(clear, register_user, user_p
         'u_id': extract_user(owner_info),
         'handle_str': 'owneronen',
         'name_first': 'owner',
-        'name_last': 'one'
+        'name_last': 'one',
+        'email': 'owner@gmail.com'
     }
 
 def test_user_profile_sethandle_invalid_token(clear, user_profile_sethandle):
