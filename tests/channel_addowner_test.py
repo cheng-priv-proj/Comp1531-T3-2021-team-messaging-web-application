@@ -92,7 +92,7 @@ def test_channel_addowner_v1_user_not_member_of_channel(clear, first_register, g
     details = first_register
     new_user = get_valid_token
     resp = requests.post(config.url + 'channel/addowner/v1', json={
-        'token': new_user['token'], 
+        'token': details['token'], 
         'channel_id': details['channel_id'], 
         'u_id': new_user['auth_user_id']})
 
