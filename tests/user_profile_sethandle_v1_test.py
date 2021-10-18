@@ -57,7 +57,7 @@ def register_user():
         return {**owner_id_dict, **registration_info}
     return register_user_function
 
-def user_profile_sethandle_basic_functionality_test(clear, register_user, user_profile_sethandle, user_profile, extract_user, extract_token):
+def test_user_profile_sethandle_basic_functionality(clear, register_user, user_profile_sethandle, user_profile, extract_user, extract_token):
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     user_profile_sethandle(extract_token(owner_info), 'owneronen')
 
@@ -68,34 +68,34 @@ def user_profile_sethandle_basic_functionality_test(clear, register_user, user_p
         'name_last': 'one'
     }
 
-def user_profile_sethandle_invalid_token_test(clear, user_profile_sethandle):
+def test_user_profile_sethandle_invalid_token(clear, user_profile_sethandle):
     assert user_profile_sethandle('asdasda', 'asdasda').status_code == 403
 
-def user_profile_sethandle_handle_str_short(clear, register_user, extract_token, user_profile_sethandle):
+def test_user_profile_sethandle_handle_str_short(clear, register_user, extract_token, user_profile_sethandle):
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
 
     assert user_profile_sethandle(extract_token(owner_info), '').status_code == 400
 
-def user_profile_sethandle_handle_str_long(clear, register_user, user_profile_sethandle, extract_token):
+def test_user_profile_sethandle_handle_str_long(clear, register_user, user_profile_sethandle, extract_token):
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
 
     assert user_profile_sethandle(extract_token(owner_info), 'a' * 21).status_code == 400
 
-def user_profile_sethandle_duplicate(clear, register_user, user_profile_sethandle, extract_token):
+def test_user_profile_sethandle_duplicate(clear, register_user, user_profile_sethandle, extract_token):
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     register_user('user1@gmail.com', 'user', 'one')
 
     assert user_profile_sethandle(extract_token(owner_info), 'userone').status_code == 400
 
-def user_profile_sethandle_nonalphanumeric(clear, register_user, user_profile_sethandle, extract_token):
+def test_user_profile_sethandle_nonalphanumeric(clear, register_user, user_profile_sethandle, extract_token):
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     
     assert user_profile_sethandle(extract_token(owner_info), '*1#$;').status_code == 400
 
-def user_profile_sethandle_invalid_handle_str_and_token(clear, user_profile_sethandle):
+def test_user_profile_sethandle_invalid_handle_str_and_token(clear, user_profile_sethandle):
     assert user_profile_sethandle('asdasd', '').status_code == 403
 
-def user_profile_sethandle_returns_nothing(clear, user_profile_sethandle, register_user, extract_token):
+def test_user_profile_sethandle_returns_nothing(clear, user_profile_sethandle, register_user, extract_token):
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
 
     assert user_profile_sethandle(extract_token(owner_info), 'oasdasd').json() == {}

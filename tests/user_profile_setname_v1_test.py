@@ -58,7 +58,7 @@ def register_user():
         return {**owner_id_dict, **registration_info}
     return register_user_function
 
-def user_profile_setname_basic_functionality(clear, register_user, user_profile, user_profile_setname, extract_user, extract_token):
+def test_user_profile_setname_basic_functionality(clear, register_user, user_profile, user_profile_setname, extract_user, extract_token):
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     user_profile_setname(extract_token(owner_info), 'ownera', 'asdd')
 
@@ -69,25 +69,25 @@ def user_profile_setname_basic_functionality(clear, register_user, user_profile,
         'name_last': 'asdd'
     }
 
-def user_profile_setname_invalid_token(clear, user_profile_setname):
+def test_user_profile_setname_invalid_token(clear, user_profile_setname):
     assert user_profile_setname('asdasd', 'owner', 'one').status_code == 403
 
-def user_profile_setname_invalid_token_and_name(clear, user_profile_setname):
+def test_user_profile_setname_invalid_token_and_name(clear, user_profile_setname):
     assert user_profile_setname('asdasd', '', '').status_code == 403
 
-def user_profile_setname_too_long(clear, user_profile_setname, register_user, extract_token):
+def test_user_profile_setname_too_long(clear, user_profile_setname, register_user, extract_token):
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
 
     assert user_profile_setname(extract_token(owner_info), 'owner', 'a' * 51).status_code == 400
     assert user_profile_setname(extract_token(owner_info), 'a' * 51, 'one').status_code == 400
 
-def user_profile_setname_too_short(clear, user_profile_setname, register_user, extract_token):
+def test_user_profile_setname_too_short(clear, user_profile_setname, register_user, extract_token):
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
 
     assert user_profile_setname(extract_token(owner_info), '', 'one').status_code == 400
     assert user_profile_setname(extract_token(owner_info), 'owner', '').status_code == 400
 
-def user_profile_setname_return_nothing(clear, user_profile_setname, register_user, extract_token):
+def test_user_profile_setname_return_nothing(clear, user_profile_setname, register_user, extract_token):
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
 
     assert user_profile_setname(extract_token(owner_info), 'ownera', 'asdd').json() == {}
