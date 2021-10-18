@@ -128,12 +128,7 @@ def token_to_auth_id(token):
     '''
 
     if data_store.is_token_invalid(token):
-<<<<<<< HEAD
         raise AccessError ('Token is invalid')
-=======
-        print(token)
-        raise AccessError
->>>>>>> c239659da41f5d96444c2e76b9cac8b4ff103d2c
     
     return data_store.get_u_id_from_token(token)
 
