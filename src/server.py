@@ -1,18 +1,15 @@
+from re import T
 import sys
 import signal
 from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
 from src import config
-from src.channels import channels_listall_v1, channels_list_v1
 
-from src.channel import channel_join_v1, channel_details_v1
-from src.channels import channels_listall_v1, channels_list_v1
-
+from src.channels import channels_listall_v1, channels_list_v1, channels_create_v1
 from src.auth import auth_login_v1, auth_register_v1, auth_logout_v1
-from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
-from src.channel import channel_invite_v1, channel_messages_v1, channel_details_v1, channel_leave_v1, channel_addowner_v1
-
+from src.dm import dm_create_v1, dm_details_v1, dm_leave_v1, dm_list_v1, dm_remove_v1, dm_details_v1, dm_create_v1, dm_messages_v1
+from src.channel import channel_invite_v1, channel_messages_v1, channel_details_v1, channel_leave_v1, channel_addowner_v1, channel_join_v1
 from src.user import user_profile_v1
 
 from src.data_store import data_store
@@ -173,7 +170,9 @@ def channel_invite_ep():
     channel/invite/v2
     POST
 
-    Invites a user with ID u_id to join a channel with ID channel_id. Once invited, the user is added to the channel immediately. In both public and private channels, all members are able to invite users.
+    Invites a user with ID u_id to join a channel with ID channel_id. 
+    Once invited, the user is added to the channel immediately. 
+    In both public and private channels, all members are able to invite users.
     
     Parameters:{ token, channel_id, u_id }
     
@@ -286,8 +285,6 @@ def channel_list_endpt():
 
     return channels_list_v1(auth_user_id)
 
-
-
 @APP.route('/channels/listall/v2', methods = ['GET'])
 def list_all_endpt():
     '''
@@ -347,6 +344,7 @@ def channel_join_endpt():
     '''
     
     join_details = request.get_json()
+
     token = join_details['token']
     auth_id = token_to_auth_id(token)
     channel_id = join_details['channel_id']
@@ -373,11 +371,82 @@ def channel_details_endpt():
     '''
 
     request_data = request.get_json()
+
     token = request_data['token']
     auth_id = token_to_auth_id(token)
     channel_id = request_data['channel_id']
 
-    return channel_details_v1(auth_id, channel_id)
+    return_dict = channel_details_v1(auth_id, channel_id)
+    print(return_dict)
+
+    return return_dict
+
+################################ DM #########################################
+
+@APP.route("/dm/create/v1", methods=['POST'])
+def dm_create_endpt():
+    '''
+    Create a DM an invite a list of users to that dm
+
+    Methods:
+        Post
+
+    Arguments:
+        token           (int)   - unique user token
+        u_ids           (int)   - list of unique user tokens
+
+    Exceptions:
+        AccessError - occurs when token is inavlid
+        TypeError   - occurs when auth_user_id is not an int
+        TypeError   - occurs when u_id is not a list
+        AccessError - occurs when auth_user_id is invalid
+        InputError  - occurs when invalid u_id in u_ids
+
+    Return value:
+        Returns {dm_id} on success
+    '''
+    request_data = request.get_json(force = True)
+    auth_user_id = token_to_auth_id(request_data['token'])
+    u_ids = request_data['u_ids']
+
+    return_dict = dm_create_v1(auth_user_id, u_ids)
+    return return_dict
+
+@APP.route("/dm/details/v1", methods=['GET'])
+def dm_details_endpt():
+    '''
+    Given a DM with ID dm_id that the authorised user is a member of, 
+    provide basic details about the DM.
+
+    Methods:
+        Get
+
+    Arguments:
+        token           (int)   - unique user token
+        dm_id           (int)   - unique dm id
+
+    Exceptions:
+        AccessError - occurs when token is invalid
+        TypeError   - occurs when auth_user_id is not an int
+        TypeError   - occurs when dm_id is not an int
+        AccessError - occurs when auth_user_id is invalid
+        InputError  - occurs when dm_id does not refer to a valid DM
+        AccessError - occurs when dm_id is valid and the authorised user is not a member of the DM
+
+    Return value:
+        Returns {name, members} on success
+    '''
+
+    request_data = request.get_json(force = True)
+    token = request_data.get('token')
+    print(3)
+    print(request_data)
+    print(token)
+    auth_user_id = token_to_auth_id(token)
+    dm_id = request_data['dm_id']
+
+    return_dict = dm_details_v1(auth_user_id, dm_id)
+    return return_dict
 
 @APP.route('/channel/addowner/v1', methods=['POST'])
 def channel_addowner_endpt():
@@ -437,6 +506,97 @@ def user_profile_ep():
 
     user_details = user_profile_v1(auth_user_id, u_id)
     return user_details
+
+@APP.route("/dm/leave/v1", methods=['POST'])
+def dm_leave_endpt():
+    '''
+    dm/leave/v1
+    Given a DM ID, the user is removed as a member of this DM. 
+    The creator is allowed to leave and the DM will still exist if this happens. 
+    This does not update the name of the DM.
+
+    POST
+
+    Parameters:
+        { token, dm_id }
+    Return Type:
+        {}
+
+    InputError when:
+      
+        dm_id does not refer to a valid DM
+      
+    AccessError when:
+      
+        dm_id is valid and the authorised user is not a member of the DM
+
+    '''
+    req_details = request.get_json(force = True)
+
+    token = req_details.get('token')
+    
+    auth_user_id = token_to_auth_id(token)
+    dm_id = req_details['dm_id']
+
+    dm_leave_v1(auth_user_id, dm_id)
+
+    return {}
+
+@APP.route("/dm/remove/v1", methods=['DELETE'])
+def dm_remove_endpt():
+    '''
+    Remove an existing DM, so all members are no longer in the DM. This can only be done by the original creator of the DM.
+
+    Arguments:
+        token       (string)    - unique user token
+        dm_id       (int)       - refers to a dm
+
+    Exceptions:
+        AccessError - Occurs when token is invalid
+        InputError  - Occurs when dm_id does refer to a valid DM
+        AccessError - Occurs when dm_id is valid but auth_id is not a creator of the DM
+
+    Return Value:
+        Returns nothing on success
+    '''
+    request_data = request.get_json(force = True)
+    auth_id = token_to_auth_id(request_data['token'])
+    dm_id = request_data['dm_id']
+    
+    return dm_remove_v1(auth_id, dm_id)
+
+@APP.route("/dm/list/v1", methods=['GET'])
+def dm_list_ep():
+    '''
+        Returns the list of DMs that the user is a member of.
+
+        Arguments:
+            token       (string)    - unique user token
+
+        Exceptions:
+            AccessError - Occurs when token is invalid
+
+        Return Value:
+            Returns nothing on success
+    '''
+
+    request_data = request.get_json()
+    token = request_data['token']
+    auth_user_id = token_to_auth_id(token)
+    
+    dm_list = dm_list_v1(auth_user_id)
+
+    return dm_list
+
+@APP.route("/dm/messages/v1", methods=['GET'])
+def dm_messages_endpt():
+    request_data = request.get_json()
+    token = request_data['token']
+    auth_id = token_to_auth_id(token)
+    dm_id = request_data['dm_id']
+    start = request_data['start']
+
+    return dm_messages_v1(auth_id, dm_id, start)
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 

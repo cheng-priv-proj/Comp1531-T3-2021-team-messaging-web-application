@@ -111,10 +111,10 @@ def channels_create_v1(auth_user_id, name, is_public):
 
     owner = data_store.get_user_from_u_id(auth_user_id)
 
-    # ASSUMPTION: channel_id starts from 0
+    # ASSUMPTION: channel_id starts from 1
     channels = data_store.get_channels_from_channel_id_dict()
 
-    new_id = len(channels)
+    new_id = len(channels) + 1
     
     data_store.insert_channel(new_id, name, is_public, [], [owner], [owner])
 
