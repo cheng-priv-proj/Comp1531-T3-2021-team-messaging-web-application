@@ -92,8 +92,8 @@ def test_users_all_works_for_non_owner(clear, register_user_return_info, users_a
 def test_users_all_works_for_failed_registration(clear, register_user_return_info, users_all, extract_token, user_info_to_user_datatype, sort_users):
     owner_info = register_user_return_info('owner@gmail.com', 'owner', 'one')
     user_info1 = register_user_return_info('user1@gmail.com', 'user', 'two')
-    user_info2 = register_user_return_info('user1@gmail.com', 'user', 'three')
-    user_info3 = register_user_return_info('user1@gmail.com', 'user', 'four')
+    register_user_return_info('user1@gmail.com', 'user', 'three')
+    register_user_return_info('user1@gmail.com', 'user', 'four')
     user_list = [owner_info, user_info1]
 
     owner_token = extract_token(owner_info)
@@ -102,6 +102,6 @@ def test_users_all_works_for_failed_registration(clear, register_user_return_inf
     assert sort_users(user_lists_from_users_all) == sort_users([user_info_to_user_datatype(user) for user in user_list])
 
 def test_users_all_invalid_token(clear, register_user_return_info, users_all):
-    owner_info = register_user_return_info('owner@gmail.com', 'owner', 'one')
+    register_user_return_info('owner@gmail.com', 'owner', 'one')
 
     assert users_all(-123123).status_code() == 403
