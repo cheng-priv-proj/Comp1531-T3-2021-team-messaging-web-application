@@ -13,6 +13,8 @@ def clear_v1():
     Returns nothing on success
     '''
     data_store.hard_reset()
+    
+    return {}
 
 # helper function to generate handles for auth_register
 def handle_str_generation(firstname, lastname):
