@@ -12,8 +12,6 @@ from src.dm import dm_create_v1, dm_details_v1, dm_leave_v1, dm_list_v1, dm_remo
 from src.channel import channel_invite_v1, channel_messages_v1, channel_details_v1, channel_leave_v1, channel_addowner_v1, channel_join_v1
 from src.user import user_profile_v1
 
-from src.message import message_send_v1, message_senddm_v1, message_remove_v1, message_edit_v1
-
 from src.data_store import data_store
 from src.error import InputError
 from src.other import clear_v1
@@ -599,89 +597,6 @@ def dm_messages_endpt():
     start = request_data['start']
 
     return dm_messages_v1(auth_id, dm_id, start)
-@APP.route("/message/send/v1", methods=['POST'])
-def message_send_endpt():
-    '''
-    Send a message from the authorised user to the channel specified by channel_id
-
-    Arguments:
-        token           (str)   - unique user token
-        channel_id      (int)   - unique channel id
-        message         (str)   - message string
-
-    Exceptions:
-        AccessError - occurs when token is invalid
-        TypeError   - occurs when auth_user_id, channel_id are not ints
-        TypeError   - occurs when message is not a str
-        AccessError - occurs when auth_user_id is invalid
-        AccessError - occurs when channel_id is valid but the authorised user is not
-                    a member of the channel
-        InputError  - occurs when message is less than 1 or more than 1000 characters
-
-    Return value:
-        Returns message_id on success
-    '''
-
-    request_data = request.get_json(force = True)
-    token = request_data['token']
-    auth_user_id = token_to_auth_id(token)
-    channel_id = request_data['channel_id']
-    message = request_data['message']
-
-    return_dict = message_send_v1(auth_user_id, channel_id, message)
-    return return_dict
-
-@APP.route("/message/senddm/v1", methods=['POST'])
-def message_senddm_endpt():
-    '''
-    Send a message from the authorised user to the dm specified by dm_id
-
-    Arguments:
-        token           (str)   - unique user token
-        dm_id           (int)   - unique dm id
-        message         (str)   - message string
-
-    Exceptions:
-        AccessError - occurs when token is invalid
-        TypeError   - occurs when auth_user_id, dm_id are not ints
-        TypeError   - occurs when message is not a str
-        AccessError - occurs when auth_user_id is invalid
-        AccessError - occurs when dm_id is valid but the authorised user is not
-                    a member of the channel
-        InputError  - occurs when message is less than 1 or more than 1000 characters
-
-    Return value:
-        Returns message_id on success
-    '''
-
-    request_data = request.get_json(force = True)
-    token = request_data['token']
-    auth_user_id = token_to_auth_id(token)
-    dm_id = request_data['dm_id']
-    message = request_data['message']
-
-    return_dict = message_senddm_v1(auth_user_id, dm_id, message)
-    return return_dict
-
-@APP.route("/message/remove/v1", methods=['DELETE'])
-def message_remove_endpt():
-    request_data = request.get_json(force = True)
-    token = request_data['token']
-    auth_user_id = token_to_auth_id(token)
-    message_id = request_data['message_id']
-    
-    return message_remove_v1(auth_user_id, message_id)
-
-@APP.route("/message/edit/v1", methods=['PUT'])
-def message_edit_endpt():
-    request_data = request.get_json(force = True)
-    token = request_data['token']
-    auth_user_id = token_to_auth_id(token)
-    message_id = request_data['message_id']
-    message = request_data['message']
-    
-    return message_edit_v1(auth_user_id, message_id, message)
-
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 

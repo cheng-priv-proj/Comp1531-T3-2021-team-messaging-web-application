@@ -26,14 +26,14 @@ def register(clear):
     ).json()
 
     user2_id = requests.post(url + 'auth/register/v2', json = {
-        'email': 'user@test.com', 
+        'email': 'user2@test.com', 
         'password': 'password', 
         'name_first': 'user',
         'name_last': 'two' }
     ).json()
 
     user3_id = requests.post(url + 'auth/register/v2', json = {
-        'email': 'user@test.com', 
+        'email': 'user3@test.com', 
         'password': 'password', 
         'name_first': 'user',
         'name_last': 'three' }
@@ -46,56 +46,64 @@ def dm_factory():
     def create_dm(owner_token, users):
         dm_id = requests.post(url + 'dm/create/v1', json = {
             'token': owner_token,
-            'u_ids': [users]}).json()
+            'u_ids': users}).json()
         return dm_id['dm_id']
     return create_dm
-@pytest.mark.skip
+
 def test_standard(register, dm_factory):
     dm_id = dm_factory(register[0]['token'], [register[1]['auth_user_id'], register[2]['auth_user_id'], register[3]['auth_user_id']])
-    
-    list = requests.get(url + 'dm/list/v1', json = {
+
+    dm_list = requests.get(url + 'dm/list/v1', json = {
         'token': register[0]['token']
         }).json()
 
-    assert list is [
-        {
-            'dm_id' : dm_id,
-            'name' : 'ownerone, userone, userthree, usertwo'
-        }
-    ]
-@pytest.mark.skip
+    assert dm_list == {
+        'dms': [
+            {
+                'dm_id' : dm_id,
+                'name' : 'ownerone, userone, userthree, usertwo'
+            }
+        ]
+    }
+
 def test_creator_only(register, dm_factory):
     dm_id = dm_factory(register[0]['token'], [])
     
-    list = requests.get(url + 'dm/list/v1', json = {
+    dm_list = requests.get(url + 'dm/list/v1', json = {
         'token': register[0]['token']
         }).json()
 
-    assert list is [
-        {
-            'dm_id' : dm_id,
-            'name' : 'ownerone'
-        }
-    ]
-@pytest.mark.skip
+    assert dm_list == {
+        'dms': [
+            {
+                'dm_id' : dm_id,
+                'name' : 'ownerone'
+            }
+        ]
+    }
+
 def test_user_has_no_dms(register, dm_factory):
 
-    list = requests.get(url + 'dm/list/v1', json = {
+    dm_list = requests.get(url + 'dm/list/v1', json = {
         'token': register[0]['token']
         }).json()
 
-    assert list is []
+    assert dm_list == {
+        'dms': []
+    }
 
     dm_factory(register[0]['token'], [register[1]['auth_user_id']])
 
-    list = requests.get(url + 'dm/list/v1', json = {
+    dm_list = requests.get(url + 'dm/list/v1', json = {
         'token': register[2]['token']
         }).json()
 
-    assert list is []
-@pytest.mark.skip
+    assert dm_list == {
+        'dms': []
+    }
+
 def test_invalid_token():
     requests.get(url + 'dm/list/v1', json = {
         'token': 'no token has been registered yet'
-        }).status_code is 403
+        }).status_code == 403
 
