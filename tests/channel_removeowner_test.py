@@ -114,7 +114,6 @@ def test_channel_removeowner_v1_user_only_owner_of_channel(clear, first_register
     
     assert resp.status_code == 400
     
-@pytest.mark.skip
 def test_channel_removeowner_v1_user_without_owner_permissions(clear, first_register, get_valid_token):
     details = first_register
     new_user = get_valid_token
