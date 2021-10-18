@@ -238,8 +238,6 @@ def channel_leave_v1(auth_user_id, channel_id):
     channel['all_members'] = [member for member in members if member.get('u_id') != auth_user_id]
 
     if data_store.is_channel_owner(channel_id, auth_user_id):
-        owners = channel.get('owner_members')
-
         channel['owner_members'] = [owner for owner in members if owner.get('u_id') != auth_user_id]
     
     return {}
