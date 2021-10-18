@@ -78,7 +78,8 @@ class Datastore:
                 'message_ids' : {},
                 'messages' : {},
                 'users': {},
-                'perms' : {}
+                'perms' : {},
+                'message_count': 0
             }, 
             FILE
             )
@@ -155,7 +156,7 @@ class Datastore:
         return message
 
     def get_messages_count(self):
-        return self.__store['messages']
+        return self.__store['message_count']
 
     # users
 

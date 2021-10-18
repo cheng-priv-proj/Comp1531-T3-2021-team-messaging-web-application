@@ -57,11 +57,11 @@ def test_send_one_valid_message(clear, register, extract_token, extract_user, ex
     channel_id = extract_channel(register)
     owner_token = extract_token(register)
     now = datetime.utcnow().timestamp()
-    print(owner_token)
-    message_id = print(requests.post(url + 'message/send/v1', json = {
+
+    message_id = requests.post(url + 'message/send/v1', json = {
         'token': owner_token,
         'channel_id': channel_id,
-        'message': 'testmessage' }))
+        'message': 'testmessage' }).json()
     messages = requests.get(url + 'channel/messages/v2', json = {
         'token': owner_token,
         'channel_id': channel_id, 
@@ -70,7 +70,7 @@ def test_send_one_valid_message(clear, register, extract_token, extract_user, ex
     assert messages == {
         'messages': [
             {
-                'message_id': message_id,
+                'message_id': message_id.get('message_id'),
                 'u_id': extract_user(register),
                 'message': 'testmessage',
                 'time_created':  pytest.approx(now, rel=2)

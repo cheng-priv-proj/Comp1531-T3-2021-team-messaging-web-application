@@ -42,8 +42,8 @@ def message_send_v1(auth_user_id, channel_id, message):
         raise InputError('message has invalid length')
 
     # message ids will start from 0
-    data_store.insert_message_count()
     message_id = data_store.get_messages_count()
+    data_store.insert_message_count()
 
     message_dict = {
         'message_id': message_id,
@@ -146,3 +146,35 @@ def message_remove_v1(auth_user_id, message_id):
 
     return {}
 
+def message_edit_v1(auth_user_id, message_id, message):
+
+    check_type(auth_user_id, int)
+    check_type(message_id, int)
+    check_type(message, str)
+
+    if data_store.is_invalid_user_id(auth_user_id):
+        raise AccessError
+
+    if data_store.is_invalid_message_id(message_id):
+        raise InputError
+
+    id = data_store.get_channel_or_dm_id_from_message_id(message_id)
+
+    if not (data_store.is_user_sender_of_message(auth_user_id, message_id) and
+        data_store.is_user_owner_of_channel_or_dm(id, auth_user_id)): 
+        raise AccessError
+
+    messages = data_store.get_messages_from_channel_or_dm_id(id)
+
+    if len(message) > 1000:
+        raise InputError
+
+    if message == '':
+        data_store.remove_message(message_id)
+    
+    for index, original_message in enumerate(messages):
+        if original_message.get('message_id') == message_id:
+            messages[index]['message'] = message
+    
+
+    return {}
