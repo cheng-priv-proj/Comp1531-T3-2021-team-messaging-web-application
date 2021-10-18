@@ -11,14 +11,14 @@ def clear():
 @pytest.fixture
 def register(clear):
     owner_id = requests.post(url + 'auth/register/v2', json = {
-        'username': 'owner@test.com', 
+        'email': 'owner@test.com', 
         'password': 'password', 
         'name_first': 'owner',
         'name_last': 'one' }
         ).json()
 
     user1_id = requests.post(url + 'auth/register/v2', json = {
-        'username': 'user@test.com', 
+        'email': 'user@test.com', 
         'password': 'password', 
         'name_first': 'user',
         'name_last': 'one' }
@@ -31,7 +31,7 @@ def test_standard(register):
     dm_id_dict = requests.post(url + 'dm/create/v1', json={
         'token': register[0].get('token'),
         'u_ids': [register[1].get('auth_user_id')]
-    })
+    }).json()
 
     requests.delete(url + 'dm/remove/v1', json={
         'token': register[0].get('token'),
@@ -53,7 +53,7 @@ def test_dm_id_invalid(register):
 
     assert requests.delete(url + 'dm/remove/v1', json={
         'token': register[0].get('token'),
-        'dm_id': 123123
+        'dm_id': -123123
     }).status_code == 400
 
 def test_user_not_creator(register):
@@ -61,7 +61,7 @@ def test_user_not_creator(register):
     dm_id_dict = requests.post(url + 'dm/create/v1', json={
         'token': register[0].get('token'),
         'u_ids': [register[1].get('auth_user_id')]
-    })
+    }).json()
 
     assert requests.delete(url + 'dm/remove/v1', json={
         'token': register[1].get('token'),
@@ -73,7 +73,7 @@ def test_token_invalid(register):
     dm_id_dict = requests.post(url + 'dm/create/v1', json={
         'token': register[0].get('token'),
         'u_ids': [register[1].get('auth_user_id')]
-    })
+    }).json()
 
     requests.delete(url + 'dm/remove/v1', json={
         'token': 'not a valid token',
@@ -84,5 +84,5 @@ def test_token_and_dm_id_invalid(clear):
 
     requests.delete(url + 'dm/remove/v1', json={
         'token': 'not a valid token',
-        'dm_id': 123123
+        'dm_id': -123123
     })

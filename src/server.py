@@ -563,7 +563,7 @@ def dm_remove_endpt():
     request_data = request.get_json(force = True)
     auth_id = token_to_auth_id(request_data['token'])
     dm_id = request_data['dm_id']
-
+    print(dm_id)
     return dm_remove_v1(auth_id, dm_id)
 
 @APP.route("/dm/list/v1", methods=['GET'])

@@ -208,26 +208,14 @@ def dm_remove_v1(auth_id, dm_id):
     '''
     check_type(auth_id, int)
     check_type(dm_id, int)
-
+    
     if data_store.is_invalid_user_id(auth_id):
         raise AccessError ('Invalid auth_user_id')
 
-    if data_store.is_invalid_dm(dm_id):
+    if data_store.is_invalid_dm_id(dm_id):
         raise InputError ('dm_id does not refer to valid DM')
-
-    if data_store.is_user_member_of_dm(dm_id, auth_id):
-        raise AccessError ('dm_id is valid and the authorised user is not a member of the DM')
-
-    # ^^ yo inked from aleks code. if this is boken check his code.
-
-    details_dict = data_store.get_dm_from_dm_id(dm_id).get('details')
-    members = details_dict['members']
-    for person in members:
-        if person['u_id'] == auth_id:
-            person.clear()
-            return {}
-
-    if not data_store.is_user_owner_of_channel_or_dm(auth_id, dm_id):
+    
+    if not data_store.is_user_owner_of_channel_or_dm(dm_id, auth_id):
         raise AccessError ('dm_id is valid and the authorised user is not creator of the DM')
 
     data_store.remove_dm(dm_id)
