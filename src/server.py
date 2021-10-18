@@ -700,6 +700,14 @@ def message_edit_endpt():
     auth_user_id = token_to_auth_id(token)
     return message_edit_v1(auth_user_id, message_id, message)
 
+@APP.route("/message/remove/v1", methods=['DELETE'])
+def message_remove_endpt():
+    request_data = request.get_json(force = True)
+    message_id = request_data['message_id']
+    token = request_data['token']
+    auth_user_id = token_to_auth_id(token)
+    return message_edit_v1(auth_user_id, message_id)
+
 
 @APP.route("/admin/userpermission/change/v1", methods=['POST'])
 def admin_userpermission_change_v1_endpt():
