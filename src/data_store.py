@@ -158,18 +158,13 @@ class Datastore:
     def get_user_perms_from_u_id(self, u_id):
         return self.get_user_perms_from_u_id_dict().get(u_id)
 
-    def get_dms_from_dm_id_dict(self):
-        return self.__store['dm']
-
-    def get_dms_from_dm_id(self, dm_id):
-        return self.get_dms_from_dm_id_dict().get(dm_id)
-
 
     # Check functions ##########################################################
 
     def is_token_invalid(self, token):
-        if token in self.get_u_ids_from_token_dict():
+        if self.get_u_id_from_token(token) == None:
             return False
+
         return True
 
     def is_user_member_of_channel(self, channel_id, u_id):
@@ -180,7 +175,7 @@ class Datastore:
         return False
 
     def is_user_member_of_dm(self, dm_id, u_id):
-        dms = self.get_dms_from_dm_id(dm_id)
+        dms = self.get_dm_from_dm_id(dm_id)
         if any (member['u_id'] == u_id for member in dms['members']):
             return True
 
@@ -229,7 +224,7 @@ class Datastore:
         
         return False
 
-    def is_invalid_dm_id(self, dm_id):
+    def is_invalid_dm(self, dm_id):
         dms = self.get_dms_from_dm_id_dict()
         if dm_id not in dms:
             return True

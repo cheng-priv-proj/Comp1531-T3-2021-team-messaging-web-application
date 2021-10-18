@@ -225,6 +225,4 @@ def test_name_alphabetically_sorted(clear, user1, user2, user3, extract_dm, extr
     }).json()
     
     # Find all members
-    assert dm_details['name'] == {
-        'name': 'aone, btwo, cthree'
-    }
+    assert dm_details['name'] == 'aone, btwo, cthree'

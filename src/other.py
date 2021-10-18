@@ -126,7 +126,7 @@ def token_to_auth_id(token):
     '''
 
     if data_store.is_token_invalid(token):
-        raise AccessError
+        raise AccessError ('Token is invalid')
     
     return data_store.get_u_id_from_token(token)
 
