@@ -5,7 +5,6 @@ from src.other import clear_v1
 
 import requests
 
-# Clears storage 
 @pytest.fixture
 def clear():
     requests.delete(url + "clear/v1")
@@ -171,7 +170,6 @@ def test_invalid_token(clear, first_register, register_user):
     ).status_code == 403
 
 # Test messages remain
-@pytest.mark.skip('This will work when the messages branch is merged in')
 def test_messages_remain(clear, first_register, register_user):
     owner_token = first_register.get('token')
     channel_id = first_register.get('channel_id')
@@ -224,3 +222,4 @@ def test_channel_owner_leaves(clear, first_register):
             }
         ]
     }
+
