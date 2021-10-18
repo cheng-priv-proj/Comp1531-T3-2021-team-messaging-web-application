@@ -129,13 +129,6 @@ def test_invalid_last_name_v2(clear_server):
         }))
     assert(long_last_name.status_code == 400)
 
-# Token generation is not known yet.
-# Will implement token related tests later. 
-@pytest.mark.skip('For later when we know tokens')
-def test_invalid_register_return_token_v2():
-    return
-
-
 
 # A test that checks if handle genneration has been correctly generated. 
 #<<<assume that user profiles is working>>
