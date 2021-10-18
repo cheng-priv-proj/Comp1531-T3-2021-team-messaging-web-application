@@ -92,17 +92,22 @@ def dm_details_v1(auth_id, dm_id):
 
         
 
-def dm_list_v1(u_id):
+def dm_list_v1(auth_id):
     '''
     Returns a list of DMs that the user is a member of
     '''
+    check_type(auth_id, int)
+
+    if data_store.is_invalid_user_id(auth_id):
+        raise AccessError ('Invalid auth_user_id')
+
     dm_list = { 'dms': [] }
 
     dms = data_store.get_dms_from_dm_id_dict()
 
     for dm_id in dms:
         for member in dms[dm_id]['details']['members']:
-            if member['u_id'] == u_id:
+            if member['u_id'] == auth_id:
                 dm_list['dms'].append(
                     {
                         'dm_id': dm_id,
@@ -112,18 +117,29 @@ def dm_list_v1(u_id):
 
     return dm_list
 
-def dm_messages_v1(token, dm_id, start):
+def dm_messages_v1(auth_id, dm_id, start):
     '''
     Returns a list of messages between index 'start' and up to 'start' + 50 from a
     given DM that the authorised user has access to. Additionally returns
     'start', and 'end' = 'start' + 50
 
     '''
+    check_type(auth_id, int)
+    check_type(dm_id, int)
+    check_type(start, int)
 
     if start < 0:
         raise InputError('start is a negative integer')
 
-    # need to check if dm id exists and auth_id is in dm
+    # check if auth and dm ids are valid and user is in dm
+    if data_store.is_invalid_user_id(auth_id):
+        raise AccessError ('Invalid auth_user_id')
+
+    if data_store.is_invalid_dm_id(dm_id):
+        raise InputError ('dm_id does not refer to valid DM')
+
+    if not data_store.is_user_member_of_dm(dm_id, auth_id):
+        raise AccessError ('dm_id is valid and the authorised user is not a member of the DM')
 
     messages = data_store.get_messages_from_channel_or_dm_id(dm_id)
     no_of_messages = len(messages)
@@ -138,7 +154,7 @@ def dm_messages_v1(token, dm_id, start):
         end = -1
     
     return {
-        'messages' : messages,
+        'messages' : messages[start: start + 50],
         'start': start,
         'end' : end
         }
