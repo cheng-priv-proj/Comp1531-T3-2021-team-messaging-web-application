@@ -79,7 +79,7 @@ def test_senddm_one_valid_message(clear, register, extract_token, extract_user, 
         'token': owner_token,
         'dm_id': dm_id,
         'message': 'testmessage' }).json())
-    messages = requests.post(url + 'message/senddm/v1', params = {
+    messages = requests.get(url + 'dm/messages/v1', json = {
         'token': owner_token,
         'dm_id': dm_id, 
         'start': 0 }).json()
@@ -101,20 +101,23 @@ def test_senddm_multiple_valid_messages(clear, register, extract_token, extract_
     dm_id = extract_dm(register)
     owner_token = extract_token(register)
     owner_id = extract_user(register)
-    now = datetime.utcnow().timestamp()
+    now1 = datetime.utcnow().timestamp()
     message_id0 = extract_message(requests.post(url + 'message/senddm/v1', json = {
         'token': owner_token,
         'dm_id': dm_id,
-        'message': 'testmessage' }).json())
+        'message': 'testmessage0' }).json())
+    now2 = datetime.utcnow().timestamp()
     message_id1 = extract_message(requests.post(url + 'message/senddm/v1', json = {
         'token': owner_token,
         'dm_id': dm_id,
-        'message': 'testmessage0' }).json())
+        'message': 'testmessage1' }).json())
+    now3 = datetime.utcnow().timestamp()
     message_id2 = extract_message(requests.post(url + 'message/senddm/v1', json = {
         'token': owner_token,
         'dm_id': dm_id,
         'message': 'testmessage2' }).json())
-    messages = requests.post(url + 'message/senddm/v1', params = {
+
+    messages = requests.get(url + 'dm/messages/v1', json = {
         'token': owner_token,
         'dm_id': dm_id, 
         'start': 0 }).json()
@@ -125,19 +128,19 @@ def test_senddm_multiple_valid_messages(clear, register, extract_token, extract_
                 'message_id': message_id2,
                 'u_id': owner_id,
                 'message': 'testmessage2',
-                'time_created': pytest.approx(now, rel=2)
+                'time_created': pytest.approx(now1, rel=2)
             },
             {
                 'message_id': message_id1,
                 'u_id': owner_id,
                 'message': 'testmessage1',
-                'time_created': pytest.approx(now, rel=2)
+                'time_created': pytest.approx(now2, rel=2)
             },
             {
                 'message_id': message_id0,
                 'u_id': owner_id,
                 'message': 'testmessage0',
-                'time_created':  pytest.approx(now, rel=2)
+                'time_created':  pytest.approx(now3, rel=2)
             }
             ],
         'start': 0,
