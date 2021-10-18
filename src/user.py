@@ -87,7 +87,7 @@ def user_setname_v1(auth_user_id, name_first, name_last):
 
     return {}
 
-def user_profile_setemail_v1(auth_id, email):
+def user_setemail_v1(auth_id, email):
     '''
     Update the authorised user's email address
 
@@ -116,17 +116,21 @@ def user_profile_setemail_v1(auth_id, email):
     if data_store.is_duplicate_email(email):
         raise InputError ('email is already being used by another user')
 
-    data_store.update_value(auth_id, 'email', email)
+    # data_store.update_value(auth_id, 'email', email)
 
-    password = ''
-    email_dict = data_store.get_logins_from_email_dict()
-    for login in email_dict:
-        if login['auth_user_id'] == auth_id:
-            password = login['password']
+    # password = ''
+    # email_dict = data_store.get_logins_from_email_dict()
+    # for login in email_dict:
+    #     if login['auth_user_id'] == auth_id:
+    #         password = login['password']
 
-    data_store.insert_login(email, auth_id, password)
+    # data_store.insert_login(email, auth_id, password)
+
+    data_store.update_email(auth_id, email)
+
+    return {}
     
-def user_profile_sethandle_v1(auth_id, handle_str):
+def user_sethandle_v1(auth_id, handle_str):
     '''
     Update the authorised user's email address
 

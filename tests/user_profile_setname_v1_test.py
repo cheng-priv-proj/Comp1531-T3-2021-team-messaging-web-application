@@ -31,7 +31,7 @@ def user_profile():
 @pytest.fixture
 def user_profile_setname():
     def user_profile_setname_function(token, name_first, name_last):
-        return requests.get(url + 'user/profile/sethandle/v1', json = {
+        return requests.put(url + 'user/profile/sethandle/v1', json = {
             'token': token,
             'name_first': name_first,
             'name_last': name_last

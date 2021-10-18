@@ -65,7 +65,7 @@ def test_user_setemail_test_valid(clear, register_user, extract_user, extract_to
 
     assert userone_profile == {
         'u_id': extract_user(owner_info),
-        'email': 'valid@gmail.com',
+        'email': 'valid@email.com',
         'name_first': 'owner',
         'name_last': 'one',
         'handle_str': 'ownerone'

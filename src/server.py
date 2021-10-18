@@ -240,7 +240,6 @@ def channel_list_endpt():
     return channels_list_v1(auth_user_id)
 
 
-
 @APP.route('/channels/listall/v2', methods = ['GET'])
 def list_all():
     '''

@@ -289,6 +289,12 @@ class Datastore:
     
     def update_email(self, auth_user_id, email):
         user = self.get_users_from_u_id_dict().get(auth_user_id)
+        login_info = self.get_logins_from_email_dict()
+        old_email = user['email']
+
+        login_info[email] = login_info[old_email]
+        del login_info[old_email]
+
         user['email'] = email
 
         self.update_json()
