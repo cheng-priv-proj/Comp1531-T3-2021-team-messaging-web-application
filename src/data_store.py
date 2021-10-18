@@ -304,6 +304,10 @@ class Datastore:
     def invalidate_token(self, token):
         tokens = self.get_u_ids_from_token_dict()
         del tokens[token]
+    
+    def remove_dm(self, dm_id):
+        dm = self.get_dm_from_dm_id(dm_id)
+        dm['members'] = []
 
     def set(self, store):
         if not isinstance(store, dict):

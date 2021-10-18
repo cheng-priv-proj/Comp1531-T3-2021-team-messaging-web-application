@@ -26,7 +26,7 @@ def register(clear):
 
     return [owner_id, user1_id]
 
-def test_standard(register):
+def test_standard(clear, register):
     
     dm_id_dict = requests.post(url + 'dm/create/v1', json={
         'token': register[0].get('token'),
@@ -47,16 +47,16 @@ def test_standard(register):
     assert requests.get(url + 'dm/details/v1', json={
         'token': register[0].get('token'),
         'dm_id': dm_id_dict.get('dm_id')
-    }).status_code == 400
+    }).status_code == 403
 
-def test_dm_id_invalid(register):
+def test_dm_id_invalid(clear, register):
 
     assert requests.delete(url + 'dm/remove/v1', json={
         'token': register[0].get('token'),
         'dm_id': -123123
     }).status_code == 400
 
-def test_user_not_creator(register):
+def test_user_not_creator(clear, register):
 
     dm_id_dict = requests.post(url + 'dm/create/v1', json={
         'token': register[0].get('token'),
@@ -68,7 +68,7 @@ def test_user_not_creator(register):
         'dm_id': dm_id_dict.get('dm_id')
     }).status_code == 403
 
-def test_token_invalid(register):
+def test_token_invalid(clear, register):
 
     dm_id_dict = requests.post(url + 'dm/create/v1', json={
         'token': register[0].get('token'),
