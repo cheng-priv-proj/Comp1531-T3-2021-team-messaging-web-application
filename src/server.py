@@ -690,6 +690,25 @@ def message_senddm_endpt():
     return_dict = message_senddm_v1(auth_user_id, dm_id, message)
     return return_dict
 
+@APP.route("/message/edit/v1", methods=['PUT'])
+
+def message_edit_endpt():
+    return {}
+    request_data = request.get_json(force = True)
+
+    token = request_data['token']
+@APP.route("/admin/user/remove/v1", methods=['DELETE'])
+    auth_user_id = token_to_auth_id(token)
+def admin_user_remove_v1_endpt():
+    message_id = request_data['message_id']
+    request_data = request.get_json()
+    message = request_data['message']
+    token = request_data['token']
+    
+    auth_id = token_to_auth_id(token)
+    return message_edit_v1(auth_user_id, message_id, message)
+
+
 @APP.route("/admin/userpermission/change/v1", methods=['POST'])
 def admin_userpermission_change_v1_endpt():
 
