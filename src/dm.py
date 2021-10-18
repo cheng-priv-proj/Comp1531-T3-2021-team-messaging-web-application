@@ -92,25 +92,21 @@ def dm_details_v1(auth_id, dm_id):
 
         
 
-def dm_list_v1(token):
+def dm_list_v1(u_id):
     '''
     Returns a list of DMs that the user is a member of
     '''
     dm_list = { 'dms': [] }
 
-    u_id = data_store.get_uid_from_token(token)
-    if u_id == -1:
-        raise AccessError("Invalid auth user id")
-
     dms = data_store.get_dms_from_dm_id_dict()
 
     for dm_id in dms:
-        for member in dm_id['details']['members']:
+        for member in dms[dm_id]['details']['members']:
             if member['u_id'] == u_id:
                 dm_list['dms'].append(
                     {
                         'dm_id': dm_id,
-                        'name': dm_id['details']['name']
+                        'name': dms[dm_id]['details']['name']
                     }
                 )
 
@@ -170,6 +166,27 @@ def dm_leave_v1(auth_id, dm_id):
         dm_id is valid and the authorised user is not a member of the DM
 
     '''
+    check_type(auth_id, int)
+    check_type(dm_id, int)
+
+    if data_store.is_invalid_user_id(auth_id):
+        raise AccessError ('Invalid auth_user_id')
+
+    if data_store.is_invalid_dm_id(dm_id):
+        raise InputError ('dm_id does not refer to valid DM')
+
+    if not data_store.is_user_member_of_dm(dm_id, auth_id):
+        raise AccessError ('dm_id is valid and the authorised user is not a member of the DM')
+
+    # ^^ yo inked from aleks code. if this is boken check his code.
+
+    details_dict = data_store.get_dm_from_dm_id(dm_id)
+    members = details_dict['members']
+    
+    for person in members:
+        if person['u_id'] == auth_id:
+            members.remove(person)
+            return {}
 
 def dm_remove_v1(auth_id, dm_id):
     '''

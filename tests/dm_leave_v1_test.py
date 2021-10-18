@@ -13,32 +13,31 @@ from src.config import url
 def clear_server():
     requests.delete(config.url + "clear/v1")
 
-
 @pytest.fixture
 def register(clear_server):
     owner_id = requests.post(url + 'auth/register/v2', json = {
-        'username': 'owner@test.com', 
+        'email': 'owner@test.com', 
         'password': 'password', 
         'name_first': 'owner',
         'name_last': 'one' }
         ).json()
 
     user1_id = requests.post(url + 'auth/register/v2', json = {
-        'username': 'user@test.com', 
+        'email': 'user@test.com', 
         'password': 'password', 
         'name_first': 'user',
         'name_last': 'one' }
     ).json()
 
     user2_id = requests.post(url + 'auth/register/v2', json = {
-        'username': 'user@test.com', 
+        'email': 'user2@test.com', 
         'password': 'password', 
         'name_first': 'user',
         'name_last': 'two' }
     ).json()
 
     user3_id = requests.post(url + 'auth/register/v2', json = {
-        'username': 'user@test.com', 
+        'email': 'user3@test.com', 
         'password': 'password', 
         'name_first': 'user',
         'name_last': 'three' }
@@ -52,62 +51,69 @@ def dm_factory():
     def create_dm(owner_token, users):
         dm_id = requests.post(url + 'dm/create/v1', json = {
             'token': owner_token,
-            'u_ids': [users]}).json()
+            'u_ids': users}).json()
         return dm_id['dm_id']
     return create_dm
 
-
-def test_standard(register, dm_factory):
+def test_standard(clear_server, register, dm_factory):
     dm_id = dm_factory(register[0]['token'], [register[1]['auth_user_id'], register[2]['auth_user_id'], register[3]['auth_user_id']])
     
-    assert requests.post(url + 'dm/leave/v1', json = {
+    requests.post(url + 'dm/leave/v1', json = {
         'token': register[1]['token'],
         'dm_id': dm_id
-        }).json() == {}
+    })
 
-    assert request.get(url + 'dm/list/v1', json = {
+    assert requests.get(url + 'dm/list/v1', json = {
         'token': register[1]['token']
-        }).json() == []
+    }).json() == {
+        'dms': []
+    }
 
-    assert request.get(url + 'dm/list/v1', json = {
+    assert requests.get(url + 'dm/list/v1', json = {
         'token': register[0]['token']
-        }).json() == [
+    }).json() == {
+        'dms': [
             {
                 'dm_id': dm_id,
                 'name' :'ownerone, userone, userthree, usertwo'
             }
         ]
+    }
 
-def test_creator_leaves(register, dm_factory):
+def test_creator_leaves(clear_server, register, dm_factory):
     dm_id = dm_factory(register[0]['token'], [register[1]['auth_user_id'], register[2]['auth_user_id'], register[3]['auth_user_id']])
     
-    assert requests.post(url + 'dm/leave/v1', json = {
+    requests.post(url + 'dm/leave/v1', json = {
         'token': register[0]['token'],
         'dm_id': dm_id
-        }).json() == {}
+    })
 
-    assert request.get(url + 'dm/list/v1', json = {
+    assert requests.get(url + 'dm/list/v1', json = {
         'token': register[0]['token']
-        }).json() == []
+    }).json() == {
+        'dms':[]
+    }
 
-    assert request.get(url + 'dm/list/v1', json = {
+    assert requests.get(url + 'dm/list/v1', json = {
         'token': register[1]['token']
-        }).json() == [
+    }).json() == {
+        'dms': [
             {
                 'dm_id': dm_id,
                 'name' :'ownerone, userone, userthree, usertwo'
             }
         ]
+    }
 
-def test_invalid_dm_id(clear_server):
+def test_invalid_dm_id(clear_server, register):
     assert requests.post(url + 'dm/leave/v1', json = {
         'token': register[1]['token'],
         'dm_id': 1
         }).status_code == 400
 
-def test_invalid_auth_user_id(register, dm_factory):
+def test_invalid_auth_user_id(clear_server, register, dm_factory):
 
-    dm_id = dm_factory(register[0]['token'], register[1]['auth_user_id'])
+    dm_id = dm_factory(register[0]['token'], [register[1]['auth_user_id']])
 
     assert requests.post(url + 'dm/leave/v1', json = {
         'token': 'totally a token',

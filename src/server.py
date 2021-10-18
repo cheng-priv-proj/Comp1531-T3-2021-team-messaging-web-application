@@ -8,7 +8,7 @@ from src import config
 
 from src.channels import channels_listall_v1, channels_list_v1, channels_create_v1
 from src.auth import auth_login_v1, auth_register_v1, auth_logout_v1
-from src.dm import dm_create_v1, dm_details_v1, dm_remove_v1, dm_details_v1, dm_create_v1
+from src.dm import dm_create_v1, dm_details_v1, dm_leave_v1, dm_list_v1, dm_remove_v1, dm_details_v1, dm_create_v1
 from src.channel import channel_invite_v1, channel_messages_v1, channel_details_v1, channel_leave_v1, channel_addowner_v1
 from src.user import user_profile_v1
 
@@ -535,9 +535,11 @@ def dm_leave_endpt():
     req_details = request.get_json(force = True)
 
     token = req_details.get('token')
+    
     auth_user_id = token_to_auth_id(token)
     dm_id = req_details['dm_id']
-    dm_details_v1(auth_user_id, dm_id)
+
+    dm_leave_v1(auth_user_id, dm_id)
 
     return {}
 
@@ -563,6 +565,29 @@ def dm_remove_endpt():
     dm_id = request_data['dm_id']
 
     return dm_remove_v1(auth_id, dm_id)
+
+@APP.route("/dm/list/v1", methods=['GET'])
+def dm_list_ep():
+    '''
+        Returns the list of DMs that the user is a member of.
+
+        Arguments:
+            token       (string)    - unique user token
+
+        Exceptions:
+            AccessError - Occurs when token is invalid
+
+        Return Value:
+            Returns nothing on success
+    '''
+
+    request_data = request.get_json()
+    token = request_data['token']
+    auth_user_id = token_to_auth_id(token)
+    
+    dm_list = dm_list_v1(auth_user_id)
+
+    return dm_list
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 
