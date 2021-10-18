@@ -159,10 +159,9 @@ def user_sethandle_v1(auth_id, handle_str):
         raise InputError('Handle str longer than 20 characters')
     if handle_str.isalnum() == False:
         raise InputError('Handle str not alphanumeric')
-    for user in data_store.get_users_from_u_id_dict().values():
-        if user['Handle_str'] == handle_str:
-            raise InputError('Handle str already being used')
+    if data_store.is_duplicate_handle(handle_str):
+        raise InputError('Duplicate handle string')
 
-    data_store.update_value(auth_id, 'Handle_str', handle_str)
+    data_store.update_handle(auth_id, handle_str)
 
     return {}

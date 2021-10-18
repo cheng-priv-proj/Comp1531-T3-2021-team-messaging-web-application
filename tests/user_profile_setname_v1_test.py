@@ -31,7 +31,7 @@ def user_profile():
 @pytest.fixture
 def user_profile_setname():
     def user_profile_setname_function(token, name_first, name_last):
-        return requests.put(url + 'user/profile/sethandle/v1', json = {
+        return requests.put(url + 'user/profile/setname/v1', json = {
             'token': token,
             'name_first': name_first,
             'name_last': name_last
@@ -88,9 +88,6 @@ def test_user_profile_setname_too_short(clear, user_profile_setname, register_us
     assert user_profile_setname(extract_token(owner_info), '', 'one').status_code == 400
     assert user_profile_setname(extract_token(owner_info), 'owner', '').status_code == 400
 
-def test_user_profile_setname_return_nothing(clear, user_profile_setname, register_user, extract_token):
-    owner_info = register_user('owner@gmail.com', 'owner', 'one')
 
-    assert user_profile_setname(extract_token(owner_info), 'ownera', 'asdd').json() == {}
 
     

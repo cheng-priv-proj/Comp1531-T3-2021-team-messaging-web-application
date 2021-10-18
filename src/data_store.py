@@ -201,7 +201,7 @@ class Datastore:
         users = self.get_users_from_u_id_dict()
 
         for user in users:
-            if user['handle_str'] == handle:
+            if users[user]['handle_str'] == handle:
                 return True
 
         return False
@@ -302,6 +302,8 @@ class Datastore:
     def update_handle(self, auth_user_id, handle):
         user = self.get_users_from_u_id_dict().get(auth_user_id)
         user['handle_str'] = handle
+
+        print(user)
 
         self.update_json()
 

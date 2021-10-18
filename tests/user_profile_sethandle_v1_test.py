@@ -31,7 +31,7 @@ def user_profile():
 @pytest.fixture
 def user_profile_sethandle():
     def user_profile_sethandle_function(token, handle_str):
-        return requests.get(url + 'user/profile/sethandle/v1', json = {
+        return requests.put(url + 'user/profile/sethandle/v1', json = {
             'token': token,
             'handle_str': handle_str
          })
@@ -95,9 +95,4 @@ def test_user_profile_sethandle_nonalphanumeric(clear, register_user, user_profi
 
 def test_user_profile_sethandle_invalid_handle_str_and_token(clear, user_profile_sethandle):
     assert user_profile_sethandle('asdasd', '').status_code == 403
-
-def test_user_profile_sethandle_returns_nothing(clear, user_profile_sethandle, register_user, extract_token):
-    owner_info = register_user('owner@gmail.com', 'owner', 'one')
-
-    assert user_profile_sethandle(extract_token(owner_info), 'oasdasd').json() == {}
 

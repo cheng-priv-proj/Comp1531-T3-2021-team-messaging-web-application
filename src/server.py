@@ -448,7 +448,7 @@ def user_profile_sethandle_ep():
     request_data = request.get_json()
     token = request_data['token']
     auth_user_id = token_to_auth_id(token)
-    handle = request_data.get('handle')
+    handle = request_data.get('handle_str')
 
     user_sethandle_v1(auth_user_id, handle)
     return {}
