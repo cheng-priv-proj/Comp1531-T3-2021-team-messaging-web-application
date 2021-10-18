@@ -17,6 +17,9 @@ from src.error import InputError
 from src.other import clear_v1
 from src.other import token_to_auth_id
 
+from src.admin import admin_userpermission_change_v1
+
+
 def quit_gracefully(*args):
     '''For coverage'''
     exit(0)
@@ -332,12 +335,20 @@ def channel_details_endpt():
     print(return_dict)
     return return_dict
 
-@APP.route("admin/userpermission/change/v1", methods=['POST'])
+@APP.route("/admin/userpermission/change/v1", methods=['POST'])
 def admin_userpermission_change_v1_endpt():
 
     request_data = request.get_json()
     token = request_data['token']
     auth_id = token_to_auth_id(token)
+    u_id = request_data['u_id']
+    permission_id = request_data['permission_id']
+
+    admin_userpermission_change_v1(auth_id, u_id, permission_id)
+
+    return {}
+
+
 
 
 
