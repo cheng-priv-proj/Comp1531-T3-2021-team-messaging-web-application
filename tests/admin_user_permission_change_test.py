@@ -28,8 +28,10 @@ def first_register():
     }
     channel_id_dict = requests.post(url + 'channels/create/v2', json = channel_details).json()
     channel_id = channel_id_dict.get('channel_id')
+
+    auth_user_id = token_dict.get('auth_user_id')
     
-    return {'token': token, 'channel_id': int(channel_id)}
+    return {'token': token, 'auth_user_id': auth_user_id, 'channel_id': int(channel_id)}
 
 # Creates a user using the given details and returns the channel_id
 @pytest.fixture 
@@ -42,9 +44,8 @@ def register_user():
             'name_last': 'user'
         }
         token_dict = requests.post(url + 'auth/register/v2', json = user_details).json()
-        token = token_dict.get('token')
 
-        return token
+        return token_dict
     return register_user_function
 
 # Creates a channel using the given details and returns the channel_id
@@ -63,7 +64,21 @@ def register_channel():
     return register_channel_function
 
 def test_invalid_u_id(clear, first_register):
+    token = first_register.get('token')
     invalid_u_id = -10000
+    permission_id = 1
+
+    assert requests.get(url + 'admin/userpermission/change/v1', json = {
+        'token': token, 
+        'u_id': invalid_u_id,
+        'permission_id': permission_id
+    }).status_code == 400
+
+def test_invalid_permission_id(clear, first_register, register_user):
+    token = first_register.get('token')
+
+
+
 
 # Test input u_id does not refer to valid
 # Test input permission id is invalid
@@ -71,6 +86,5 @@ def test_invalid_u_id(clear, first_register):
 # Access if not global owner
 # Access if not valid token
 # admin/userpermission/change/v1
-
 # 1 is owner
 # 2 is user 
