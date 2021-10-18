@@ -18,6 +18,10 @@ from src.error import InputError
 from src.other import clear_v1
 from src.other import token_to_auth_id
 
+from src.admin import admin_userpermission_change_v1
+from src.admin import admin_user_remove_v1
+
+
 def quit_gracefully(*args):
     '''For coverage'''
     exit(0)
@@ -349,7 +353,7 @@ def channel_join_endpt():
     return {}
 
 
-@APP.route("/channel/details/v2", methods=['get'])
+@APP.route("/channel/details/v2", methods=['GET'])
 def channel_details_endpt():
     '''
     Given a channel with ID channel_id that the authorised user is a member of, provide basic details about the channel.
@@ -777,24 +781,50 @@ def message_senddm_endpt():
     return_dict = message_senddm_v1(auth_user_id, dm_id, message)
     return return_dict
 
+@APP.route("/message/edit/v1", methods=['PUT'])
+
+def message_edit_endpt():
+    request_data = request.get_json(force = True)
+    message_id = request_data['message_id']
+    message = request_data['message']
+    token = request_data['token']
+    auth_user_id = token_to_auth_id(token)
+    return message_edit_v1(auth_user_id, message_id, message)
+
 @APP.route("/message/remove/v1", methods=['DELETE'])
 def message_remove_endpt():
     request_data = request.get_json(force = True)
+    message_id = request_data['message_id']
     token = request_data['token']
     auth_user_id = token_to_auth_id(token)
-    message_id = request_data['message_id']
-    
     return message_remove_v1(auth_user_id, message_id)
 
-@APP.route("/message/edit/v1", methods=['PUT'])
-def message_edit_endpt():
-    request_data = request.get_json(force = True)
+
+@APP.route("/admin/userpermission/change/v1", methods=['POST'])
+def admin_userpermission_change_v1_endpt():
+
+    request_data = request.get_json()
     token = request_data['token']
-    auth_user_id = token_to_auth_id(token)
-    message_id = request_data['message_id']
-    message = request_data['message']
-    
-    return message_edit_v1(auth_user_id, message_id, message)
+    auth_id = token_to_auth_id(token)
+    u_id = request_data['u_id']
+    permission_id = request_data['permission_id']
+
+    admin_userpermission_change_v1(auth_id, u_id, permission_id)
+
+    return {}
+
+@APP.route("/admin/user/remove/v1", methods=['DELETE'])
+def admin_user_remove_v1_endpt():
+    request_data = request.get_json()
+    token = request_data['token']
+    auth_id = token_to_auth_id(token)
+    u_id = request_data['u_id']
+
+    admin_user_remove_v1(auth_id, u_id)
+
+    return{}
+
+
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 
