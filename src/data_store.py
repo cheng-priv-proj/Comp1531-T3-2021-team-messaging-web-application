@@ -330,7 +330,7 @@ class Datastore:
         channel_or_dm_id = self.get_channel_or_dm_id_from_message_id(message_id)
         self.get_messages_from_channel_or_dm_id(channel_or_dm_id).remove(self.get_message_from_message_id(message_id))
         del self.get_channel_or_dm_id_from_message_id_dict()[message_id]
-    
+        self.update_json()
 
     # Other ####################################################################
 
