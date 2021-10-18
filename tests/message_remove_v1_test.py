@@ -228,7 +228,6 @@ def test_edit_acess_error(clear_server, get_user_1, auth_id_v2):
 
 
 # does not test global owner
-@pytest.mark.skip('Not yet implemented')
 def test_normal_case_dms(clear_server, get_user_1, auth_id_v2):
     dm_id_dict = requests.post(config.url + 'dm/create/v1', json= {
         'token': get_user_1['token'], 
@@ -258,7 +257,6 @@ def test_normal_case_dms(clear_server, get_user_1, auth_id_v2):
         'end': -1
     }
 
-@pytest.mark.skip('Not yet implemented')
 def test_normal_case_non_owner_dms(clear_server, get_user_1, auth_id_v2):
     dm_id_dict = requests.post(config.url + 'dm/create/v1', json= {
         'token': get_user_1['token'], 
@@ -290,7 +288,6 @@ def test_normal_case_non_owner_dms(clear_server, get_user_1, auth_id_v2):
     }
 
 # testing owner can edit other peoples messages
-@pytest.mark.skip('Not yet implemented')
 def test_owner_perms_dms(clear_server, get_user_1, auth_id_v2):
     dm_id_dict = requests.post(config.url + 'dm/create/v1', json= {
         'token': get_user_1['token'], 
@@ -324,7 +321,6 @@ def test_owner_perms_dms(clear_server, get_user_1, auth_id_v2):
 
 
 # message_id does not refer to a valid message within a channel/DM that the authorised user has joined
-@pytest.mark.skip('Not yet implemented')
 def test_invalid_message_id_dms(clear_server, get_user_1, auth_id_v2):
     dm_id_dict = requests.post(config.url + 'dm/create/v1', json= {
         'token': get_user_1['token'], 
@@ -352,7 +348,6 @@ def test_invalid_message_id_dms(clear_server, get_user_1, auth_id_v2):
         the authorised user has owner permissions in the channel/DM
 '''
 # non owner tries to dlelete other members messages
-@pytest.mark.skip('Not yet implemented')
 def test_edit_acess_error_dms(clear_server, get_user_1, auth_id_v2):
     dm_id_dict = requests.post(config.url + 'dm/create/v1', json= {
         'token': get_user_1['token'], 
@@ -371,7 +366,7 @@ def test_edit_acess_error_dms(clear_server, get_user_1, auth_id_v2):
     assert requests.delete(config.url + 'message/remove/v1', json = {
         'token' : auth_id_v2['token'],
         'message_id': message_id
-    }).status_code == 400
+    }).status_code == 403
 
 
 

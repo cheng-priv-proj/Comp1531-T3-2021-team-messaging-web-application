@@ -139,13 +139,22 @@ class Datastore:
         return self.__store['message_ids']
 
     def get_channel_or_dm_id_from_message_id(self, message_id):
-        return self.get_channels_or_dms_id_from_message_id_dict().get(message_id)
+        return self.get_channel_or_dm_id_from_message_id_dict().get(message_id)
 
     def get_messages_from_channel_or_dm_id_dict(self):
         return self.__store['messages']
   
     def get_messages_from_channel_or_dm_id(self, id):
         return self.get_messages_from_channel_or_dm_id_dict().get(id)
+
+    def get_message_from_message_id(self, message_id):
+        channel_or_dm_id = self.get_channel_or_dm_id_from_message_id(message_id)
+        message = {}
+        for messages in data_store.get_messages_from_channel_or_dm_id(channel_or_dm_id):
+            if messages['message_id'] == message_id:
+                message = messages
+        
+        return message
 
     def get_messages_count(self):
         return self.__store['message_count']
@@ -187,7 +196,7 @@ class Datastore:
         
         return True
 
-    def is_user_member_of_dm_or_channel(self, channel_or_dm_id, u_id):
+    def is_user_member_of_channel_or_dm(self, channel_or_dm_id, u_id):
         if channel_or_dm_id <= -1:
             return self.is_user_member_of_dm(channel_or_dm_id, u_id)
         
