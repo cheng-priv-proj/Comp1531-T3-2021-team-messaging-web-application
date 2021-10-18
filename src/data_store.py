@@ -6,6 +6,7 @@ import json
 #          password, 
 #          auth_user_id } 
 #
+
 # Tokens:
 #   Key: token (str)
 #   Value: u_id
@@ -56,7 +57,8 @@ initial_object = {
     'message_ids' : {},
     'messages' : {},
     'users': {},
-    'perms' : {}
+    'perms' : {},
+    'message_count': 0
 }
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
 
@@ -77,7 +79,8 @@ class Datastore:
                 'message_ids' : {},
                 'messages' : {},
                 'users': {},
-                'perms' : {}
+                'perms' : {},
+                'message_count': 0
             }, 
             FILE
             )
@@ -132,7 +135,7 @@ class Datastore:
 
     # messages
 
-    def get_channels_or_dms_id_from_message_id_dict(self):
+    def get_channel_or_dm_id_from_message_id_dict(self):
         return self.__store['message_ids']
 
     def get_channel_or_dm_id_from_message_id(self, message_id):
@@ -143,6 +146,9 @@ class Datastore:
   
     def get_messages_from_channel_or_dm_id(self, id):
         return self.get_messages_from_channel_or_dm_id_dict().get(id)
+
+    def get_messages_count(self):
+        return self.__store['message_count']
 
     # users
 
@@ -186,6 +192,20 @@ class Datastore:
             return self.is_user_member_of_dm(channel_or_dm_id, u_id)
         
         return self.is_user_member_of_channel(channel_or_dm_id, u_id)
+
+    def is_user_sender_of_message(self, auth_user_id, message_id):
+        message = self.get_message_from_message_id(message_id)
+        if message.get('u_id') == auth_user_id:
+            return True
+
+        return False
+
+    def is_invalid_message_id(self, message_id):
+        messages = self.get_channel_or_dm_id_from_message_id_dict()
+        if message_id not in messages:
+            return True
+        
+        return False
 
     def is_user_owner_of_channel_or_dm(self, channel_or_dm_id, u_id):
         if channel_or_dm_id <= -1:
@@ -295,8 +315,24 @@ class Datastore:
         self.get_messages_from_channel_or_dm_id_dict()[dm_id] = []
         self.update_json()
 
+    def insert_message(self, id, message):
+        self.get_messages_from_channel_or_dm_id(id).insert(0, message)
+        self.get_channel_or_dm_id_from_message_id_dict()[message.get('message_id')] = id
+        self.update_json()
+        
+    def insert_message_count(self):
+        self.__store['message_count'] += 1
+
     def update_value(self, dict_key, key, value):
         self.__store[dict_key][key] = value
+        self.update_json()
+
+    # Remove ###################################################################
+
+    def remove_message(self, message_id):
+        channel_or_dm_id = self.get_channel_or_dm_id_from_message_id(message_id)
+        self.get_messages_from_channel_or_dm_id(channel_or_dm_id).remove(self.get_message_from_message_id(message_id))
+        del self.get_channel_or_dm_id_from_message_id_dict()[message_id]
         self.update_json()
 
     # Other ####################################################################
