@@ -8,7 +8,7 @@ import requests
 # Clears storage
 @pytest.fixture
 def clear():
-    requests.delete(url + "clear/v1")
+    requests.delete(url + "clear/v1") 
 
 
 # Generates the first user

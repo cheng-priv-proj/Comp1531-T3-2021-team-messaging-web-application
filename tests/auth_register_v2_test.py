@@ -5,7 +5,7 @@ import flask
 from requests.models import Response
 from src import config
 
-from src.other import clear_v1
+from src.other import clear_v1 
 
 @pytest.fixture
 def clear_server():

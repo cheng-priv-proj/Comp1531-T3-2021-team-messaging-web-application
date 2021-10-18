@@ -7,7 +7,7 @@ import requests
 
 # Clears storage
 @pytest.fixture
-def clear():
+def clear(): 
     requests.delete(url + "clear/v1")
 
 

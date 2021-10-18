@@ -5,7 +5,7 @@ auth/logout/v1
 Given an <<<<active>>> token, invalidates the token to log the user out.
 
 POST
-
+ 
 Parameters:{ token }
 
 Return Type:{}
