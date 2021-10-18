@@ -46,7 +46,7 @@ def dm_factory():
     def create_dm(owner_token, users):
         dm_id = requests.post(url + 'dm/create/v1', json = {
             'token': owner_token,
-            'u_ids': [users]}).json()
+            'u_ids': users}).json()
         return dm_id['dm_id']
     return create_dm
 
