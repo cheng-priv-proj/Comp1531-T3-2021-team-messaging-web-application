@@ -197,6 +197,15 @@ class Datastore:
         
         return False
 
+    def is_duplicate_handle(self, handle):
+        users = self.get_users_from_u_id_dict()
+
+        for user in users:
+            if user['handle_str'] == handle:
+                return True
+
+        return False
+
     def is_invalid_user_id(self, u_id):
         users = self.get_users_from_u_id_dict()
         if u_id not in users:
@@ -270,6 +279,25 @@ class Datastore:
     def invalidate_token(self, token):
         tokens = self.get_u_ids_from_token_dict()
         del tokens[token]
+    
+    def update_name(self, auth_user_id, name_first, name_last):
+        user = self.get_users_from_u_id_dict().get(auth_user_id)
+        user['name_first'] = name_first
+        user['name_last'] = name_last
+
+        self.update_json()
+    
+    def update_email(self, auth_user_id, email):
+        user = self.get_users_from_u_id_dict().get(auth_user_id)
+        user['email'] = email
+
+        self.update_json()
+    
+    def update_handle(self, auth_user_id, handle):
+        user = self.get_users_from_u_id_dict().get(auth_user_id)
+        user['handle_str'] = handle
+
+        self.update_json()
 
     def set(self, store):
         if not isinstance(store, dict):
