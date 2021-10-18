@@ -12,7 +12,7 @@ from src.auth import auth_login_v1, auth_register_v1
 from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
 from src.channel import channel_invite_v1, channel_messages_v1, channel_details_v1
 
-from src.user import user_profile_v1
+from src.user import user_profile_v1, users_all_v1, user_profile_setemail_v1, user_profile_sethandle_v1
 
 from src.data_store import data_store
 from src.error import InputError
@@ -362,6 +362,35 @@ def user_profile_ep():
 
     user_details = user_profile_v1(auth_user_id, u_id)
     return user_details
+
+@APP.route("/users/all/v1", methods=['GET'])
+def users_all_ep():
+    
+    request_data = request.get_json()
+    token = request_data['token']
+    auth_user_id = token_to_auth_id(token)
+
+    return users_all_v1(auth_user_id)
+
+@APP.route("/user/profile/setemail/v1", methods=['PUT'])
+def user_profile_setemail_ep():
+    
+    request_data = request.get_json()
+    token = request_data['token']
+    auth_user_id = token_to_auth_id(token)
+    email = request_data.get('email')
+
+    return user_profile_setemail_v1(auth_user_id, email)
+
+@APP.route("/user/profile/sethandle/v1", methods=['PUT'])
+def user_profile_sethandle_ep():
+    
+    request_data = request.get_json()
+    token = request_data['token']
+    auth_user_id = token_to_auth_id(token)
+    handle = request_data.get('Handle_str')
+
+    return user_profile_sethandle_v1(auth_user_id, handle)
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 

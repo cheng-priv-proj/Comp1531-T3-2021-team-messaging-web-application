@@ -59,7 +59,6 @@ def user_info_to_user_datatype():
 
 
 def test_user_profile_test_valid(clear, register_user, user_info_to_user_datatype, extract_user, extract_token, user_profile):
-    print("AAAAAAAAAAAAAAAAAAA")
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     userone_info = register_user('user1@gmail.com', 'user', 'one')
     userone_profile = user_profile(extract_token(owner_info), extract_user(userone_info)).json()
