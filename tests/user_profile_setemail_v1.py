@@ -30,7 +30,7 @@ def user_profile():
 @pytest.fixture
 def set_email():
     def set_email_function(token, email):
-        return requests.get(url + 'user/profile/setemail/v1', json = {
+        return requests.put(url + 'user/profile/setemail/v1', json = {
             'token': token,
             'email': email
          })
