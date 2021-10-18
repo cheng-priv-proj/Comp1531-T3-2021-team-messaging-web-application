@@ -272,39 +272,53 @@ class Datastore:
         login = self.__store['login']
         channel = self.__store['channels']
         dms = self.__store['dms']
+        perms = self.__store['perms']
 
         user = self.get_users_from_u_id_dict().get(u_id)
-        
-        email = users['Email']
+        print(users)
+        email = users[u_id]['email']
         del login[email]
 
         # loop through channel to delete user from all channels
         for c_id in channel:
             if user in c_id['all_members']:
-                c_id['all_members'].remove(user)
+                user_details = c_id['all_members']
+                user_details['name_first'] = 'Removed'
+                user_details['name_last'] = 'user'
+                user_details['handle_str'] = ''
+                user_details['email'] = ''
             if user in c_id['owner_members']:
-                c_id['owner_members'].remove(user)
+                user_details = c_id['owner_members']
+                user_details['name_first'] = 'Removed'
+                user_details['name_last'] = 'user'
+                user_details['handle_str'] = ''
+                user_details['email'] = ''
                 print('sucess')
-
 
         for dm_id in dms:
             if user in dm_id['members']:
-                dm_id['members'].remove(user)
+                user_details = dm_id['members']
+                user_details['name_first'] = 'Removed'
+                user_details['name_last'] = 'user'
+                user_details['handle_str'] = ''
+                user_details['email'] = ''
             if user in dm_id['creator']:
-                dm_id['creator'].remove(user)
+                user_details = dm_id['creator']
+                user_details['name_first'] = 'Removed'
+                user_details['name_last'] = 'user'
+                user_details['handle_str'] = ''
+                user_details['email'] = ''
                 print('>>sucess')
-
         
+        for perm_u_id in perms:
+            if perm_u_id == u_id:
+                del perms[perm_u_id]
+
         if user in users:
             users.remove(user)
             print('>>>>sucess')
         
-
-        
         self.update_json()
-
-
-
 
 print('Loading Datastore...')
 
