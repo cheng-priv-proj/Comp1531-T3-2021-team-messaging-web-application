@@ -14,7 +14,7 @@ def extract_token():
 @pytest.fixture
 def extract_user():
     def extract_u_id_function(auth_user_id_dict):
-        return auth_user_id_dict['user']
+        return auth_user_id_dict['auth_user_id']
     return extract_u_id_function
 
 # Call user profile
@@ -41,11 +41,7 @@ def register_user():
             'password': 'password', 
             'name_first': name_first,
             'name_last': name_last }
-        print(registration_info)
         owner_id_dict = requests.post(url + 'auth/register/v2', json = registration_info).json()
-        print(owner_id_dict)
-        if owner_id_dict.status_code == 400 or owner_id_dict.status_code == 403:
-            return {}
         
         owner_id_dict['handle_str'] = registration_info.get('name_first') + registration_info.get('name_last')
         return {**owner_id_dict, **registration_info}

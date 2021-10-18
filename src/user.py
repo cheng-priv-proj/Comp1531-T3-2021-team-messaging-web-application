@@ -26,11 +26,13 @@ def user_profile_v1(auth_user_id, u_id):
     check_type(auth_user_id, int)
     check_type(u_id, int)
 
+    
+
     if data_store.is_invalid_user_id(auth_user_id):
         raise AccessError('auth_user_id is invalid')
     
-    if data_store.is_invalid_user_id(auth_user_id):
-        raise InputError('auth_user_id is invalid')
+    if data_store.is_invalid_user_id(u_id):
+        raise InputError('u_id is invalid')
 
     return data_store.get_user_from_u_id(u_id)
 
