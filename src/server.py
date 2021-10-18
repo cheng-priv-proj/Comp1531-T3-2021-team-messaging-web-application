@@ -703,10 +703,9 @@ def message_edit_endpt():
 def admin_user_remove_v1_endpt():
     message_id = request_data['message_id']
     request_data = request.get_json()
-    message = request_data['message']
     token = request_data['token']
     
-    auth_id = token_to_auth_id(token)
+    auth_user_id = token_to_auth_id(token)
     return message_remove_v1(auth_user_id, message_id)
 
 @APP.route("/admin/userpermission/change/v1", methods=['POST'])
