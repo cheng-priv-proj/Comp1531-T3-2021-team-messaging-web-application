@@ -160,8 +160,9 @@ def message_edit_v1(auth_user_id, message_id, message):
 
     id = data_store.get_channel_or_dm_id_from_message_id(message_id)
 
-    if not (data_store.is_user_sender_of_message(auth_user_id, message_id) and
-        data_store.is_user_owner_of_channel_or_dm(id, auth_user_id)): 
+    if not (data_store.is_user_sender_of_message(auth_user_id, message_id) or
+        data_store.is_user_owner_of_channel_or_dm(id, auth_user_id)
+        or data_store.is_stream_owner(auth_user_id)): 
         raise AccessError
 
     messages = data_store.get_messages_from_channel_or_dm_id(id)
@@ -172,9 +173,13 @@ def message_edit_v1(auth_user_id, message_id, message):
     if message == '':
         data_store.remove_message(message_id)
     
+    print(messages)
     for index, original_message in enumerate(messages):
+        print(original_message.get('message_id'))
         if original_message.get('message_id') == message_id:
             messages[index]['message'] = message
+            print(messages[index]['message'] )
+            break
     
 
     return {}

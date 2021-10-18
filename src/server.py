@@ -12,7 +12,7 @@ from src.auth import auth_login_v1, auth_register_v1
 from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
 from src.channel import channel_invite_v1, channel_messages_v1, channel_details_v1
 
-from src.message import message_send_v1, message_senddm_v1, message_remove_v1
+from src.message import message_send_v1, message_senddm_v1, message_remove_v1, message_edit_v1
 
 from src.data_store import data_store
 from src.error import InputError
@@ -398,10 +398,6 @@ def message_senddm_endpt():
     return_dict = message_senddm_v1(auth_user_id, dm_id, message)
     return return_dict
 
-@APP.route("/message/edit/v1", methods=['POST'])
-def message_edit_endpt():
-    return {}
-
 @APP.route("/message/remove/v1", methods=['DELETE'])
 def message_remove_endpt():
     request_data = request.get_json(force = True)
@@ -410,6 +406,17 @@ def message_remove_endpt():
     message_id = request_data['message_id']
     
     return message_remove_v1(auth_user_id, message_id)
+
+@APP.route("/message/edit/v1", methods=['PUT'])
+def message_edit_endpt():
+    request_data = request.get_json(force = True)
+    token = request_data['token']
+    auth_user_id = token_to_auth_id(token)
+    message_id = request_data['message_id']
+    message = request_data['message']
+    
+    return message_edit_v1(auth_user_id, message_id, message)
+
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 

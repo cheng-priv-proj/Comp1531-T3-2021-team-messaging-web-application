@@ -65,7 +65,6 @@ AccessError when message_id refers to a valid message in a joined channel/DM and
 # need to add test multple messages
 
 # tests owner case
-@pytest.mark.skip('Not yet implemented')
 def test_normal_case_channel(clear_server, get_user_1, auth_id_v2):
     channel_dict = requests.post(config.url + 'channels/create/v2', json= {
         'token': get_user_1['token'], 
@@ -81,7 +80,7 @@ def test_normal_case_channel(clear_server, get_user_1, auth_id_v2):
 
     message_id = message_dict['message_id']
 
-    requests.post(config.url + 'message/edit/v1', json = {
+    requests.put(config.url + 'message/edit/v1', json = {
         'token' : get_user_1['token'],
         'message_id': message_id,
         'message' : "GENERAL KENOBI"
@@ -97,7 +96,6 @@ def test_normal_case_channel(clear_server, get_user_1, auth_id_v2):
 
     assert message['message'] == "GENERAL KENOBI"
 
-@pytest.mark.skip('Not yet implemented')
 def test_normal_case_non_owner(clear_server, get_user_1, auth_id_v2):
     channel_dict = requests.post(config.url + 'channels/create/v2', json= {
         'token': get_user_1['token'], 
@@ -119,7 +117,7 @@ def test_normal_case_non_owner(clear_server, get_user_1, auth_id_v2):
 
     message_id = message_dict['message_id']
 
-    requests.post(config.url + 'message/edit/v1', json = {
+    requests.put(config.url + 'message/edit/v1', json = {
         'token' : auth_id_v2['token'],
         'message_id': message_id,
         'message' : "GENERAL KENOBI"
@@ -136,7 +134,6 @@ def test_normal_case_non_owner(clear_server, get_user_1, auth_id_v2):
     assert message['message'] == "GENERAL KENOBI"
 
 # testing owner can edit other peoples messages
-@pytest.mark.skip('Not yet implemented')
 def test_owner_perms(clear_server, get_user_1, auth_id_v2):
     channel_dict = requests.post(config.url + 'channels/create/v2', json= {
         'token': get_user_1['token'], 
@@ -158,7 +155,7 @@ def test_owner_perms(clear_server, get_user_1, auth_id_v2):
 
     message_id = message_dict['message_id']
 
-    requests.post(config.url + 'message/edit/v1', json = {
+    requests.put(config.url + 'message/edit/v1', json = {
         'token' : get_user_1['token'],
         'message_id': message_id,
         'message' : "GENERAL KENOBI"
@@ -175,7 +172,6 @@ def test_owner_perms(clear_server, get_user_1, auth_id_v2):
     assert message['message'] == "GENERAL KENOBI"
 
 # Over 100 char message
-@pytest.mark.skip('Not yet implemented')
 def test_long_edit_channel(clear_server, get_user_1):
     channel_dict = requests.post(config.url + 'channels/create/v2', json= {
         'token': get_user_1['token'], 
@@ -191,7 +187,7 @@ def test_long_edit_channel(clear_server, get_user_1):
 
     message_id = message_dict['message_id']
 
-    assert requests.post(config.url + 'message/edit/v1', json = {
+    assert requests.put(config.url + 'message/edit/v1', json = {
         'token' : get_user_1['token'],
         'message_id': message_id,
         'message' : "a" * 1001
@@ -215,7 +211,7 @@ def test_empty_edit_channel(clear_server, get_user_1):
 
     message_id = message_dict['message_id']
 
-    requests.post(config.url + 'message/edit/v1', json = {
+    requests.put(config.url + 'message/edit/v1', json = {
         'token' : get_user_1['token'],
         'message_id': message_id,
         'message' : "" 
@@ -233,7 +229,6 @@ def test_empty_edit_channel(clear_server, get_user_1):
     }
 
 # message_id does not refer to a valid message within a channel/DM that the authorised user has joined
-@pytest.mark.skip('Not yet implemented')
 def test_invalid_message_id(clear_server, get_user_1):
     channel_dict = requests.post(config.url + 'channels/create/v2', json= {
         'token': get_user_1['token'], 
@@ -248,7 +243,7 @@ def test_invalid_message_id(clear_server, get_user_1):
         'message': 'Hello there' }).json()
 
     message_id = 123213123
-    assert requests.post(config.url + 'message/edit/v1', json = {
+    assert requests.put(config.url + 'message/edit/v1', json = {
         'token' : get_user_1['token'],
         'message_id': message_id,
         'message' : "" 
@@ -260,7 +255,6 @@ def test_invalid_message_id(clear_server, get_user_1):
         the message was sent by the authorised user making this request
         the authorised user has owner permissions in the channel/DM
 '''
-@pytest.mark.skip('Not yet implemented')
 def test_edit_acess_error(clear_server, get_user_1, auth_id_v2):
     channel_dict = requests.post(config.url + 'channels/create/v2', json= {
         'token': get_user_1['token'], 
@@ -281,11 +275,11 @@ def test_edit_acess_error(clear_server, get_user_1, auth_id_v2):
         'channel_id': extracted_channel_id
     })
 
-    assert requests.post(config.url + 'message/edit/v1', json = {
+    assert requests.put(config.url + 'message/edit/v1', json = {
         'token' : auth_id_v2['token'],
         'message_id': message_id,
         'message' : "GENERAL KENOBI"
-    }).status_code == 400
+    }).status_code == 403
 
 
 
@@ -306,7 +300,7 @@ def test_normal_case_dms(clear_server, get_user_1, auth_id_v2):
 
     message_id = message_dict['message_id']
 
-    requests.post(config.url + 'message/edit/v1', json = {
+    requests.put(config.url + 'message/edit/v1', json = {
         'token' : get_user_1['token'],
         'message_id': message_id,
         'message' : "GENERAL KENOBI"
@@ -336,7 +330,7 @@ def test_normal_case_non_owner_dms(clear_server, get_user_1, auth_id_v2):
 
     message_id = message_dict['message_id']
 
-    requests.post(config.url + 'message/edit/v1', json = {
+    requests.put(config.url + 'message/edit/v1', json = {
         'token' : auth_id_v2['token'],
         'message_id': message_id,
         'message' : "GENERAL KENOBI"
@@ -368,7 +362,7 @@ def test_owner_perms_dms(clear_server, get_user_1, auth_id_v2):
 
     message_id = message_dict['message_id']
 
-    requests.post(config.url + 'message/edit/v1', json = {
+    requests.put(config.url + 'message/edit/v1', json = {
         'token' : get_user_1['token'],
         'message_id': message_id,
         'message' : "GENERAL KENOBI"
@@ -401,7 +395,7 @@ def test_long_edit_dms(clear_server, get_user_1):
 
     message_id = message_dict['message_id']
 
-    assert requests.post(config.url + 'message/edit/v1', json = {
+    assert requests.put(config.url + 'message/edit/v1', json = {
         'token' : get_user_1['token'],
         'message_id': message_id,
         'message' : "a" * 1001
@@ -425,7 +419,7 @@ def test_empty_edit_dms(clear_server, get_user_1):
     
     message_id = message_dict['message_id']
 
-    requests.post(config.url + 'message/edit/v1', json = {
+    requests.put(config.url + 'message/edit/v1', json = {
         'token' : get_user_1['token'],
         'message_id': message_id,
         'message' : ""
@@ -459,7 +453,7 @@ def test_invalid_message_id_dms(clear_server, get_user_1):
 
     message_id = 123213123
 
-    assert requests.post(config.url + 'message/edit/v1', json = {
+    assert requests.put(config.url + 'message/edit/v1', json = {
         'token' : get_user_1['token'],
         'message_id': message_id,
         'message' : "" 
@@ -487,7 +481,7 @@ def test_edit_acess_error_dms(clear_server, get_user_1, auth_id_v2):
 
     message_id = message_dict['message_id']
 
-    assert requests.post(config.url + 'message/edit/v1', json = {
+    assert requests.put(config.url + 'message/edit/v1', json = {
         'token' : auth_id_v2['token'],
         'message_id': message_id,
         'message' : "GENERAL KENOBI"
