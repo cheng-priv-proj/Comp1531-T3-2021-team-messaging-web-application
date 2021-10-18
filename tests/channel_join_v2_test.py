@@ -67,7 +67,7 @@ def register_channel():
 def test_valid_id(clear, first_register, register_user):
     token2 = register_user('member2@test.com')
     channel_id = first_register.get('channel_id')
-    r = requests.post(url + 'channel/join/v2', json = {'token': token2,'channel_id': channel_id})
+    requests.post(url + 'channel/join/v2', json = {'token': token2,'channel_id': channel_id})
     channel_list = requests.get(url + 'channels/list/v2', json = {'token': token2}).json()
     assert channel_list == {
         'channels': [
