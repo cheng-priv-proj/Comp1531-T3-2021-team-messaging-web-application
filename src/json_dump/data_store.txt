@@ -1,1 +1,1 @@
-{"login": {}, "token": {}, "channels": {}, "dms": {}, "message_ids": {}, "messages": {}, "users": {}, "perms": {}}
+{"login": {"owner@gmail.com": {"password": "password", "auth_id": 0}}, "token": {"0": 0}, "channels": {}, "dms": {}, "message_ids": {}, "messages": {}, "users": {"0": {"u_id": 0, "email": "owner@gmail.com", "name_first": "owner", "name_last": "one", "handle_str": "ownerone"}}, "perms": {"0": 1}}
