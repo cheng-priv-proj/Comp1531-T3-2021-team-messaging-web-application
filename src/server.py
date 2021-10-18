@@ -9,7 +9,7 @@ from src.channels import channels_listall_v1, channels_list_v1
 from src.channel import channel_join_v1, channel_details_v1
 from src.channels import channels_listall_v1, channels_list_v1
 
-from src.auth import auth_login_v1, auth_register_v1
+from src.auth import auth_login_v1, auth_register_v1, auth_logout_v1
 from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
 from src.channel import channel_invite_v1, channel_messages_v1, channel_details_v1, channel_leave_v1, channel_addowner_v1
 
@@ -110,11 +110,26 @@ def login_ep():
     email = login_details.get('email')
     password = login_details.get('password')
 
-    auth_id_dict = auth_login_v1(email, password)
-    auth_id = auth_id_dict.get('auth_user_id')
-    token = str(auth_id) # Change to jwt later
+    return auth_login_v1(email, password)
 
-    return {'token': token, 'auth_user_id': auth_id}
+# Auth logout
+@APP.route('/auth/logout/v1', methods = ['POST'])
+def logout_endpt():
+    '''
+    Given a valid token, invalidates it for future use
+    
+    Arguments:
+        token (str)
+        
+    Exceptions:
+        AccessError - Token is invalid
+        
+    Returns nothing when successful
+    '''
+    token = request.get_json(force = True).get('token')
+    token_to_auth_id(token)
+    return auth_logout_v1(token)
+
 
 ###################### Channels ######################
 # Channel create
@@ -274,7 +289,7 @@ def channel_list_endpt():
 
 
 @APP.route('/channels/listall/v2', methods = ['GET'])
-def list_all():
+def list_all_endpt():
     '''
     channels/listall/v2
     Provide a list of all channels, including private channels, (and their associated details)
