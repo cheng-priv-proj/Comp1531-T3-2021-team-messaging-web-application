@@ -207,7 +207,7 @@ def test_multiple_handles(clear, user1, user2, extract_dm, extract_id, extract_t
 
 # Test alphabetically sorted
 def test_name_alphabetically_sorted(clear, user1, user2, user3, extract_dm, extract_id, extract_token):
-    user1_id = extract_id(user1)
+    extract_id(user1)
     token1 = extract_token(user1)
     user2_id = extract_id(user2)
     user3_id = extract_id(user3)

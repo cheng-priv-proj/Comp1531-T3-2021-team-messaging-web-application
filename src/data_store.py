@@ -185,7 +185,7 @@ class Datastore:
         if channel_or_dm_id <= -1:
             return self.is_user_member_of_dm(channel_or_dm_id, u_id)
         
-        return self.is_user_member_of_channel(channel_or_dm_id)
+        return self.is_user_member_of_channel(channel_or_dm_id, u_id)
 
     def is_user_owner_of_channel_or_dm(self, channel_or_dm_id, u_id):
         if channel_or_dm_id <= -1:

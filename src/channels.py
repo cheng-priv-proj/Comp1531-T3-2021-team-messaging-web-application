@@ -116,6 +116,6 @@ def channels_create_v1(auth_user_id, name, is_public):
 
     new_id = len(channels) + 1
     
-    data_store.insert_channel(new_id, name, is_public, [owner], [owner])
+    data_store.insert_channel(new_id, name, is_public, [], [owner], [owner])
 
     return { 'channel_id': new_id }
