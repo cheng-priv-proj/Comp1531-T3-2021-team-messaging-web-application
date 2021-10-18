@@ -9,10 +9,9 @@ from src import config
 from src.channels import channels_listall_v1, channels_list_v1, channels_create_v1
 from src.auth import auth_login_v1, auth_register_v1, auth_logout_v1
 from src.dm import dm_create_v1, dm_details_v1, dm_leave_v1, dm_list_v1, dm_remove_v1, dm_details_v1, dm_create_v1, dm_messages_v1
-from src.channel import channel_invite_v1, channel_messages_v1, channel_details_v1, channel_leave_v1, channel_addowner_v1, channel_join_v1
+from src.channel import channel_invite_v1, channel_messages_v1, channel_details_v1, channel_leave_v1, channel_addowner_v1, channel_removeowner_v1, channel_join_v1
 from src.user import user_profile_v1
 from src.message import message_send_v1, message_senddm_v1, message_remove_v1, message_edit_v1
-
 
 from src.data_store import data_store
 from src.error import InputError
@@ -378,10 +377,8 @@ def channel_details_endpt():
     auth_id = token_to_auth_id(token)
     channel_id = request_data['channel_id']
 
-    return_dict = channel_details_v1(auth_id, channel_id)
-    print(return_dict)
 
-    return return_dict
+    return channel_details_v1(auth_id, channel_id)
 
 ################################ DM #########################################
 
@@ -481,6 +478,36 @@ def channel_addowner_endpt():
 
     return channel_addowner_v1(auth_id, channel_id, u_id)
 
+
+@APP.route('/channel/removeowner/v1', methods=['POST'])
+def channel_removeowner_endpt():
+    '''
+    Remove user with user id u_id as an owner of the channel.
+
+    Arguments:
+        token           (str)   - authorised user token
+        channel_id      (int)   - unique channel id
+        u_id            (int)   - unique user id
+
+    Exceptions:
+        AccessError - occurs when auth_user_id is invalid
+        InputError  - occurs when channel_id is invalid
+        AccessError - occurs when channel_id is valid and the authorised user does not have owner permissions in the channel
+        InputError  - occurs when u_id does not refer to a valid user
+        InputError  - occurs when u_id refers to a user who is not an owner of the channel
+        InputError  - occurs when u_id refers to a user who is currently the only owner of the channel
+
+    Returns:
+        Returns nothing on success
+    '''
+    
+    request_data = request.get_json()
+    token = request_data['token']
+    auth_id = token_to_auth_id(token)
+    channel_id = request_data.get('channel_id')
+    u_id = request_data.get('u_id')
+
+    return channel_removeowner_v1(auth_id, channel_id, u_id)
 
 ################## User ###################################
 @APP.route("/user/profile/v1", methods=['get'])
@@ -682,8 +709,6 @@ def message_edit_endpt():
     message = request_data['message']
     
     return message_edit_v1(auth_user_id, message_id, message)
-
-
 
 
 #### NO NEED TO MODIFY BELOW THIS POINT

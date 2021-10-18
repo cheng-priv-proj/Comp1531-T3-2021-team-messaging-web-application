@@ -5,7 +5,6 @@ from src.other import clear_v1
 
 import requests
 
-# Clears storage 
 @pytest.fixture
 def clear():
     requests.delete(url + "clear/v1")
@@ -226,3 +225,4 @@ def test_channel_owner_leaves(clear, first_register):
             }
         ]
     }
+

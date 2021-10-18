@@ -187,6 +187,20 @@ class Datastore:
             return False
         
         return True
+    
+    def is_channel_owner(self, channel_id, u_id):
+        channels = self.get_channels_from_channel_id_dict().get(channel_id)
+        if not any (member['u_id'] == u_id for member in channels['owner_members']):
+            return False
+        
+        return True   
+
+    def is_channel_only_owner(self, channel_id):
+        channels = self.get_channels_from_channel_id_dict().get(channel_id)
+        if len(channels['owner_members']) == 1:
+            return True 
+        
+        return False
 
     def is_user_member_of_dm(self, dm_id, u_id):
         dm = self.get_dm_from_dm_id(dm_id)
@@ -227,14 +241,7 @@ class Datastore:
         if any (member['u_id'] == u_id for member in channel['owner_members']):
             return True
 
-        return False
-        
-    def is_channel_owner(self, channel_id, u_id):
-        channels = self.get_channels_from_channel_id_dict().get(channel_id)
-        if not any (member['u_id'] == u_id for member in channels['owner_members']):
-            return False
-        
-        return True        
+        return False      
 
     def is_stream_owner(self, u_id):
         return self.get_user_perms_from_u_id_dict().get(u_id) == 1
@@ -358,6 +365,16 @@ class Datastore:
         if not isinstance(store, dict):
             raise TypeError('store must be of type dictionary')
         self.__store = store
+    
+    def remove_channel_owner(self, channel_id, u_id):
+        channels = self.get_channels_from_channel_id_dict().get(channel_id)
+        members = channels['owner_members']
+    
+        for person in members:
+            if person['u_id'] == u_id:
+                members.remove(person)
+        
+        self.update_json()
 
 print('Loading Datastore...')
 
