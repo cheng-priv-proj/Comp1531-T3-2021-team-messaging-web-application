@@ -8,7 +8,7 @@ from src import config
 
 from src.channels import channels_listall_v1, channels_list_v1, channels_create_v1
 from src.auth import auth_login_v1, auth_register_v1, auth_logout_v1
-from src.dm import dm_create_v1, dm_details_v1, dm_leave_v1, dm_list_v1, dm_remove_v1, dm_details_v1, dm_create_v1
+from src.dm import dm_create_v1, dm_details_v1, dm_leave_v1, dm_list_v1, dm_remove_v1, dm_details_v1, dm_create_v1, dm_messages_v1
 from src.channel import channel_invite_v1, channel_messages_v1, channel_details_v1, channel_leave_v1, channel_addowner_v1
 from src.user import user_profile_v1
 
@@ -588,6 +588,16 @@ def dm_list_ep():
     dm_list = dm_list_v1(auth_user_id)
 
     return dm_list
+
+@APP.route("/dm/messages/v1", methods=['GET'])
+def dm_messages_endpt():
+    request_data = request.get_json()
+    token = request_data['token']
+    auth_id = token_to_auth_id(token)
+    dm_id = request_data['dm_id']
+    start = request_data['start']
+
+    return dm_list_v1(auth_id, dm_id, start)
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 
