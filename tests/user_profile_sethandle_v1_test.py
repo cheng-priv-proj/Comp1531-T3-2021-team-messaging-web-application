@@ -33,7 +33,6 @@ def user_profile_sethandle():
     def user_profile_sethandle_function(token, handle_str):
         return requests.get(url + 'user/profile/sethandle/v1', json = {
             'token': token,
-            'u_id': u_id,
             'handle_str': handle_str
          })
     return user_profile_sethandle_function
@@ -84,7 +83,7 @@ def user_profile_sethandle_handle_str_long(clear, register_user, user_profile_se
 
 def user_profile_sethandle_duplicate(clear, register_user, user_profile_sethandle, extract_token):
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
-    userone_info = register_user('user1@gmail.com', 'user', 'one')
+    register_user('user1@gmail.com', 'user', 'one')
 
     assert user_profile_sethandle(extract_token(owner_info), 'userone').status_code == 400
 

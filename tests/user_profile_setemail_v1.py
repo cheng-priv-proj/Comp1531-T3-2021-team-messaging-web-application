@@ -77,15 +77,15 @@ def test_user_setemail_invalid_token(clear, set_email):
 
     assert owner_profile.status_code == 403
 
-def test_user_setemail_invalid_email(clear, register_user, set_email):
+def test_user_setemail_invalid_email(clear, register_user, set_email, extract_token):
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
 
     assert set_email(extract_token(owner_info), 'inv$alid@gmail.com').statuscode == 400
 
 
-def test_user_setemail_duplicate_email(clear, register_user, extract_user, set_email):
+def test_user_setemail_duplicate_email(clear, register_user, extract_user, set_email, extract_token):
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
-    user_info = ('common@gmail.com', 'user', 'one')
+    register_user('common@gmail.com', 'user', 'one')
 
     assert set_email(extract_token(owner_info), 'common@gmail.com').statuscode == 400
 
