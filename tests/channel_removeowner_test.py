@@ -46,7 +46,7 @@ def first_register():
     
     return {'u_id': u_id, 'token': token, 'channel_id': channel_id}
 
-@pytest.mark.skip
+
 def test_channel_removeowner_v1_invalid_token(clear, first_register, get_valid_token):
     details = first_register
     new_user = get_valid_token
@@ -57,7 +57,7 @@ def test_channel_removeowner_v1_invalid_token(clear, first_register, get_valid_t
     })
 
     assert resp.status_code == 403
-@pytest.mark.skip
+
 def test_channel_removeowner_v1_invalid_channel_id(clear, first_register, get_valid_token):
     details = first_register
     new_user = get_valid_token
@@ -70,7 +70,7 @@ def test_channel_removeowner_v1_invalid_channel_id(clear, first_register, get_va
     assert resp.status_code == 400
 
 # make sure access error has priority
-@pytest.mark.skip
+
 def test_channel_removeowner_v1_invalid_token_and_channel_id(clear, get_valid_token):
     new_user = get_valid_token
     resp = requests.post(config.url + 'channel/removeowner/v1', json={
@@ -80,7 +80,7 @@ def test_channel_removeowner_v1_invalid_token_and_channel_id(clear, get_valid_to
     })
 
     assert resp.status_code == 403
-@pytest.mark.skip
+
 def test_channel_removeowner_v1_invalid_u_id(clear, first_register):
     details = first_register
     resp = requests.post(config.url + 'channel/removeowner/v1', json={
@@ -89,17 +89,17 @@ def test_channel_removeowner_v1_invalid_u_id(clear, first_register):
         'u_id': -1})
 
     assert resp.status_code == 400
-@pytest.mark.skip
+
 def test_channel_removeowner_v1_user_not_member_of_channel(clear, first_register, get_valid_token):
     details = first_register
     new_user = get_valid_token
     resp = requests.post(config.url + 'channel/removeowner/v1', json={
-        'token': new_user['token'], 
+        'token': details['token'], 
         'channel_id': details['channel_id'], 
         'u_id': new_user['auth_user_id']})
 
     assert resp.status_code == 400
-@pytest.mark.skip
+
 def test_channel_removeowner_v1_user_only_owner_of_channel(clear, first_register):
     details = first_register
     requests.post(config.url + 'channel/join/v2', json={
@@ -113,11 +113,12 @@ def test_channel_removeowner_v1_user_only_owner_of_channel(clear, first_register
     })
     
     assert resp.status_code == 400
+    
 @pytest.mark.skip
 def test_channel_removeowner_v1_user_without_owner_permissions(clear, first_register):
     # access error
     pass
-@pytest.mark.skip
+
 def test_channel_removeowner_v1_works(clear, first_register, get_valid_token):
     details = first_register
     new_user = get_valid_token
