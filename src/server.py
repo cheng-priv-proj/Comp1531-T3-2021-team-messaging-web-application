@@ -13,6 +13,8 @@ from src.auth import auth_login_v1, auth_register_v1
 from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
 from src.channel import channel_invite_v1, channel_messages_v1, channel_details_v1, channel_leave_v1, channel_addowner_v1
 
+from src.user import user_profile_v1
+
 from src.data_store import data_store
 from src.error import InputError
 from src.other import clear_v1
@@ -72,11 +74,12 @@ def register_ep():
     password = register_details.get('password')
     name_first = register_details.get('name_first')
     name_last = register_details.get('name_last')
-
+    
     auth_id_dict = auth_register_v1(email, password, name_first, name_last)
+    print("THIS IS NOOTT WORKINNNGG")
     auth_id = auth_id_dict.get('auth_user_id')
     token = str(auth_id) # Change to jwt later
-
+    print("THIS IS WORKINNNGG")
     data_store.insert_token(token, auth_id)
 
     return {'token': token, 'auth_user_id': auth_id}
@@ -391,6 +394,34 @@ def channel_addowner_endpt():
     u_id = request_data.get('u_id')
 
     return channel_addowner_v1(auth_id, channel_id, u_id)
+
+
+################## User ###################################
+@APP.route("/user/profile/v1", methods=['get'])
+def user_profile_ep():
+    '''
+    For a valid user, returns information about their user_id, email, 
+    first name, last name, and handle
+
+    Arguments:
+        token           (str)   - authorised user id
+        u_id            (int)   - unique id
+
+    Exceptions:
+        AccessError - occurs when token is invalid
+        InputError  - occurs when u_id is invalid
+
+    Return value:
+        Returns user on success
+    '''
+
+    request_data = request.get_json()
+    token = request_data['token']
+    auth_user_id = token_to_auth_id(token)
+    u_id = request_data.get('u_id')
+
+    user_details = user_profile_v1(auth_user_id, u_id)
+    return user_details
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 
