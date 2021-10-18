@@ -5,7 +5,7 @@ import flask
 from requests.models import Response
 from src import config
 
-from src.other import clear_v1
+from src.other import clear_v1 
 
 @pytest.fixture
 def clear_server():
@@ -140,10 +140,9 @@ def test_invalid_register_return_token_v2():
 # A test that checks if handle genneration has been correctly generated. 
 #<<<assume that user profiles is working>>
 
-@pytest.mark.skip('Assumes user profile is implemented correctly')
 def test_appended_handle_number(clear_server, get_user_1):
-    user_1_dict = requests.get(config.url + 'user/profile/v1', params={'token': get_user_1['token'], 'u_id': get_user_1['auth_user_id']}).json()
-    assert(user_1_dict['handle'] == "ownerone")
+    user_1_dict = requests.get(config.url + 'user/profile/v1', json={'token': get_user_1['token'], 'u_id': get_user_1['auth_user_id']}).json()
+    assert(user_1_dict['handle_str'] == "ownerone")
 
     response = requests.post(config.url + 'auth/register/v2', json={
         'email': 'owner1@test.com', 
@@ -152,13 +151,12 @@ def test_appended_handle_number(clear_server, get_user_1):
         'name_last' : 'one'
         })
     user_2 = response.json()
-    user_2_dict = requests.get(config.url + 'user/profile/v1', params={'token': user_2['token'], 'u_id': user_2['auth_user_id']}).json()
+    user_2_dict = requests.get(config.url + 'user/profile/v1', json={'token': user_2['token'], 'u_id': user_2['auth_user_id']}).json()
 
-    assert(user_2_dict['handle'] == "ownerone0"), 'handle generation of appended handle number'
+    assert(user_2_dict['handle_str'] == "ownerone0"), 'handle generation of appended handle number'
 
 #<<<assume that user profiles is working>>
 # TEsting handle generation on a name that is longer than 20 characters 
-@pytest.mark.skip('Assumes user profile is implemented correctly')
 def test_concatenated_length(clear_server):
     response = requests.post(config.url + 'auth/register/v2', json={
         'email': 'owner1@test.com', 
@@ -167,7 +165,7 @@ def test_concatenated_length(clear_server):
         'name_last' : 'one'
         })
     user_2 = response.json()
-    user_2_dict = requests.get(config.url + 'user/profile/v1', params={'token': user_2['token'], 'u_id': user_2['auth_user_id']}).json()
+    user_2_dict = requests.get(config.url + 'user/profile/v1', json={'token': user_2['token'], 'u_id': user_2['auth_user_id']}).json()
 
-    assert len(user_2_dict['handle']) <= 20
+    assert len(user_2_dict['handle_str']) <= 20
 

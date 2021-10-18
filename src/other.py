@@ -13,6 +13,8 @@ def clear_v1():
     Returns nothing on success
     '''
     data_store.hard_reset()
+    
+    return {}
 
 # helper function to generate handles for auth_register
 def handle_str_generation(firstname, lastname):
@@ -34,7 +36,6 @@ def handle_str_generation(firstname, lastname):
 
     base_handle_str = base_handle_str_generation(firstname, lastname)
     handle_str = handle_prevent_duplicates(base_handle_str)
-    print(handle_str)
     return handle_str
 
 # Returns a nonduplicate handle_str
@@ -126,7 +127,7 @@ def token_to_auth_id(token):
     '''
 
     if data_store.is_token_invalid(token):
-        raise AccessError
+        raise AccessError ('Token is invalid')
     
     return data_store.get_u_id_from_token(token)
 

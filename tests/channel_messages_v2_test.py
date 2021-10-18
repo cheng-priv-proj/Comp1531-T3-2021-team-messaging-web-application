@@ -6,7 +6,7 @@ import pytest
 import requests
 import json
 import flask
-from src import config
+from src import config 
 
 #NEED TO IMPLEMENT clear for server or change clear v1
 @pytest.fixture
@@ -72,8 +72,7 @@ def test_start_greater_than_messages(clear_server, get_user_1):
     assert(channel_messages.status_code == 400)
 
 # ASSUMES THAT message/send/v1 COMPLETELY WORKS
-@pytest.mark.skip('Messages send not yet implemented')
-def test_message_is_sent(get_user_1, clear_server):
+def test_message_is_sent(clear_server, get_user_1):
     channel_dict = requests.post(config.url + 'channels/create/v2', json={'token': get_user_1['token'], 'name': 'test channel', 'is_public': True}).json()
     extracted_channel_id = channel_dict['channel_id']
 

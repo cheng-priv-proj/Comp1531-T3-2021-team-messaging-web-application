@@ -7,7 +7,7 @@ import requests
 
 # Clears storage
 @pytest.fixture
-def clear():
+def clear(): 
     requests.delete(url + "clear/v1")
 
 
@@ -21,7 +21,6 @@ def first_register():
         'name_last': 'user'
     }
     token_dict = requests.post(url + 'auth/register/v2', json = user_details).json()
-    print(token_dict)
     token = token_dict.get('token')
 
     channel_details = {
@@ -68,11 +67,8 @@ def register_channel():
 def test_valid_id(clear, first_register, register_user):
     token2 = register_user('member2@test.com')
     channel_id = first_register.get('channel_id')
-    print(token2, channel_id)
-    r = requests.post(url + 'channel/join/v2', json = {'token': token2,'channel_id': channel_id})
-    print(r)
+    requests.post(url + 'channel/join/v2', json = {'token': token2,'channel_id': channel_id})
     channel_list = requests.get(url + 'channels/list/v2', json = {'token': token2}).json()
-    print("channel list:   ", channel_list)
     assert channel_list == {
         'channels': [
         	{

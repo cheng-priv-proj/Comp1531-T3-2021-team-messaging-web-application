@@ -197,3 +197,142 @@ def channel_join_v1(auth_user_id, channel_id):
     channel.get('all_members').append(user)
 
     return {}
+
+def channel_leave_v1(auth_user_id, channel_id):
+    '''
+    Given a channel with ID channel_id that the authorised user is a member of,
+    remove them as a member of the channel.
+
+    Arguments:
+        auth_user_id    (int)   - authorised user id
+        channel_id      (int)   - unique channel id
+
+    Exceptions:
+        TypeError   - occurs when auth_user_id, channel_id are not ints
+        AccessError - occurs when auth_id is invalid
+        InputError  - occurs when channel_id is invalid
+        AccessError - occurs when channel_id is valid and the authorised user is
+                      not a member of the channel
+
+    Return value:
+        Returns nothing on success
+    '''
+
+    check_type(auth_user_id, int)
+    check_type(channel_id, int)
+
+    if data_store.is_invalid_user_id(auth_user_id):
+        raise AccessError('auth_id is invalid')
+    
+    if data_store.is_invalid_channel_id(channel_id):
+        raise InputError('channel_id is invalid')
+
+    if not data_store.is_user_member_of_channel(channel_id, auth_user_id):
+        raise AccessError('channel_id is valid and the authorised user is not a member of the channel')
+
+    # move everything below into a data_store method?
+    channel = data_store.get_channel_from_channel_id(channel_id)
+
+    members = channel.get('all_members')
+
+    channel['all_members'] = [member for member in members if member.get('u_id') != auth_user_id]
+
+    if data_store.is_channel_owner(channel_id, auth_user_id):
+        channel['owner_members'] = [owner for owner in members if owner.get('u_id') != auth_user_id]
+    
+    return {}
+
+def channel_addowner_v1(auth_user_id, channel_id, u_id):
+    '''
+    Make user with user id u_id an owner of the channel.
+
+    Arguments:
+        auth_user_id    (int)   - authorised user id
+        channel_id      (int)   - unique channel id
+        u_id            (int)   - unique user id
+
+    Exceptions:
+        AccessError - occurs when auth_user_id is invalid
+        InputError  - occurs when channel_id is invalid
+        AccessError - occurs when channel_id is valid and the authorised user does not have owner permissions in the channel
+        InputError  - occurs when u_id does not refer to a valid user
+        InputError  - occurs when u_id refers to a user who is not a member of the channel
+        InputError  - occurs when u_id refers to a user who is already an owner of the channel
+
+    Returns:
+        Returns nothing on success
+    '''
+    check_type(auth_user_id, int)
+    check_type(channel_id, int)
+    check_type(u_id, int)
+
+    if data_store.is_invalid_user_id(auth_user_id):
+        raise AccessError ('auth_user_id is invalid')
+    
+    if data_store.is_invalid_channel_id(channel_id):
+        raise InputError ('channel_id is invalid')
+
+    if not (data_store.is_channel_owner(channel_id, auth_user_id) or data_store.is_stream_owner(auth_user_id)):
+        raise AccessError ('channel_id is valid and the authorised user does not have owner permissions in the channel')
+    
+    if data_store.is_invalid_user_id(u_id):
+        raise InputError ('u_id does not refer to a valid user')
+
+    if not data_store.is_user_member_of_channel(channel_id, u_id):
+        raise InputError ('u_id refers to a user who is not a member of the channel')
+
+    if data_store.is_channel_owner(channel_id, u_id):
+        raise InputError ('u_id refers to a user who is already an owner of the channel')
+
+    data_store.insert_channel_owner(channel_id, u_id)
+
+    return {}
+
+def channel_removeowner_v1(auth_user_id, channel_id, u_id):
+    '''
+    Remove user with user id u_id as an owner of the channel.
+
+    Arguments:
+        auth_user_id    (int)   - authorised user id
+        channel_id      (int)   - unique channel id
+        u_id            (int)   - unique user id
+
+    Exceptions:
+        AccessError - occurs when auth_user_id is invalid
+        InputError  - occurs when channel_id is invalid
+        AccessError - occurs when channel_id is valid and the authorised user does not have owner permissions in the channel
+        InputError  - occurs when u_id does not refer to a valid user
+        InputError  - occurs when u_id refers to a user who is not an owner of the channel
+        InputError  - occurs when u_id refers to a user who is currently the only owner of the channel
+
+    Returns:
+        Returns nothing on success
+    '''
+
+    check_type(auth_user_id, int)
+    check_type(channel_id, int)
+    check_type(u_id, int)
+
+    if data_store.is_invalid_user_id(auth_user_id):
+        raise AccessError ('auth_user_id is invalid')
+    
+    if data_store.is_invalid_channel_id(channel_id):
+        raise InputError ('channel_id is invalid')
+
+    if not (data_store.is_channel_owner(channel_id, auth_user_id) or data_store.is_stream_owner(auth_user_id)):
+        raise AccessError ('channel_id is valid and the authorised user does not have owner permissions in the channel')
+    
+    if data_store.is_invalid_user_id(u_id):
+        raise InputError ('u_id does not refer to a valid user')
+    
+    if not data_store.is_channel_owner(channel_id, u_id) and not data_store.is_stream_owner(u_id): 
+        raise InputError ('u_id refers to a user who is already an owner of the channel')
+    
+    if data_store.is_channel_only_owner(channel_id):
+        raise InputError ('u_id refers to a user who is the only owner')
+    
+    data_store.remove_channel_owner(channel_id, u_id)
+
+    return {}
+
+
