@@ -1,7 +1,6 @@
 import pytest
 import requests
 
-from src.error import AccessError
 from src.config import url
 
 @pytest.fixture
@@ -41,6 +40,7 @@ def register(clear):
 
     return [owner_id, user1_id, user2_id, user3_id]
 
+
 @pytest.fixture
 def dm_factory():
     def create_dm(owner_token, users):
@@ -50,52 +50,52 @@ def dm_factory():
         return dm_id['dm_id']
     return create_dm
 @pytest.mark.skip
-def test_standard(register, dm_factory):
-    dm_id = dm_factory(register[0]['token'], [register[1]['auth_user_id'], register[2]['auth_user_id'], register[3]['auth_user_id']])
-    
-    list = requests.get(url + 'dm/list/v1', json = {
-        'token': register[0]['token']
-        }).json()
+def test_no_messages(register, dm_factory):
 
-    assert list is [
-        {
-            'dm_id' : dm_id,
-            'name' : 'ownerone, userone, userthree, usertwo'
-        }
-    ]
-@pytest.mark.skip
-def test_creator_only(register, dm_factory):
     dm_id = dm_factory(register[0]['token'], [])
-    
-    list = requests.get(url + 'dm/list/v1', json = {
-        'token': register[0]['token']
-        }).json()
 
-    assert list is [
-        {
-            'dm_id' : dm_id,
-            'name' : 'ownerone'
-        }
-    ]
+    messages_dict = requests.get(url + 'dm/messages/v1', json = {
+        'token': register[0]['token'],
+        'dm_id': dm_id,
+        'start': 0
+    }).json()
+
+    assert messages_dict == {
+        'messages': [],
+        'start': 0,
+        'end': -1
+    }
 @pytest.mark.skip
-def test_user_has_no_dms(register, dm_factory):
+def test_invalid_token_valid_dm_id(register, dm_factory):
+    dm_id = dm_factory(register[0]['token'], [])
 
-    list = requests.get(url + 'dm/list/v1', json = {
-        'token': register[0]['token']
-        }).json()
-
-    assert list is []
-
-    dm_factory(register[0]['token'], [register[1]['auth_user_id']])
-
-    list = requests.get(url + 'dm/list/v1', json = {
-        'token': register[2]['token']
-        }).json()
-
-    assert list is []
+    assert requests.get(url + 'dm/messages/v1', json = {
+        'token': register[1]['token'],
+        'dm_id': dm_id,
+        'start': 0
+    }).status_code == 403
 @pytest.mark.skip
-def test_invalid_token():
-    requests.get(url + 'dm/list/v1', json = {
-        'token': 'no token has been registered yet'
-        }).status_code is 403
+def test_invalid_dm_id(register):
 
+    assert requests.get(url + 'dm/messages/v1', json = {
+        'token': register[0]['token'],
+        'dm_id': 0,
+        'start': 0
+    }).status_code == 400
+@pytest.mark.skip
+def test_invalid_start(register, dm_factory):
+    dm_id = dm_factory(register[0]['token'], [])
+
+    assert requests.get(url + 'dm/messages/v1', json = {
+        'token': register[0]['token'],
+        'dm_id': dm_id,
+        'start': 50
+    }).status_code == 400
+    pass
+@pytest.mark.skip
+def test_invalid_dm_and_token(clear):
+    assert requests.get(url + 'dm/messages/v1', json = {
+        'token': 'no token has been registered',
+        'dm_id': 1,
+        'start': 0
+    }).status_code == 400
