@@ -326,7 +326,7 @@ def test_owner_perms_dms(clear_server, get_user_1, auth_id_v2):
 
 # message_id does not refer to a valid message within a channel/DM that the authorised user has joined
 @pytest.mark.skip('Not yet implemented')
-def test_invalid_message_id_dms(clear_server, get_user_1):
+def test_invalid_message_id_dms(clear_server, get_user_1, auth_id_v2):
     dm_id_dict = requests.post(config.url + 'dm/create/v1', json= {
         'token': get_user_1['token'], 
         'u_ids': [auth_id_v2["auth_user_id"]]

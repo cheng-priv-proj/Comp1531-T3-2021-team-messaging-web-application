@@ -237,7 +237,7 @@ def test_invalid_message_id(clear_server, get_user_1):
     }).json()
 
     extracted_channel_id = channel_dict['channel_id']
-    message_dict = requests.post(config.url + 'message/send/v1', json = {
+    requests.post(config.url + 'message/send/v1', json = {
         'token': get_user_1['token'],
         'channel_id': extracted_channel_id,
         'message': 'Hello there' }).json()
@@ -379,7 +379,7 @@ def test_owner_perms_dms(clear_server, get_user_1, auth_id_v2):
 
 # Over 100 char message
 @pytest.mark.skip('Not yet implemented')
-def test_long_edit_dms(clear_server, get_user_1):
+def test_long_edit_dms(clear_server, get_user_1, auth_id_v2):
     dm_id_dict = requests.post(config.url + 'dm/create/v1', json= {
         'token': get_user_1['token'], 
         'u_ids': [auth_id_v2["auth_user_id"]]
@@ -404,7 +404,7 @@ def test_long_edit_dms(clear_server, get_user_1):
 # message edit with empty string 
 # same behavoiur as removing
 @pytest.mark.skip('Not yet implemented')
-def test_empty_edit_dms(clear_server, get_user_1):
+def test_empty_edit_dms(clear_server, get_user_1, auth_id_v2):
     dm_id_dict = requests.post(config.url + 'dm/create/v1', json= {
         'token': get_user_1['token'], 
         'u_ids': [auth_id_v2["auth_user_id"]]
@@ -438,7 +438,7 @@ def test_empty_edit_dms(clear_server, get_user_1):
 
 # message_id does not refer to a valid message within a channel/DM that the authorised user has joined
 @pytest.mark.skip('Not yet implemented')
-def test_invalid_message_id_dms(clear_server, get_user_1):
+def test_invalid_message_id_dms(clear_server, get_user_1, auth_id_v2):
     dm_id_dict = requests.post(config.url + 'dm/create/v1', json= {
         'token': get_user_1['token'], 
         'u_ids': [auth_id_v2["auth_user_id"]]

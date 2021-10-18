@@ -66,7 +66,7 @@ def test_no_messages(register, dm_factory):
         'end': -1
     }
 @pytest.mark.skip
-def test_invalid_token_valid_dm_id(register):
+def test_invalid_token_valid_dm_id(register, dm_factory):
     dm_id = dm_factory(register[0]['token'], [])
 
     assert requests.get(url + 'dm/messages/v1', json = {
