@@ -1,3 +1,4 @@
+from re import U
 from src.data_store import data_store
 from src.error import InputError
 from src.error import AccessError
@@ -35,7 +36,7 @@ def admin_userpermission_change_v1(auth_user_id, u_id, permission_id):
 
     # order of these errors are really dodgy need to double check.
 
-    if data_store.is_invalid_user_id(u_id):
+    if data_store.is_invalid_user_id(u_id) == True:
         raise InputError (' u_id is invalid')
 
     if data_store.is_stream_owner(auth_user_id) == False:
@@ -47,10 +48,6 @@ def admin_userpermission_change_v1(auth_user_id, u_id, permission_id):
     if (data_store.is_stream_owner(auth_user_id) == False) and (permission_id < 1 or permission_id > 2):
         raise AccessError('Token(auth_id) is not a global owner')
     
-    if data_store.is_invalid_user_id(auth_user_id):
-        raise AccessError (' auth_id is invalid')
-
-    
     perm_dict = data_store.get_user_perms_from_u_id_dict()
     owner_count = 0
     for u_id_key in perm_dict:
@@ -60,36 +57,67 @@ def admin_userpermission_change_v1(auth_user_id, u_id, permission_id):
     if owner_count == 1 and data_store.is_stream_owner(u_id) == True:
         raise InputError ('u_id refers to a user who is the only global owner and they are being demoted to a user')
     
+    if data_store.is_invalid_user_id(auth_user_id) == True:
+        raise AccessError (' auth_id is invalid')
+
+    
+    
     data_store.insert_user_perm(u_id, permission_id)
     
     return {}
 
-'''
-admin/user/remove/v1
 
-Given a user by their u_id, remove them from the Streams. 
-This means they should be removed from all channels/DMs, and will not be included in the list of users returned by users/all. 
-Streams owners can remove other Streams owners (including the original first owner). 
-Once users are removed, the contents of the messages they sent will be replaced by 'Removed user'. 
-Their profile must still be retrievable with user/profile, however name_first should be 'Removed' and name_last should be 'user'. 
-The user's email and handle should be reusable.
+def admin_user_remove_v1(auth_user_id, u_id):
+    '''
+    admin/user/remove/v1
 
-DELETE
+    Given a user by their u_id, remove them from the Streams. 
+    This means they should be removed from all channels/DMs, and will not be included in the list of users returned by users/all. 
+    Streams owners can remove other Streams owners (including the original first owner). 
+    Once users are removed, the contents of the messages they sent will be replaced by 'Removed user'. 
+    Their profile must still be retrievable with user/profile, however name_first should be 'Removed' and name_last should be 'user'. 
+    The user's email and handle should be reusable.
 
-Parameters:
-    { token, u_id }
+    DELETE
 
-Return Type:
-    {}
+    Parameters:
+        { token, u_id }
+
+    Return Type:
+        {}
 
 
-InputError when any of:
-      
-        u_id does not refer to a valid user
-        u_id refers to a user who is the only global owner
+    InputError when any of:
+        
+            u_id does not refer to a valid user
+            u_id refers to a user who is the only global owner
 
-AccessError when:
-      
-        the authorised user is not a global owner
+    AccessError when:
+        
+            the authorised user is not a global owner
 
-'''
+    '''
+    if data_store.is_invalid_user_id(auth_user_id):
+        raise AccessError (' auth_id is invalid')
+
+    if data_store.is_stream_owner(auth_user_id) == False:
+        raise AccessError('Token(auth_id) is not a global owner')
+
+    if data_store.is_invalid_user_id(u_id):
+        raise InputError (' u_id is invalid')
+
+    perm_dict = data_store.get_user_perms_from_u_id_dict()
+    owner_count = 0
+    for u_id_key in perm_dict:
+        if perm_dict[u_id_key] == 1:
+            owner_count += 1
+
+    if owner_count == 1 and data_store.is_stream_owner(u_id) == True:
+        raise InputError ('u_id refers to a user who is the only global owner and they are being demoted to a user')
+        
+    data_store.admin_user_remove(u_id)
+    print('suzess')
+
+    return {}
+
+

@@ -267,6 +267,45 @@ class Datastore:
             raise TypeError('store must be of type dictionary')
         self.__store = store
 
+    def admin_user_remove(self, u_id):
+        users = self.__store['users']
+        login = self.__store['login']
+        channel = self.__store['channels']
+        dms = self.__store['dms']
+
+        user = self.get_users_from_u_id_dict().get(u_id)
+        
+        email = users['Email']
+        del login[email]
+
+        # loop through channel to delete user from all channels
+        for c_id in channel:
+            if user in c_id['all_members']:
+                c_id['all_members'].remove(user)
+            if user in c_id['owner_members']:
+                c_id['owner_members'].remove(user)
+                print('sucess')
+
+
+        for dm_id in dms:
+            if user in dm_id['members']:
+                dm_id['members'].remove(user)
+            if user in dm_id['creator']:
+                dm_id['creator'].remove(user)
+                print('>>sucess')
+
+        
+        if user in users:
+            users.remove(user)
+            print('>>>>sucess')
+        
+
+        
+        self.update_json()
+
+
+
+
 print('Loading Datastore...')
 
 global data_store

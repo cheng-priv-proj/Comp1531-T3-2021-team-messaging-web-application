@@ -18,6 +18,7 @@ from src.other import clear_v1
 from src.other import token_to_auth_id
 
 from src.admin import admin_userpermission_change_v1
+from src.admin import admin_user_remove_v1
 
 
 def quit_gracefully(*args):
@@ -348,6 +349,16 @@ def admin_userpermission_change_v1_endpt():
 
     return {}
 
+@APP.route("/admin/user/remove/v1", methods=['DELETE'])
+def admin_user_remove_v1_endpt():
+    request_data = request.get_json()
+    token = request_data['token']
+    auth_id = token_to_auth_id(token)
+    u_id = request_data['u_id']
+
+    admin_user_remove_v1(auth_id, u_id)
+
+    return{}
 
 
 
