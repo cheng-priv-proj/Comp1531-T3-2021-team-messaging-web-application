@@ -79,7 +79,7 @@ def test_senddm_one_valid_message(clear, register, extract_token, extract_user, 
         'token': owner_token,
         'dm_id': dm_id,
         'message': 'testmessage' }).json())
-    messages = requests.get(url + 'message/senddm/v1', params = {
+    messages = requests.post(url + 'message/senddm/v1', params = {
         'token': owner_token,
         'dm_id': dm_id, 
         'start': 0 }).json()
@@ -114,7 +114,7 @@ def test_senddm_multiple_valid_messages(clear, register, extract_token, extract_
         'token': owner_token,
         'dm_id': dm_id,
         'message': 'testmessage2' }).json())
-    messages = requests.get(url + 'message/senddm/v1', params = {
+    messages = requests.post(url + 'message/senddm/v1', params = {
         'token': owner_token,
         'dm_id': dm_id, 
         'start': 0 }).json()
@@ -169,7 +169,7 @@ def test_senddm_invalid_message_to_long(clear, register, extract_token, extract_
 def test_senddm_valid_message_unauthorized_user(clear, register, extract_token, extract_dm):
     dm_id = extract_dm(register)
     user_token = extract_token(requests.post(url + 'auth/register/v2', json = {
-    'email': 'user@test.com', 
+    'email': 'user1@test.com', 
     'password': 'password', 
     'name_first': 'user',
     'name_last': 'one' }
@@ -186,7 +186,7 @@ def test_senddm_message_invalid_dm_id(clear, register, extract_token, extract_us
         'token': owner_token,
         'dm_id': 123123,
         'message': '123123'
-    })
+    }).status_code == 400
 
 def test_senddm_valid_message_invalid_token(clear, register, extract_token):
     dm_id = extract_token(register)
