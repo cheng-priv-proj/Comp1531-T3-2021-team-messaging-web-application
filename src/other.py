@@ -13,6 +13,8 @@ def clear_v1():
     Returns nothing on success
     '''
     data_store.hard_reset()
+    
+    return {}
 
 # helper function to generate handles for auth_register
 def handle_str_generation(firstname, lastname):
@@ -126,7 +128,7 @@ def token_to_auth_id(token):
     '''
 
     if data_store.is_token_invalid(token):
-        raise AccessError
+        raise AccessError ('Token is invalid')
     
     return data_store.get_u_id_from_token(token)
 

@@ -5,18 +5,12 @@ from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
 from src import config
-from src.channel import channel_join_v1, channel_details_v1
 
-
-from src.channel import channel_join_v1, channel_details_v1
-from src.channels import channels_listall_v1, channels_list_v1
-
-from src.auth import auth_login_v1, auth_register_v1
-from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
-from src.channel import channel_invite_v1, channel_messages_v1, channel_details_v1
-from src.dm import dm_create_v1, dm_details_v1
-
-from src.dm import dm_remove_v1, dm_details_v1, dm_create_v1
+from src.channels import channels_listall_v1, channels_list_v1, channels_create_v1
+from src.auth import auth_login_v1, auth_register_v1, auth_logout_v1
+from src.dm import dm_create_v1, dm_details_v1, dm_remove_v1, dm_details_v1, dm_create_v1
+from src.channel import channel_invite_v1, channel_messages_v1, channel_details_v1, channel_leave_v1, channel_addowner_v1
+from src.user import user_profile_v1
 
 from src.data_store import data_store
 from src.error import InputError
@@ -77,11 +71,12 @@ def register_ep():
     password = register_details.get('password')
     name_first = register_details.get('name_first')
     name_last = register_details.get('name_last')
-
+    
     auth_id_dict = auth_register_v1(email, password, name_first, name_last)
+    print("THIS IS NOOTT WORKINNNGG")
     auth_id = auth_id_dict.get('auth_user_id')
     token = str(auth_id) # Change to jwt later
-
+    print("THIS IS WORKINNNGG")
     data_store.insert_token(token, auth_id)
 
     return {'token': token, 'auth_user_id': auth_id}
@@ -112,11 +107,26 @@ def login_ep():
     email = login_details.get('email')
     password = login_details.get('password')
 
-    auth_id_dict = auth_login_v1(email, password)
-    auth_id = auth_id_dict.get('auth_user_id')
-    token = str(auth_id) # Change to jwt later
+    return auth_login_v1(email, password)
 
-    return {'token': token, 'auth_user_id': auth_id}
+# Auth logout
+@APP.route('/auth/logout/v1', methods = ['POST'])
+def logout_endpt():
+    '''
+    Given a valid token, invalidates it for future use
+    
+    Arguments:
+        token (str)
+        
+    Exceptions:
+        AccessError - Token is invalid
+        
+    Returns nothing when successful
+    '''
+    token = request.get_json(force = True).get('token')
+    token_to_auth_id(token)
+    return auth_logout_v1(token)
+
 
 ###################### Channels ######################
 # Channel create
@@ -225,6 +235,36 @@ def channel_messages_ep():
 
     return channel_messages_v1(auth_user_id, channel_id, start)
 
+@APP.route('/channel/leave/v1', methods = ['POST'])
+def channel_leave_endpt():
+    '''
+    Given a channel with ID channel_id that the authorised user is a member of,
+    remove them as a member of the channel.
+
+    Arguments:
+        token           (str)   - unique user token
+        channel_id      (int)   - unique channel id
+
+    Exceptions:
+        TypeError   - occurs when token is not a str
+        TypeError   - occurs when channel_id is not a int
+        AccessError - occurs when token is invalid
+        InputError  - occurs when channel_id is invalid
+        AccessError - occurs when channel_id is valid and the authorised user is
+                      not a member of the channel
+
+    Return value:
+        Returns nothing on success
+    '''
+
+    leave_input = request.get_json(force = True)
+
+    token = leave_input.get('token')
+    auth_user_id = token_to_auth_id(token)
+    channel_id = leave_input.get('channel_id')
+
+    channel_leave_v1(auth_user_id, channel_id)
+
 @APP.route('/channels/list/v2', methods = ['GET'])
 def channel_list_endpt():
     '''
@@ -245,10 +285,8 @@ def channel_list_endpt():
 
     return channels_list_v1(auth_user_id)
 
-
-
 @APP.route('/channels/listall/v2', methods = ['GET'])
-def list_all():
+def list_all_endpt():
     '''
     channels/listall/v2
     Provide a list of all channels, including private channels, (and their associated details)
@@ -400,11 +438,75 @@ def dm_details_endpt():
     '''
 
     request_data = request.get_json(force = True)
-    auth_user_id = token_to_auth_id(request_data['token'])
+    token = request_data.get('token')
+    print(3)
+    print(request_data)
+    print(token)
+    auth_user_id = token_to_auth_id(token)
     dm_id = request_data['dm_id']
 
     return_dict = dm_details_v1(auth_user_id, dm_id)
     return return_dict
+    return channel_details_v1(auth_id, channel_id)
+
+@APP.route('/channel/addowner/v1', methods=['POST'])
+def channel_addowner_endpt():
+    '''
+    Make user with user id u_id an owner of the channel.
+
+    Arguments:
+        token           (int)   - unique user token
+        channel_id      (int)   - unique channel id
+        u_id            (int)   - unique user id
+
+    Exceptions:
+        AccessError - occurs when token is invalid
+        AccessError - occurs when auth_user_id is invalid
+        InputError  - occurs when channel_id is invalid
+        AccessError - occurs when channel_id is valid and the authorised user does not have owner permissions in the channel
+        InputError  - occurs when u_id does not refer to a valid user
+        InputError  - occurs when u_id refers to a user who is not a member of the channel
+        InputError  - occurs when u_id refers to a user who is already an owner of the channel
+
+    Returns:
+        Returns nothing on success
+    '''
+    
+    request_data = request.get_json()
+    token = request_data['token']
+    auth_id = token_to_auth_id(token)
+    channel_id = request_data.get('channel_id')
+    u_id = request_data.get('u_id')
+
+    return channel_addowner_v1(auth_id, channel_id, u_id)
+
+
+################## User ###################################
+@APP.route("/user/profile/v1", methods=['get'])
+def user_profile_ep():
+    '''
+    For a valid user, returns information about their user_id, email, 
+    first name, last name, and handle
+
+    Arguments:
+        token           (str)   - authorised user id
+        u_id            (int)   - unique id
+
+    Exceptions:
+        AccessError - occurs when token is invalid
+        InputError  - occurs when u_id is invalid
+
+    Return value:
+        Returns user on success
+    '''
+
+    request_data = request.get_json()
+    token = request_data['token']
+    auth_user_id = token_to_auth_id(token)
+    u_id = request_data.get('u_id')
+
+    user_details = user_profile_v1(auth_user_id, u_id)
+    return user_details
 
 @APP.route("/dm/leave/v1", methods=['POST'])
 def dm_leave_endpt():
