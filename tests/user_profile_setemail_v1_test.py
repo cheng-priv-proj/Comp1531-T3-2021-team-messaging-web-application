@@ -27,16 +27,14 @@ def user_profile():
          })
     return user_profile_function
 
-# Call user profile setname
 @pytest.fixture
-def user_profile_setname():
-    def user_profile_setname_function(token, name_first, name_last):
-        return requests.get(url + 'user/profile/sethandle/v1', json = {
+def set_email():
+    def set_email_function(token, email):
+        return requests.put(url + 'user/profile/setemail/v1', json = {
             'token': token,
-            'name_first': name_first,
-            'name_last': name_last
+            'email': email
          })
-    return user_profile_setname_function
+    return set_email_function
 
 @pytest.fixture
 def clear():
@@ -58,38 +56,41 @@ def register_user():
         return {**owner_id_dict, **registration_info}
     return register_user_function
 
-def test_user_profile_setname_basic_functionality(clear, register_user, user_profile, user_profile_setname, extract_user, extract_token):
+def test_user_setemail_test_valid(clear, register_user, extract_user, extract_token, user_profile, set_email):
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
-    user_profile_setname(extract_token(owner_info), 'ownera', 'asdd')
 
-    assert user_profile(extract_token(owner_info), extract_user(owner_info)).json() == {
+    set_email(extract_token(owner_info), 'valid@email.com')
+
+    userone_profile = user_profile(extract_token(owner_info), extract_user(owner_info)).json()
+
+    assert userone_profile == {
         'u_id': extract_user(owner_info),
-        'handle_str': 'ownerone',
-        'name_first': 'ownera',
-        'name_last': 'asdd'
+        'email': 'valid@gmail.com',
+        'name_first': 'owner',
+        'name_last': 'one',
+        'handle_str': 'ownerone'
     }
 
-def test_user_profile_setname_invalid_token(clear, user_profile_setname):
-    assert user_profile_setname('asdasd', 'owner', 'one').status_code == 403
+def test_user_setemail_invalid_token(clear, set_email):
 
-def test_user_profile_setname_invalid_token_and_name(clear, user_profile_setname):
-    assert user_profile_setname('asdasd', '', '').status_code == 403
+    owner_profile = set_email('123123123', 'valid@email.com')
 
-def test_user_profile_setname_too_long(clear, user_profile_setname, register_user, extract_token):
+    assert owner_profile.status_code == 403
+
+def test_user_setemail_invalid_email(clear, register_user, set_email, extract_token):
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
 
-    assert user_profile_setname(extract_token(owner_info), 'owner', 'a' * 51).status_code == 400
-    assert user_profile_setname(extract_token(owner_info), 'a' * 51, 'one').status_code == 400
+    assert set_email(extract_token(owner_info), 'inv$alid@gmail.com').status_code == 400
 
-def test_user_profile_setname_too_short(clear, user_profile_setname, register_user, extract_token):
+
+def test_user_setemail_duplicate_email(clear, register_user, extract_user, set_email, extract_token):
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
+    register_user('common@gmail.com', 'user', 'one')
 
-    assert user_profile_setname(extract_token(owner_info), '', 'one').status_code == 400
-    assert user_profile_setname(extract_token(owner_info), 'owner', '').status_code == 400
+    assert set_email(extract_token(owner_info), 'common@gmail.com').status_code == 400
 
-def test_user_profile_setname_return_nothing(clear, user_profile_setname, register_user, extract_token):
-    owner_info = register_user('owner@gmail.com', 'owner', 'one')
+def test_user_setemail_invalid_token_and_email(clear, set_email):
 
-    assert user_profile_setname(extract_token(owner_info), 'ownera', 'asdd').json() == {}
+    owner_profile = set_email('123123123', 'inv$alid@email.com')
 
-    
+    assert owner_profile.status_code == 403
