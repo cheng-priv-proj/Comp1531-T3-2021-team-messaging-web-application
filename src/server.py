@@ -693,8 +693,9 @@ def message_senddm_endpt():
 @APP.route("/message/edit/v1", methods=['PUT'])
 
 def message_edit_endpt():
-    return {}
     request_data = request.get_json(force = True)
+    message_id = request_data['message_id']
+    message = request_data['message']
     token = request_data['token']
     auth_user_id = token_to_auth_id(token)
     return message_edit_v1(auth_user_id, message_id, message)
