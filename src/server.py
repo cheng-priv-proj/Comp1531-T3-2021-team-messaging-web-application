@@ -400,7 +400,11 @@ def dm_details_endpt():
     '''
 
     request_data = request.get_json(force = True)
-    auth_user_id = token_to_auth_id(request_data['token'])
+    token = request_data.get('token')
+    print(3)
+    print(request_data)
+    print(token)
+    auth_user_id = token_to_auth_id(token)
     dm_id = request_data['dm_id']
 
     return_dict = dm_details_v1(auth_user_id, dm_id)

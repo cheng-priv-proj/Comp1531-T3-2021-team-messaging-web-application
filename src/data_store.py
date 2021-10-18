@@ -108,6 +108,9 @@ class Datastore:
         return self.__store['token']
 
     def get_u_id_from_token(self, token):
+        print(42)
+        print(self.get_u_ids_from_token_dict())
+        print(token)
         check_none = self.get_u_ids_from_token_dict().get(token)
 
         return -1 if check_none == None else check_none
@@ -175,7 +178,7 @@ class Datastore:
     # Check functions ##########################################################
 
     def is_token_invalid(self, token):
-        if token in self.get_u_ids_from_token_dict():
+        if self.get_u_id_from_token(token) != None:
             return False
         return True
 
@@ -188,7 +191,8 @@ class Datastore:
         
     def is_user_member_of_dm(self, dm_id, u_id):
         dm = self.get_dm_from_dm_id(dm_id)
-        if u_id not in dm.get('details').get('members'):
+
+        if not any (member['u_id'] == u_id for member in dm.get('members')):
             return False
         
         return True

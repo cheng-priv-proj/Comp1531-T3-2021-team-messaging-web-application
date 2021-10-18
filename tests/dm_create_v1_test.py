@@ -61,6 +61,7 @@ def user3():
     }).json()
     return response
 
+
 # Might add test with valid_u_id some other time too tho
 # Test access error priority
 def test_invalid_token(clear):
