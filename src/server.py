@@ -306,7 +306,7 @@ def channel_join_endpt():
     return {}
 
 
-@APP.route("/channel/details/v2", methods=['get'])
+@APP.route("/channel/details/v2", methods=['GET'])
 def channel_details_endpt():
     '''
     Given a channel with ID channel_id that the authorised user is a member of, provide basic details about the channel.
@@ -331,6 +331,15 @@ def channel_details_endpt():
     return_dict = channel_details_v1(auth_id, channel_id)
     print(return_dict)
     return return_dict
+
+@APP.route("admin/userpermission/change/v1", methods=['POST'])
+def admin_userpermission_change_v1_endpt():
+
+    request_data = request.get_json()
+    token = request_data['token']
+    auth_id = token_to_auth_id(token)
+
+
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 

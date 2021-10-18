@@ -1,40 +1,62 @@
 from src.data_store import data_store
 from src.error import InputError
+from src.error import AccessError
+from src.other import check_type
 
 
 
+def admin_userpermission_change_v1(auth_user_id, u_id, permission_id):
+    '''
+    admin/userpermission/change/v1
+    Given a user by their user ID, set their permissions to new permissions described by permission_id.
+
+    POST
+
+    Parameters:
+        { token, u_id, permission_id }
+
+    Return Type:
+        {}
+
+    InputError when any of:
+        
+            u_id does not refer to a valid user
+            u_id refers to a user who is the only global owner and they are being demoted to a user
+            permission_id is invalid
+        
+    AccessError when:
+        
+            the authorised user is not a global owner
 
 
+    added exceptions (not in spec)
+        if for any reason, the 
+    '''
 
+    if data_store.is_invalid_user_id(u_id):
+        raise InputError (' auth_id is invalid')
+    
+    if data_store.is_invalid_user_id(auth_user_id):
+        raise AccessError (' auth_id is invalid')
 
+    if data_store.is_stream_owner(u_id) == False:
+        raise AccessError('Token(auth_id) is not a global owner')
+    
+    perm_dict = data_store.get_user_perms_from_u_id_dict()
+    owner_count = 0
+    for u_id_key in perm_dict:
+        if perm_dict[u_id_key] == 1:
+            owner_count += 1
 
-
-'''
-
-admin/userpermission/change/v1
-Given a user by their user ID, set their permissions to new permissions described by permission_id.
-
-POST
-
-Parameters:
-    { token, u_id, permission_id }
-
-Return Type:
-    {}
-
-InputError when any of:
-      
-        u_id does not refer to a valid user
-        u_id refers to a user who is the only global owner and they are being demoted to a user
-        permission_id is invalid
-      
-AccessError when:
-      
-        the authorised user is not a global owner
-
-'''
-
-
+    if owner_count == 1 and data_store.is_stream_owner(u_id) == True:
+        raise InputError ('u_id refers to a user who is the only global owner and they are being demoted to a user')
+    
+    if permission_id != 1 or permission_id != 2:
+        raise InputError('permission_id is invalid')
+    
+    data_store.insert_user_perm(u_id, permission_id)
+    
+    return {}
 
 
 
