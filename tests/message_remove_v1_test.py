@@ -64,6 +64,7 @@ AccessError when message_id refers to a valid message in a joined channel/DM and
 # need to add test multple messages
 
 #tests owner case
+@pytest.mark.skip('Not yet implemented')
 def test_normal_case_channel(clear_server, get_user_1):
     channel_dict = requests.post(config.url + 'channels/create/v2', json= {
         'token': get_user_1['token'], 
@@ -95,6 +96,7 @@ def test_normal_case_channel(clear_server, get_user_1):
         'end': -1
     }
 
+@pytest.mark.skip('Not yet implemented')
 def test_normal_case_non_owner(clear_server, get_user_1, auth_id_v2):
     channel_dict = requests.post(config.url + 'channels/create/v2', json= {
         'token': get_user_1['token'], 
@@ -133,6 +135,7 @@ def test_normal_case_non_owner(clear_server, get_user_1, auth_id_v2):
     }
 
 # testing owner can edit other peoples messages
+@pytest.mark.skip('Not yet implemented')
 def test_owner_perms(clear_server, get_user_1, auth_id_v2):
     channel_dict = requests.post(config.url + 'channels/create/v2', json= {
         'token': get_user_1['token'], 
@@ -171,6 +174,7 @@ def test_owner_perms(clear_server, get_user_1, auth_id_v2):
     }
 
 # message_id does not refer to a valid message within a channel/DM that the authorised user has joined
+@pytest.mark.skip('Not yet implemented')
 def test_invalid_message_id(clear_server, get_user_1):
     channel_dict = requests.post(config.url + 'channels/create/v2', json= {
         'token': get_user_1['token'], 
@@ -200,6 +204,7 @@ def test_invalid_message_id(clear_server, get_user_1):
         the authorised user has owner permissions in the channel/DM
 '''
 # non owner removing someone elses message
+@pytest.mark.skip('Not yet implemented')
 def test_edit_acess_error(clear_server, get_user_1, auth_id_v2):
     channel_dict = requests.post(config.url + 'channels/create/v2', json= {
         'token': get_user_1['token'], 
@@ -228,6 +233,7 @@ def test_edit_acess_error(clear_server, get_user_1, auth_id_v2):
 
 
 # does not test global owner
+@pytest.mark.skip('Not yet implemented')
 def test_normal_case_dms(clear_server, get_user_1, auth_id_v2):
     dm_id_dict = requests.post(config.url + 'dm/create/v1', json= {
         'token': get_user_1['token'], 
@@ -257,6 +263,7 @@ def test_normal_case_dms(clear_server, get_user_1, auth_id_v2):
         'end': -1
     }
 
+@pytest.mark.skip('Not yet implemented')
 def test_normal_case_non_owner_dms(clear_server, get_user_1, auth_id_v2):
     dm_id_dict = requests.post(config.url + 'dm/create/v1', json= {
         'token': get_user_1['token'], 
@@ -288,6 +295,7 @@ def test_normal_case_non_owner_dms(clear_server, get_user_1, auth_id_v2):
     }
 
 # testing owner can edit other peoples messages
+@pytest.mark.skip('Not yet implemented')
 def test_owner_perms_dms(clear_server, get_user_1, auth_id_v2):
     dm_id_dict = requests.post(config.url + 'dm/create/v1', json= {
         'token': get_user_1['token'], 
@@ -321,6 +329,7 @@ def test_owner_perms_dms(clear_server, get_user_1, auth_id_v2):
 
 
 # message_id does not refer to a valid message within a channel/DM that the authorised user has joined
+@pytest.mark.skip('Not yet implemented')
 def test_invalid_message_id_dms(clear_server, get_user_1):
     dm_id_dict = requests.post(config.url + 'dm/create/v1', json= {
         'token': get_user_1['token'], 
@@ -348,6 +357,7 @@ def test_invalid_message_id_dms(clear_server, get_user_1):
         the authorised user has owner permissions in the channel/DM
 '''
 # non owner tries to dlelete other members messages
+@pytest.mark.skip('Not yet implemented')
 def test_edit_acess_error_dms(clear_server, get_user_1, auth_id_v2):
     dm_id_dict = requests.post(config.url + 'dm/create/v1', json= {
         'token': get_user_1['token'], 
