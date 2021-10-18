@@ -3,6 +3,7 @@ from src.data_store import data_store
 from src.error import InputError
 from src.error import AccessError
 from src.other import check_type
+import re
 
 import re
 
@@ -41,6 +42,10 @@ def users_all_v1(auth_id):
     '''
     Returns a list of all users and their associated details
     '''
+    check_type(auth_id, int)
+
+    if data_store.is_invalid_user_id(auth_id):
+        raise AccessError('auth_user_id is invalid')
 
     user_list = []
     for user in data_store.get_users_from_u_id_dict():
@@ -82,7 +87,7 @@ def user_setname_v1(auth_user_id, name_first, name_last):
 
     return {}
 
-def user_setemail_v1(auth_user_id, email):
+def user_profile_setemail_v1(auth_id, email):
     '''
     Update the authorised user's email address
 
@@ -99,22 +104,29 @@ def user_setemail_v1(auth_user_id, email):
     Return value:
         Returns nothing on success
     '''
-
-    check_type(auth_user_id, int)
+    check_type(auth_id, int)
     check_type(email, str)
 
-    if data_store.is_invalid_user_id(auth_user_id):
+    if data_store.is_invalid_user_id(auth_id):
         raise AccessError('auth_user_id is invalid')
+
     if not re.fullmatch(r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$', email):
         raise InputError ('incorrect email format')
+
     if data_store.is_duplicate_email(email):
         raise InputError ('email is already being used by another user')
+
+    data_store.update_value(auth_id, 'email', email)
+
+    password = ''
+    email_dict = data_store.get_logins_from_email_dict()
+    for login in email_dict:
+        if login['auth_user_id'] == auth_id:
+            password = login['password']
+
+    data_store.insert_login(email, auth_id, password)
     
-    data_store.update_email(auth_user_id, email)
-
-    return {}
-
-def user_sethandle_v1(auth_user_id, handle):
+def user_profile_sethandle_v1(auth_id, handle_str):
     '''
     Update the authorised user's email address
 
@@ -131,19 +143,22 @@ def user_sethandle_v1(auth_user_id, handle):
     Return value:
         Returns nothing on success
     '''
+    check_type(auth_id, int)
+    check_type(handle_str, str)
 
-    check_type(auth_user_id, int)
-    check_type(handle, str)
-
-    if data_store.is_invalid_user_id(auth_user_id):
+    if data_store.is_invalid_user_id(auth_id):
         raise AccessError('auth_user_id is invalid')
-    if len(handle) < 3 or len(handle) > 20 :
-        raise InputError ('name_first is less than 1 character or more than 50')
-    if data_store.is_duplicate_handle(handle):
-        raise InputError ('handle is already being used by another user')
-    if not handle.isalnum():
-        raise InputError ('handle contains non alphanumeric characters')
-    
-    data_store.update_handle(auth_user_id, handle)
+
+    if len(handle_str) < 3:
+        raise InputError('Handle str shorter than 3 characters')
+    if len(handle_str) > 20:
+        raise InputError('Handle str longer than 20 characters')
+    if handle_str.isalnum() == False:
+        raise InputError('Handle str not alphanumeric')
+    for user in data_store.get_users_from_u_id_dict().values():
+        if user['Handle_str'] == handle_str:
+            raise InputError('Handle str already being used')
+
+    data_store.update_value(auth_id, 'Handle_str', handle_str)
 
     return {}
