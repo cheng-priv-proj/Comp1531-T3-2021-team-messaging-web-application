@@ -33,7 +33,7 @@ def first_register():
     channel_id_dict = requests.post(url + 'channels/create/v2', json = channel_details).json()
     channel_id = channel_id_dict.get('channel_id')
     
-    return {'token': token, 'channel_id': channel_id}
+    return {'token': token, 'channel_id': int(channel_id)}
 
 # Creates a user using the given details and returns the channel_id
 @pytest.fixture 

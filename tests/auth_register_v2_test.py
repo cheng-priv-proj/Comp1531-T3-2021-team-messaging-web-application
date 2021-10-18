@@ -7,7 +7,6 @@ from src import config
 
 from src.other import clear_v1
 
-#NEED TO IMPLEMENT CLEAR v2 or change clear v1
 @pytest.fixture
 def clear_server():
     requests.delete(config.url + "clear/v1")
@@ -41,7 +40,6 @@ def auth_id_v2(clear_server):
 # Do fixtures call from left to right?
 # if not then the server may run into the case where it runs get_user1 and then clears or it runs get_user1 and sometimes gets an input error
 
-@pytest.mark.skip('Needc auth login')
 def test_standard(clear_server, get_user_1):
     response = requests.post(config.url + 'auth/login/v2', json={'email': 'owner@test.com', 'password': 'spotato'}).json()
     assert response['auth_user_id'] == get_user_1['auth_user_id'], 'Valid case: Auth_id not consistant across login and register'

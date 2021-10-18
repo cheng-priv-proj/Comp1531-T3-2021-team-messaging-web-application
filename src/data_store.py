@@ -159,21 +159,27 @@ class Datastore:
         return self.get_user_perms_from_u_id_dict().get(u_id)
 
 
-    # Check functions
+    # Check functions ##########################################################
 
-    def is_token_valid(self, token):
+    def is_token_invalid(self, token):
         if token in self.get_u_ids_from_token_dict():
-            return True
-        return False
+            return False
+        return True
 
     def is_user_member_of_channel(self, channel_id, u_id):
-
         channels = self.get_channels_from_channel_id_dict().get(channel_id)
         if not any (member['u_id'] == u_id for member in channels['all_members']):
             return False
         
         return True
     
+    def is_channel_owner(self, channel_id, u_id):
+        channels = self.get_channels_from_channel_id_dict().get(channel_id)
+        if not any (member['u_id'] == u_id for member in channels['owner_members']):
+            return False
+        
+        return True        
+
     def is_stream_owner(self, u_id):
         return self.get_user_perms_from_u_id_dict().get(u_id) == 1
 
@@ -206,7 +212,7 @@ class Datastore:
         return False
 
 
-    # Insertion functions
+    # Insertion functions ######################################################
 
     def insert_login(self, email, password, auth_id):
         self.get_logins_from_email_dict()[email] = {
@@ -244,6 +250,9 @@ class Datastore:
         self.get_messages_from_channel_or_dm_id_dict()[channel_id] = messages
         self.update_json()
 
+    def insert_channel_owner(self, channel_id, u_id):
+        self.get_channel_from_channel_id(channel_id).get('owner_members').append(data_store.get_user_from_u_id(u_id))
+
     def insert_dm(self, creator, dm_id, u_ids, name):
         self.get_dms_from_dm_id_dict()[dm_id] = {
             'details' : {'name': name, 'members': u_ids},
@@ -256,7 +265,7 @@ class Datastore:
         self.__store[dict_key][key] = value
         self.update_json()
 
-    # Other
+    # Other ####################################################################
 
     def invalidate_token(self, token):
         tokens = self.get_u_ids_from_token_dict()
