@@ -22,7 +22,7 @@ import json
 #   Key: dm_id:
 #   Value: Dictionary {
 #              details : { name, members}
-#              creator }
+#              owner_members }
 #
 # Message ids:
 #   Key: message_id
@@ -57,6 +57,7 @@ initial_object = {
     'messages' : {},
     'users': {},
     'perms' : {},
+    'message_count': 0
 }
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
 
@@ -132,17 +133,29 @@ class Datastore:
 
     # messages
 
-    def get_channels_or_dms_id_from_message_id_dict(self):
+    def get_channel_or_dm_id_from_message_id_dict(self):
         return self.__store['message_ids']
 
     def get_channel_or_dm_id_from_message_id(self, message_id):
-        return self.get_channels_or_dms_id_from_message_id_dict().get(message_id)
+        return self.get_channel_or_dm_id_from_message_id_dict().get(message_id)
 
     def get_messages_from_channel_or_dm_id_dict(self):
         return self.__store['messages']
   
     def get_messages_from_channel_or_dm_id(self, id):
         return self.get_messages_from_channel_or_dm_id_dict().get(id)
+
+    def get_message_from_message_id(self, message_id):
+        channel_or_dm_id = self.get_channel_or_dm_id_from_message_id(message_id)
+        message = {}
+        for messages in data_store.get_messages_from_channel_or_dm_id(channel_or_dm_id):
+            if messages['message_id'] == message_id:
+                message = messages
+        
+        return message
+
+    def get_messages_count(self):
+        return self.__store['messages']
 
     # users
 
@@ -162,33 +175,46 @@ class Datastore:
     # Check functions ##########################################################
 
     def is_token_invalid(self, token):
-        if self.get_u_id_from_token(token) == None:
+        if token in self.get_u_ids_from_token_dict():
             return False
-
         return True
 
     def is_user_member_of_channel(self, channel_id, u_id):
-        channels = self.get_channels_from_channel_id_dict().get(channel_id)
-        if not any (member['u_id'] == u_id for member in channels['all_members']):
+        channel = self.get_channel_from_channel_id(channel_id)
+        if not any (member['u_id'] == u_id for member in channel['all_members']):
             return False
         
-        return False
-
+        return True
+        
     def is_user_member_of_dm(self, dm_id, u_id):
-        dms = self.get_dm_from_dm_id(dm_id)
-        if any (member['u_id'] == u_id for member in dms['members']):
-            return True
+        dm = self.get_dm_from_dm_id(dm_id)
+        if u_id not in dm.get('details').get('members'):
+            return False
+        
+        return True
 
-        return False
+    def is_user_member_of_dm_or_channel(self, channel_or_dm_id, u_id):
+        if channel_or_dm_id <= -1:
+            return self.is_user_member_of_dm(channel_or_dm_id, u_id)
+        
+        return self.is_user_member_of_channel(channel_or_dm_id)
 
     def is_user_owner_of_channel_or_dm(self, channel_or_dm_id, u_id):
         if channel_or_dm_id <= -1:
             if u_id == self.get_dm_creator_from_dm_id(channel_or_dm_id):
                 return True
-
+            
             return False
+        
         channel = self.get_channel_from_channel_id(channel_or_dm_id)
         if any (member['u_id'] == u_id for member in channel['owner_members']):
+            return True
+
+        return False
+        
+    def is_user_sender_of_message(self, auth_user_id, message_id):
+        message = self.get_message_from_message_id(message_id)
+        if message.get('u_id') == auth_user_id:
             return True
 
         return False
@@ -224,13 +250,19 @@ class Datastore:
         
         return False
 
-    def is_invalid_dm(self, dm_id):
+    def is_invalid_dm_id(self, dm_id):
         dms = self.get_dms_from_dm_id_dict()
         if dm_id not in dms:
             return True
         
         return False
 
+    def is_invalid_message_id(self, message_id):
+        messages = self.get_channel_or_dm_id_from_message_id_dict()
+        if message_id not in messages:
+            return True
+        
+        return False
 
     # Insertion functions ######################################################
 
@@ -258,24 +290,33 @@ class Datastore:
     def insert_user_perm(self, u_id, global_id):
         self.get_user_perms_from_u_id_dict()[u_id] = global_id
         self.update_json()
-    
-    def insert_channel(self, channel_id, channel_name, is_public, owner_members, all_members):
+
+    def insert_channel(self, channel_id, channel_name, is_public, messages, owner_members, all_members):
         self.get_channels_from_channel_id_dict()[channel_id] = {
             'name': channel_name,
             'is_public': is_public,
             'owner_members': owner_members,
             'all_members': all_members,
         }
-        self.get_messages_from_channel_or_dm_id_dict()[channel_id] = []
+
+        self.get_messages_from_channel_or_dm_id_dict()[channel_id] = messages
         self.update_json()
 
-    def insert_dm(self, creator, dm_id, u_ids, name):
+    def insert_dm(self, owner_members, dm_id, u_ids, name):
         self.get_dms_from_dm_id_dict()[dm_id] = {
             'details' : {'name': name, 'members': u_ids},
-            'creator' : creator
+            'owner_members' : owner_members
         }
         self.get_messages_from_channel_or_dm_id_dict()[dm_id] = []
         self.update_json()
+
+    def insert_message(self, id, message):
+        self.get_messages_from_channel_or_dm_id(id).insert(0, message)
+        self.get_channel_or_dm_id_from_message_id_dict()[message.get('message_id')] = id
+        self.update_json()
+        
+    def insert_message_count(self):
+        self.__store['message_count'] += 1
 
     def update_value(self, dict_key, key, value):
         self.__store[dict_key][key] = value
@@ -283,10 +324,11 @@ class Datastore:
 
     # Remove ###################################################################
 
-    def remove_dm(self, dm_id):
-        self.get_dm_from_dm_id(dm_id)['creator'] = None
-        self.get_dm_from_dm_id(dm_id)['details']['members'] = None
+    def remove_message(self, message_id):
+        channel_or_dm_id = self.get_channel_or_dm_id_from_message_id(message_id)
+        del self.get_channel_or_dm_id_from_message_id_dict()[message_id]
 
+        self.get_messages_from_channel_or_dm_id(channel_or_dm_id).remove(self.get_message_from_message_id(message_id))
 
     # Other ####################################################################
 
