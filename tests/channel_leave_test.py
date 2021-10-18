@@ -5,7 +5,7 @@ from src.other import clear_v1
 
 import requests
 
-# Clears storage
+# Clears storage 
 @pytest.fixture
 def clear():
     requests.delete(url + "clear/v1")

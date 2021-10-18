@@ -5,7 +5,7 @@ from src.other import clear_v1
 import requests
 import json
 import flask
-from src import config
+from src import config 
 
 # Important Accessarror case
 # In the spec, it spacifies an access error when 'channel_id is valid and the authorised user is not a member of the channel'

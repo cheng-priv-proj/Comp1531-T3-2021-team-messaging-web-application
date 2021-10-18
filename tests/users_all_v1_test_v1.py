@@ -2,7 +2,7 @@ import pytest
 import requests
 import operator
 
-from src.config import url
+from src.config import url 
 
 
 # Extracts the token from a given dictionary.

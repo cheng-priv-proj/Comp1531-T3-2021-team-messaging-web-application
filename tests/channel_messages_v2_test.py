@@ -6,7 +6,7 @@ import pytest
 import requests
 import json
 import flask
-from src import config
+from src import config 
 
 #NEED TO IMPLEMENT clear for server or change clear v1
 @pytest.fixture

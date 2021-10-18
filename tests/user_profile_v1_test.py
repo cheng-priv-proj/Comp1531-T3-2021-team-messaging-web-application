@@ -1,7 +1,7 @@
 import pytest
 import requests
 
-from src.config import url
+from src.config import url 
 
 # Extracts the token from a given dictionary.
 @pytest.fixture
