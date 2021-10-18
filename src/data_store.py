@@ -134,12 +134,14 @@ class Datastore:
         return self.get_dms_from_dm_id_dict().get(dm_id).get('creator')
 
     # messages
-
-    def get_channel_or_dm_id_from_message_id_dict(self):
+    def get_channels_or_dms_id_from_message_id_dict(self):
         return self.__store['message_ids']
 
     def get_channel_or_dm_id_from_message_id(self, message_id):
-        return self.get_channel_or_dm_id_from_message_id_dict().get(message_id)
+        return self.get_channels_or_dms_id_from_message_id_dict().get(message_id)
+
+    def get_channel_or_dm_id_from_message_id_dict(self):
+        return self.__store['message_ids']
 
     def get_messages_from_channel_or_dm_id_dict(self):
         return self.__store['messages']
@@ -150,7 +152,7 @@ class Datastore:
     def get_message_from_message_id(self, message_id):
         channel_or_dm_id = self.get_channel_or_dm_id_from_message_id(message_id)
         message = {}
-        for messages in data_store.get_messages_from_channel_or_dm_id(channel_or_dm_id):
+        for messages in self.get_messages_from_channel_or_dm_id(channel_or_dm_id):
             if messages['message_id'] == message_id:
                 message = messages
         
@@ -192,7 +194,7 @@ class Datastore:
         channels = self.get_channels_from_channel_id_dict().get(channel_id)
         if not any (member['u_id'] == u_id for member in channels['owner_members']):
             return False
-        
+             
         return True   
 
     def is_channel_only_owner(self, channel_id):
@@ -258,6 +260,15 @@ class Datastore:
         if email in emails:
             return True
         
+        return False
+
+    def is_duplicate_handle(self, handle):
+        users = self.get_users_from_u_id_dict()
+
+        for user in users:
+            if users[user]['handle_str'] == handle:
+                return True
+
         return False
 
     def is_invalid_user_id(self, u_id):
@@ -357,6 +368,32 @@ class Datastore:
         tokens = self.get_u_ids_from_token_dict()
         del tokens[token]
     
+    def update_name(self, auth_user_id, name_first, name_last):
+        user = self.get_users_from_u_id_dict().get(auth_user_id)
+        user['name_first'] = name_first
+        user['name_last'] = name_last
+
+        self.update_json()
+    
+    def update_email(self, auth_user_id, email):
+        user = self.get_users_from_u_id_dict().get(auth_user_id)
+        login_info = self.get_logins_from_email_dict()
+        old_email = user['email']
+
+        login_info[email] = login_info[old_email]
+        del login_info[old_email]
+
+        user['email'] = email
+
+        self.update_json()
+    
+    def update_handle(self, auth_user_id, handle):
+        user = self.get_users_from_u_id_dict().get(auth_user_id)
+        user['handle_str'] = handle
+
+        print(user)
+
+        self.update_json()
     def remove_dm(self, dm_id):
         dm = self.get_dm_from_dm_id(dm_id)
         dm['members'] = []
