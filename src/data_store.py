@@ -167,13 +167,46 @@ class Datastore:
         return True
 
     def is_user_member_of_channel(self, channel_id, u_id):
-
         channels = self.get_channels_from_channel_id_dict().get(channel_id)
         if not any (member['u_id'] == u_id for member in channels['all_members']):
             return False
         
         return True
-    
+
+    def is_user_member_of_dm(self, dm_id, u_id):
+        dm = self.get_dm_from_dm_id(dm_id)
+
+        if not any (member['u_id'] == u_id for member in dm.get('members')):
+            return False
+        
+        return True
+
+    def is_user_member_of_dm_or_channel(self, channel_or_dm_id, u_id):
+        if channel_or_dm_id <= -1:
+            return self.is_user_member_of_dm(channel_or_dm_id, u_id)
+        
+        return self.is_user_member_of_channel(channel_or_dm_id, u_id)
+
+    def is_user_owner_of_channel_or_dm(self, channel_or_dm_id, u_id):
+        if channel_or_dm_id <= -1:
+            if u_id == self.get_dm_creator_from_dm_id(channel_or_dm_id):
+                return True
+            
+            return False
+        
+        channel = self.get_channel_from_channel_id(channel_or_dm_id)
+        if any (member['u_id'] == u_id for member in channel['owner_members']):
+            return True
+
+        return False
+        
+    def is_channel_owner(self, channel_id, u_id):
+        channels = self.get_channels_from_channel_id_dict().get(channel_id)
+        if not any (member['u_id'] == u_id for member in channels['owner_members']):
+            return False
+        
+        return True        
+
     def is_stream_owner(self, u_id):
         return self.get_user_perms_from_u_id_dict().get(u_id) == 1
 
@@ -201,6 +234,13 @@ class Datastore:
     def is_invalid_channel_id(self, channel_id):
         channels = self.get_channels_from_channel_id_dict()
         if channel_id not in channels:
+            return True
+        
+        return False
+
+    def is_invalid_dm_id(self, dm_id):
+        dms = self.get_dms_from_dm_id_dict()
+        if dm_id not in dms:
             return True
         
         return False
@@ -244,6 +284,9 @@ class Datastore:
         self.get_messages_from_channel_or_dm_id_dict()[channel_id] = messages
         self.update_json()
 
+    def insert_channel_owner(self, channel_id, u_id):
+        self.get_channel_from_channel_id(channel_id).get('owner_members').append(data_store.get_user_from_u_id(u_id))
+
     def insert_dm(self, creator, dm_id, u_ids, name):
         self.get_dms_from_dm_id_dict()[dm_id] = {
             'details' : {'name': name, 'members': u_ids},
@@ -261,6 +304,10 @@ class Datastore:
     def invalidate_token(self, token):
         tokens = self.get_u_ids_from_token_dict()
         del tokens[token]
+    
+    def remove_dm(self, dm_id):
+        dm = self.get_dm_from_dm_id(dm_id)
+        dm['members'] = []
 
     def set(self, store):
         if not isinstance(store, dict):
@@ -271,4 +318,3 @@ print('Loading Datastore...')
 
 global data_store
 data_store = Datastore()
-

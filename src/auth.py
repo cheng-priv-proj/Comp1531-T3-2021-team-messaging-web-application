@@ -38,8 +38,11 @@ def auth_login_v1(email, password):
         raise InputError ('password is not correct')
 
     auth_user_id = login.get("auth_id")
+    # Temp solution before implementing jwt
+    token = str(auth_user_id) + str(len(data_store.get_u_ids_from_token_dict()))
+    data_store.insert_token(token, auth_user_id)
 
-    return { 'auth_user_id': auth_user_id }
+    return { 'token': token,'auth_user_id': auth_user_id }
 
 def auth_register_v1(email, password, name_first, name_last):
     '''
@@ -100,3 +103,9 @@ def auth_register_v1(email, password, name_first, name_last):
     data_store.insert_login(email, password, auth_user_id)
 
     return { 'auth_user_id': auth_user_id }
+
+
+def auth_logout_v1(token):
+    data_store.invalidate_token(token)
+
+    return {}
