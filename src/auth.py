@@ -4,7 +4,10 @@ from src.other import check_type
 from src.other import handle_str_generation
 from src.other import stream_owner
 from src.other import stream_member
+from src.other import hash_str
+from src.config import SECRET
 import re
+import jwt
 
 def auth_login_v1(email, password):
     '''
@@ -34,12 +37,17 @@ def auth_login_v1(email, password):
     login = data_store.get_login_from_email(email)
 
     # input error if password is wrong
-    if password != login.get('password'):
+    if hash_str(password) != login.get('password'):
         raise InputError ('password is not correct')
 
     auth_user_id = login.get("auth_id")
-    # Temp solution before implementing jwt
-    token = str(auth_user_id) + str(len(data_store.get_u_ids_from_token_dict()))
+
+    token = jwt.encode({
+                'auth_user_id':auth_user_id,
+                'token_count': len(data_store.get_u_ids_from_token_dict())
+                },
+                 SECRET, algorithm='HS256')
+
     data_store.insert_token(token, auth_user_id)
 
     return { 'token': token,'auth_user_id': auth_user_id }
@@ -96,11 +104,14 @@ def auth_register_v1(email, password, name_first, name_last):
     auth_user_id = len(data_store.get_users_from_u_id_dict())
     handle_str = handle_str_generation(name_first, name_last)
 
+    # hash the password
+    encrypted_password = hash_str(password)
+
     # insert new data into dicts
     perm = stream_owner if auth_user_id == 0 else stream_member
     data_store.insert_user_perm(auth_user_id, perm)
     data_store.insert_user(auth_user_id, email, name_first, name_last, handle_str)
-    data_store.insert_login(email, password, auth_user_id)
+    data_store.insert_login(email, encrypted_password, auth_user_id)
 
     return { 'auth_user_id': auth_user_id }
 
