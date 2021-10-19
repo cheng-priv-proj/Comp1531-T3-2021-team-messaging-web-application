@@ -85,10 +85,6 @@ def test_message_is_sent(clear_server, get_user_1):
     assert channel_messages['start'] == 0
     assert channel_messages['end'] == -1
 
-@pytest.mark.skip('Not implemented')
-def test_message_is_edited():
-    return
-
 
 ''' Auth id is not a parameter yet the spec still considers it so. Need to clarify what it means 
 it says in the spec:

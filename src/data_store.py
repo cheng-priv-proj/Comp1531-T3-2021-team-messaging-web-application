@@ -134,12 +134,14 @@ class Datastore:
         return self.get_dms_from_dm_id_dict().get(dm_id).get('creator')
 
     # messages
-
-    def get_channel_or_dm_id_from_message_id_dict(self):
+    def get_channels_or_dms_id_from_message_id_dict(self):
         return self.__store['message_ids']
 
     def get_channel_or_dm_id_from_message_id(self, message_id):
-        return self.get_channel_or_dm_id_from_message_id_dict().get(message_id)
+        return self.get_channels_or_dms_id_from_message_id_dict().get(message_id)
+
+    def get_channel_or_dm_id_from_message_id_dict(self):
+        return self.__store['message_ids']
 
     def get_messages_from_channel_or_dm_id_dict(self):
         return self.__store['messages']
@@ -150,7 +152,7 @@ class Datastore:
     def get_message_from_message_id(self, message_id):
         channel_or_dm_id = self.get_channel_or_dm_id_from_message_id(message_id)
         message = {}
-        for messages in data_store.get_messages_from_channel_or_dm_id(channel_or_dm_id):
+        for messages in self.get_messages_from_channel_or_dm_id(channel_or_dm_id):
             if messages['message_id'] == message_id:
                 message = messages
         
@@ -192,7 +194,7 @@ class Datastore:
         channels = self.get_channels_from_channel_id_dict().get(channel_id)
         if not any (member['u_id'] == u_id for member in channels['owner_members']):
             return False
-        
+             
         return True   
 
     def is_channel_only_owner(self, channel_id):
@@ -260,6 +262,15 @@ class Datastore:
         
         return False
 
+    def is_duplicate_handle(self, handle):
+        users = self.get_users_from_u_id_dict()
+
+        for user in users:
+            if users[user]['handle_str'] == handle:
+                return True
+
+        return False
+
     def is_invalid_user_id(self, u_id):
         users = self.get_users_from_u_id_dict()
         if u_id not in users:
@@ -280,7 +291,6 @@ class Datastore:
             return True
         
         return False
-
 
     # Insertion functions ######################################################
 
@@ -357,6 +367,32 @@ class Datastore:
         tokens = self.get_u_ids_from_token_dict()
         del tokens[token]
     
+    def update_name(self, auth_user_id, name_first, name_last):
+        user = self.get_users_from_u_id_dict().get(auth_user_id)
+        user['name_first'] = name_first
+        user['name_last'] = name_last
+
+        self.update_json()
+    
+    def update_email(self, auth_user_id, email):
+        user = self.get_users_from_u_id_dict().get(auth_user_id)
+        login_info = self.get_logins_from_email_dict()
+        old_email = user['email']
+
+        login_info[email] = login_info[old_email]
+        del login_info[old_email]
+
+        user['email'] = email
+
+        self.update_json()
+    
+    def update_handle(self, auth_user_id, handle):
+        user = self.get_users_from_u_id_dict().get(auth_user_id)
+        user['handle_str'] = handle
+
+        print(user)
+
+        self.update_json()
     def remove_dm(self, dm_id):
         dm = self.get_dm_from_dm_id(dm_id)
         dm['members'] = []
@@ -373,6 +409,50 @@ class Datastore:
         for person in members:
             if person['u_id'] == u_id:
                 members.remove(person)
+        
+        self.update_json()
+
+    def admin_user_remove(self, u_id):
+        users = self.__store['users']
+        login = self.__store['login']
+        channels = self.__store['channels']
+        dms = self.__store['dms']
+        perms = self.__store['perms']
+        messages = self.__store['messages']
+
+        user = self.get_users_from_u_id_dict().get(u_id)
+        email = users[u_id]['email']
+        del login[email]
+
+        print(users[u_id])
+        user_details = users[u_id]
+        user_details['email'] = ''
+        user_details['name_first'] = 'Removed'
+        user_details['name_last'] = 'user'
+        user_details['handle_str'] = ''
+        # Update user/profile
+
+        # loop through channel to delete user from all channels
+        for c_id in channels:
+            for i, user in enumerate(channels[c_id]['all_members']):
+                if user['u_id'] == u_id:
+                    del channels[c_id]['all_members'][i]
+
+            for i, user in enumerate(channels[c_id]['owner_members']):
+                if user['u_id'] == u_id:
+                    del channels[c_id]['owner_members'][i]
+        
+        for dm_id in dms:
+            for i, member in enumerate(dms[dm_id]['details']['members']):
+                if member['u_id'] == u_id:
+                    del dms[dm_id]['details']['members'][i]
+        
+        del perms[u_id]
+
+        for dm_channel_id in messages:
+            for message in messages[dm_channel_id]:
+                if message['u_id'] == u_id:
+                    message['message'] = 'Removed user'
         
         self.update_json()
 

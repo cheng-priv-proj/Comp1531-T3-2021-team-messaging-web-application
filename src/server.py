@@ -6,17 +6,21 @@ from flask import Flask, request
 from flask_cors import CORS
 from src import config
 
+from src.user import user_profile_v1, users_all_v1, user_setname_v1, user_setemail_v1, user_sethandle_v1
 from src.channels import channels_listall_v1, channels_list_v1, channels_create_v1
 from src.auth import auth_login_v1, auth_register_v1, auth_logout_v1
 from src.dm import dm_create_v1, dm_details_v1, dm_leave_v1, dm_list_v1, dm_remove_v1, dm_details_v1, dm_create_v1, dm_messages_v1
 from src.channel import channel_invite_v1, channel_messages_v1, channel_details_v1, channel_leave_v1, channel_addowner_v1, channel_removeowner_v1, channel_join_v1
-from src.user import user_profile_v1
 from src.message import message_send_v1, message_senddm_v1, message_remove_v1, message_edit_v1
 
 from src.data_store import data_store
 from src.error import InputError
 from src.other import clear_v1
 from src.other import token_to_auth_id
+
+from src.admin import admin_userpermission_change_v1
+from src.admin import admin_user_remove_v1
+
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -349,7 +353,7 @@ def channel_join_endpt():
     return {}
 
 
-@APP.route("/channel/details/v2", methods=['get'])
+@APP.route("/channel/details/v2", methods=['GET'])
 def channel_details_endpt():
     '''
     Given a channel with ID channel_id that the authorised user is a member of, provide basic details about the channel.
@@ -531,6 +535,44 @@ def user_profile_ep():
     user_details = user_profile_v1(auth_user_id, u_id)
     return user_details
 
+@APP.route("/users/all/v1", methods=['GET'])
+def users_all_ep():
+    
+    request_data = request.get_json()
+    token = request_data['token']
+    auth_user_id = token_to_auth_id(token)
+
+    return users_all_v1(auth_user_id)
+
+@APP.route("/user/profile/setname/v1", methods=['PUT'])
+def user_profile_setname_ep():
+    '''
+    Update the authorised user's first and last name
+
+    Arguments:
+        token           (str)   - valid token
+        name_first      (str)   - string
+        name_last       (str)   - string
+
+    Exceptions:
+        TypeError   - occurs when auth_user_id is not an int
+        TypeError   - occurs when name_first, name_last are not str
+        AccessError - occurs when auth_user_id is invalid
+        InputError  - occurs when name_first, name_last are not between 1 and 50 characters
+
+    Return value:
+        Returns nothing on success
+    '''
+    request_data = request.get_json()
+    token = request_data['token']
+    auth_user_id = token_to_auth_id(token)
+
+    name_first = request_data.get('name_first')
+    name_last = request_data.get('name_last')
+
+    user_setname_v1(auth_user_id, name_first, name_last)
+    return {}
+
 @APP.route("/dm/leave/v1", methods=['POST'])
 def dm_leave_endpt():
     '''
@@ -604,13 +646,66 @@ def dm_list_ep():
             Returns nothing on success
     '''
 
-    request_data = request.get_json()
-    token = request_data['token']
-    auth_user_id = token_to_auth_id(token)
-    
+    request_data = request.get_json(force = True)
+    auth_user_id = token_to_auth_id(request_data['token'])
+
     dm_list = dm_list_v1(auth_user_id)
 
     return dm_list
+    
+@APP.route("/user/profile/setemail/v1", methods=['PUT'])
+def user_profile_setemail_ep():
+    '''
+    Update the authorised user's email address
+
+    Arguments:
+        token           (str)   - valid token
+        email           (str)   - string
+
+    Exceptions:
+        TypeError   - occurs when auth_user_id is not an int
+        TypeError   - occurs when name_first, name_last are not str
+        AccessError - occurs when auth_user_id is invalid
+        InputError  - occurs when email is not valid
+
+    Return value:
+        Returns nothing on success
+    '''
+
+    request_data = request.get_json()
+    token = request_data['token']
+    auth_user_id = token_to_auth_id(token)
+    email = request_data.get('email')
+
+    user_setemail_v1(auth_user_id, email)
+    return {}
+
+@APP.route("/user/profile/sethandle/v1", methods=['PUT'])
+def user_profile_sethandle_ep():
+    '''
+    Update the authorised user's handle
+
+    Arguments:
+        token           (str)   - valid token
+        handle          (str)   - string
+
+    Exceptions:
+        TypeError   - occurs when auth_user_id is not an int
+        TypeError   - occurs when name_first, name_last are not str
+        AccessError - occurs when auth_user_id is invalid
+        InputError  - occurs when handle is invalid
+
+    Return value:
+        Returns nothing on success
+    '''
+
+    request_data = request.get_json()
+    token = request_data['token']
+    auth_user_id = token_to_auth_id(token)
+    handle = request_data.get('handle_str')
+
+    user_sethandle_v1(auth_user_id, handle)
+    return {}
 
 @APP.route("/message/send/v1", methods=['POST'])
 def message_send_endpt():
@@ -686,28 +781,53 @@ def message_senddm_endpt():
     return_dict = message_senddm_v1(auth_user_id, dm_id, message)
     return return_dict
 
+@APP.route("/message/edit/v1", methods=['PUT'])
+
+def message_edit_endpt():
+    request_data = request.get_json(force = True)
+    message_id = request_data['message_id']
+    message = request_data['message']
+    token = request_data['token']
+    auth_user_id = token_to_auth_id(token)
+    return message_edit_v1(auth_user_id, message_id, message)
+
 @APP.route("/message/remove/v1", methods=['DELETE'])
 def message_remove_endpt():
     request_data = request.get_json(force = True)
+    message_id = request_data['message_id']
     token = request_data['token']
     auth_user_id = token_to_auth_id(token)
-    message_id = request_data['message_id']
-    
     return message_remove_v1(auth_user_id, message_id)
 
-@APP.route("/message/edit/v1", methods=['PUT'])
-def message_edit_endpt():
-    request_data = request.get_json(force = True)
+
+@APP.route("/admin/userpermission/change/v1", methods=['POST'])
+def admin_userpermission_change_v1_endpt():
+
+    request_data = request.get_json()
     token = request_data['token']
-    auth_user_id = token_to_auth_id(token)
-    message_id = request_data['message_id']
-    message = request_data['message']
-    
-    return message_edit_v1(auth_user_id, message_id, message)
+    auth_id = token_to_auth_id(token)
+    u_id = request_data['u_id']
+    permission_id = request_data['permission_id']
+
+    admin_userpermission_change_v1(auth_id, u_id, permission_id)
+
+    return {}
+
+@APP.route("/admin/user/remove/v1", methods=['DELETE'])
+def admin_user_remove_v1_endpt():
+    request_data = request.get_json()
+    token = request_data['token']
+    auth_id = token_to_auth_id(token)
+    u_id = request_data['u_id']
+
+    admin_user_remove_v1(auth_id, u_id)
+
+    return{}
+
 
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, quit_gracefully) # For coverage
-    APP.run(debug = True, port=config.port) # Do not edit this port
+    APP.run(port=config.port) # Do not edit this port

@@ -28,7 +28,6 @@ def register(clear):
     
     return [owner_info, user_info]
 
-@pytest.mark.skip('enable once channels, dms, users, etc have been merged in')
 def test_standard(register):
 
     channel_now = datetime.utcnow().timestamp()
@@ -39,16 +38,22 @@ def test_standard(register):
         'is_public': True
     }).json()
 
+    requests.post(url + 'channel/join/v2', json = {
+        'token': register[0].get('token'), 
+        'channel_id': channel_id_dict.get('channel_id')
+    })
+
     dm_now = datetime.utcnow().timestamp()
-    dm_id_dict = requests.post(url + 'message/send/v1', json={
+    
+    channel_message = requests.post(url + 'message/send/v1', json={
         'token': register[1].get('token'),
         'channel_id': channel_id_dict.get('channel_id'),
         'message': 'message of a deleted person'
     }).json()
 
-    channel_message = requests.post(url + 'dm/create/v1', json={
+    dm_id_dict = requests.post(url + 'dm/create/v1', json={
         'token': register[1].get('token'),
-        'u_ids': [register[0].get('auth_user_id'), register[1].get('auth_user_id')]
+        'u_ids': [register[0].get('auth_user_id')]
     }).json()
 
     dm_message = requests.post(url + 'message/senddm/v1', json={
@@ -57,21 +62,21 @@ def test_standard(register):
         'message': 'message of another deleted person'
     }).json()
 
-    assert requests.delete(url + 'admin/user/remove/v1', json={
+    requests.delete(url + 'admin/user/remove/v1', json={
         'token': register[0].get('token'),
-        'u_id': 123123
-    }).json() == {}
+        'u_id': register[1].get('auth_user_id')
+    })
 
     # check if user info has been correctly overwritten
     assert requests.get(url + 'user/profile/v1', json={
-        'token': register[1].get('token'),
+        'token': register[0].get('token'),
         'u_id': register[1].get('auth_user_id')
     }).json() == {
         'u_id': register[1].get('auth_user_id'),
-        'email': 'user@email.com',
+        'email': '',
         'name_first': 'Removed',
         'name_last': 'user',
-        'handle': 'userone'
+        'handle_str': ''
     }
 
     # check if channel message has been overwritten
@@ -83,23 +88,25 @@ def test_standard(register):
         'start': 0,
         'end': -1,
         'messages': [{
+            'u_id': register[1].get('auth_user_id'),
             'message': 'Removed user',
-            'time_created': pytest.approx(channel_now, rel=2),
+            'time_created': pytest.approx(channel_now, rel = 5),
             'message_id': channel_message.get('message_id')
         }]
     }
 
     # check if dm message has been overwritten
-    assert requests.get(url + 'dm/messages/v2', json={
+    assert requests.get(url + 'dm/messages/v1', json={
         'token': register[0].get('token'),
-        'channel_id': dm_id_dict.get('channel_id'),
+        'dm_id': dm_id_dict.get('dm_id'),
         'start': 0
     }).json() == {
         'start': 0,
         'end': -1,
         'messages': [{
+            'u_id': register[1].get('auth_user_id'),
             'message': 'Removed user',
-            'time_created': pytest.approx(dm_now, rel=2),
+            'time_created': pytest.approx(dm_now, rel = 5),
             'message_id': dm_message.get('message_id')
         }]
     }
@@ -113,7 +120,7 @@ def test_standard(register):
             'email': 'owner@email.com',
             'name_first': 'owner',
             'name_last': 'one',
-            'handle': 'ownerone'
+            'handle_str': 'ownerone'
         }]
     }
 
@@ -133,7 +140,7 @@ def test_standard(register):
         'email': 'user@email.com',
         'name_first': 'user',
         'name_last': 'one',
-        'handle': 'userone'
+        'handle_str': 'userone'
     }
 
 def test_invalid_u_id(register):
@@ -175,6 +182,7 @@ def test_token_invalid(register):
         'token': 'not a real token',
         'u_id': register[0].get('auth_user_id')
     }).status_code == 403
+
 
 def test_invalid_u_id_and_token(clear):
     assert requests.delete(url + 'admin/user/remove/v1', json={
