@@ -31,7 +31,7 @@ def first_register():
     channel_id_dict = requests.post(url + 'channels/create/v2', json = channel_details).json()
     channel_id = channel_id_dict.get('channel_id')
     
-    return {'token': token, 'channel_id': channel_id}
+    return {'token': token, 'channel_id': channel_id, 'auth_user_id': token_dict.get('auth_user_id')}
 
 # Creates a user using the given details and returns the channel_id
 @pytest.fixture 
@@ -99,7 +99,7 @@ def test_returns_all_info(clear, first_register):
         'is_public': True,
         'owner_members': [
             {
-                'u_id': int(token),
+                'u_id': first_register.get('auth_user_id'),
                 'email': 'globalowner@test.com',
                 'name_first': 'global',
                 'name_last': 'user',
@@ -108,7 +108,7 @@ def test_returns_all_info(clear, first_register):
         ],
         'all_members': [
             {
-                'u_id': int(token),
+                'u_id': first_register.get('auth_user_id'),
                 'email': 'globalowner@test.com',
                 'name_first': 'global',
                 'name_last': 'user',

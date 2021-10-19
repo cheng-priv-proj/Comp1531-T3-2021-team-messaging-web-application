@@ -43,7 +43,7 @@ def auth_login_v1(email, password):
     auth_user_id = login.get("auth_id")
 
     token = jwt.encode({
-                'auth_user_id':auth_user_id,
+                'auth_user_id': auth_user_id,
                 'token_count': len(data_store.get_u_ids_from_token_dict())
                 },
                  SECRET, algorithm='HS256')

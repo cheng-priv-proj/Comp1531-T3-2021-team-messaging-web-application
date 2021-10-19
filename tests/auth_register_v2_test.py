@@ -20,6 +20,7 @@ def get_user_1():
         'name_first': 'owner', 
         'name_last' : 'one'
         })
+    print(response.json())
     return response.json()
 
 # Fixture to register someone and returns a dictionary of {token, auth_user_id}
