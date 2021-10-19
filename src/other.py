@@ -133,7 +133,7 @@ def token_to_auth_id(token):
     if data_store.is_token_invalid(token):
         raise AccessError ('Token is invalid')
     
-    return jwt.decode(token, SECRET, algorithms=['HS256'])
+    return jwt.decode(token, SECRET, algorithms=['HS256']).get('auth_user_id')
 
 
 def hash_str(string):
