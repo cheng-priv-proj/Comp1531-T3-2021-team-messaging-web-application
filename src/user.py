@@ -42,17 +42,16 @@ def users_all_v1(auth_id):
     '''
     check_type(auth_id, int)
 
-    print("DDDDDDDDDDDDDDDDD")
-
     if data_store.is_invalid_user_id(auth_id):
         raise AccessError('auth_user_id is invalid')
 
     user_list = {'users': []}
     user_dict = data_store.get_users_from_u_id_dict()
     for user in user_dict:
-        user_list['users'].append(
-            user_dict[user]
-        )
+        if not user_dict[user]['email'] == '':
+            user_list['users'].append(
+                user_dict[user]
+            )
     
     print(user_list)
     return user_list

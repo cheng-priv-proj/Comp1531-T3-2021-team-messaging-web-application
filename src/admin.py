@@ -99,14 +99,10 @@ def admin_user_remove_v1(auth_user_id, u_id):
     '''
     if data_store.is_invalid_user_id(auth_user_id):
         raise AccessError (' auth_id is invalid')
-
     if data_store.is_stream_owner(auth_user_id) == False:
         raise AccessError('Token(auth_id) is not a global owner')
-
     if data_store.is_invalid_user_id(u_id):
         raise InputError (' u_id is invalid')
-
-    print("AAAAAAAAAAAAAAAAAAAAAAAAACCCCCCCC")
 
     perm_dict = data_store.get_user_perms_from_u_id_dict()
     owner_count = 0
@@ -114,11 +110,9 @@ def admin_user_remove_v1(auth_user_id, u_id):
         if perm_dict[u_id_key] == 1:
             owner_count += 1
     
-    print(perm_dict)
-    
     if owner_count == 1 and data_store.is_stream_owner(u_id) == True:
         raise InputError ('u_id refers to a user who is the only global owner and they are being demoted to a user')
-        
+
     data_store.admin_user_remove(u_id)
     print('suzess')
 

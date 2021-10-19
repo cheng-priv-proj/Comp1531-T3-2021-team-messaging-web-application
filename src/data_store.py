@@ -292,7 +292,6 @@ class Datastore:
         
         return False
 
-
     # Insertion functions ######################################################
 
     def insert_login(self, email, password, auth_id):
@@ -416,53 +415,44 @@ class Datastore:
     def admin_user_remove(self, u_id):
         users = self.__store['users']
         login = self.__store['login']
-        channel = self.__store['channels']
+        channels = self.__store['channels']
         dms = self.__store['dms']
         perms = self.__store['perms']
+        messages = self.__store['messages']
 
         user = self.get_users_from_u_id_dict().get(u_id)
-        print(users)
         email = users[u_id]['email']
         del login[email]
 
+        print(users[u_id])
+        user_details = users[u_id]
+        user_details['email'] = ''
+        user_details['name_first'] = 'Removed'
+        user_details['name_last'] = 'user'
+        user_details['handle_str'] = ''
+        # Update user/profile
+
         # loop through channel to delete user from all channels
-        for c_id in channel:
-            if user in c_id['all_members']:
-                user_details = c_id['all_members']
-                user_details['name_first'] = 'Removed'
-                user_details['name_last'] = 'user'
-                user_details['handle_str'] = ''
-                user_details['email'] = ''
-            if user in c_id['owner_members']:
-                user_details = c_id['owner_members']
-                user_details['name_first'] = 'Removed'
-                user_details['name_last'] = 'user'
-                user_details['handle_str'] = ''
-                user_details['email'] = ''
-                print('sucess')
+        for c_id in channels:
+            for i, user in enumerate(channels[c_id]['all_members']):
+                if user['u_id'] == u_id:
+                    del channels[c_id]['all_members'][i]
 
-        for dm_id in dms:
-            if user in dm_id['members']:
-                user_details = dm_id['members']
-                user_details['name_first'] = 'Removed'
-                user_details['name_last'] = 'user'
-                user_details['handle_str'] = ''
-                user_details['email'] = ''
-            if user in dm_id['creator']:
-                user_details = dm_id['creator']
-                user_details['name_first'] = 'Removed'
-                user_details['name_last'] = 'user'
-                user_details['handle_str'] = ''
-                user_details['email'] = ''
-                print('>>sucess')
+            for i, user in enumerate(channels[c_id]['owner_members']):
+                if user['u_id'] == u_id:
+                    del channels[c_id]['owner_members'][i]
         
-        for perm_u_id in perms:
-            if perm_u_id == u_id:
-                del perms[perm_u_id]
+        for dm_id in dms:
+            for i, member in enumerate(dms[dm_id]['details']['members']):
+                if member['u_id'] == u_id:
+                    del dms[dm_id]['details']['members'][i]
+        
+        del perms[u_id]
 
-        if user in users:
-            users.remove(user)
-            print('>>>>sucess')
+        for dm_channel_id in messages:
+            for message in messages[dm_channel_id]:
+                if message['u_id'] == u_id:
+                    message['message'] = 'Removed user'
         
         self.update_json()
 
