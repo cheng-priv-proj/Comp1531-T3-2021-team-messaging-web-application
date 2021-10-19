@@ -53,7 +53,7 @@ def dm_factory():
 def test_standard(register, dm_factory):
     dm_id = dm_factory(register[0]['token'], [register[1]['auth_user_id'], register[2]['auth_user_id'], register[3]['auth_user_id']])
 
-    dm_list = requests.get(url + 'dm/list/v1', json = {
+    dm_list = requests.get(url + 'dm/list/v1', params = {
         'token': register[0]['token']
         }).json()
 
@@ -69,7 +69,7 @@ def test_standard(register, dm_factory):
 def test_creator_only(register, dm_factory):
     dm_id = dm_factory(register[0]['token'], [])
     
-    dm_list = requests.get(url + 'dm/list/v1', json = {
+    dm_list = requests.get(url + 'dm/list/v1', params = {
         'token': register[0]['token']
         }).json()
 
@@ -84,7 +84,7 @@ def test_creator_only(register, dm_factory):
 
 def test_user_has_no_dms(register, dm_factory):
 
-    dm_list = requests.get(url + 'dm/list/v1', json = {
+    dm_list = requests.get(url + 'dm/list/v1', params = {
         'token': register[0]['token']
         }).json()
 
@@ -94,7 +94,7 @@ def test_user_has_no_dms(register, dm_factory):
 
     dm_factory(register[0]['token'], [register[1]['auth_user_id']])
 
-    dm_list = requests.get(url + 'dm/list/v1', json = {
+    dm_list = requests.get(url + 'dm/list/v1', params = {
         'token': register[2]['token']
         }).json()
 
@@ -103,7 +103,7 @@ def test_user_has_no_dms(register, dm_factory):
     }
 
 def test_invalid_token():
-    requests.get(url + 'dm/list/v1', json = {
+    requests.get(url + 'dm/list/v1', params = {
         'token': 'no token has been registered yet'
         }).status_code == 403
 

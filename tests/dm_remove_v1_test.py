@@ -38,13 +38,13 @@ def test_standard(clear, register):
         'dm_id': dm_id_dict.get('dm_id')
     })
 
-    assert requests.get(url + 'dm/list/v1', json={
+    assert requests.get(url + 'dm/list/v1', params={
         'token': register[0].get('token')
     }).json() == {
         'dms': []
     }
 
-    assert requests.get(url + 'dm/details/v1', json={
+    assert requests.get(url + 'dm/details/v1', params={
         'token': register[0].get('token'),
         'dm_id': dm_id_dict.get('dm_id')
     }).status_code == 403

@@ -73,7 +73,7 @@ def test_leave_member(clear, first_register, register_user):
         'channel_id': channel_id}
     )
 
-    channel_details = requests.get(url + 'channel/details/v2', json = {
+    channel_details = requests.get(url + 'channel/details/v2', params = {
         'token': member_token, 
         'channel_id': channel_id}
     ).json()
@@ -85,7 +85,7 @@ def test_leave_member(clear, first_register, register_user):
         'channel_id': channel_id}
     )
 
-    assert requests.get(url + 'channel/details/v2', json = {
+    assert requests.get(url + 'channel/details/v2', params = {
         'token': member_token, 
         'channel_id': channel_id}
     ).status_code == 403
@@ -110,7 +110,7 @@ def test_multiple_leavers(clear, first_register, register_user):
     )
 
     # Tries to get details with member1 channel
-    channel_details = requests.get(url + 'channel/details/v2', json = {
+    channel_details = requests.get(url + 'channel/details/v2', params = {
         'token': member_token1, 
         'channel_id': channel_id}
     ).json()
@@ -118,7 +118,7 @@ def test_multiple_leavers(clear, first_register, register_user):
     assert channel_details.get('name') == 'channel'
 
     # Tries to get details with member2 channel
-    channel_details = requests.get(url + 'channel/details/v2', json = {
+    channel_details = requests.get(url + 'channel/details/v2', params = {
         'token': member_token2, 
         'channel_id': channel_id}
     ).json()
@@ -131,7 +131,7 @@ def test_multiple_leavers(clear, first_register, register_user):
         'channel_id': channel_id}
     )
 
-    assert requests.get(url + 'channel/details/v2', json = {
+    assert requests.get(url + 'channel/details/v2', params = {
         'token': member_token1, 
         'channel_id': channel_id}
     ).status_code == 403
@@ -142,7 +142,7 @@ def test_multiple_leavers(clear, first_register, register_user):
         'channel_id': channel_id}
     )
 
-    assert requests.get(url + 'channel/details/v2', json = {
+    assert requests.get(url + 'channel/details/v2', params = {
         'token': member_token2, 
         'channel_id': channel_id}
     ).status_code == 403
@@ -192,7 +192,7 @@ def test_messages_remain(clear, first_register, register_user):
         'channel_id': channel_id
     })
 
-    messages_list = requests.get(url + 'channel/messages/v2', json = {
+    messages_list = requests.get(url + 'channel/messages/v2', params = {
         'token': owner_token, 
         'channel_id': channel_id,
         'start': 0
@@ -210,7 +210,7 @@ def test_channel_owner_leaves(clear, first_register):
         'channel_id': channel_id}
     )
 
-    channel_list2 = requests.get(url + 'channels/listall/v2', json = {
+    channel_list2 = requests.get(url + 'channels/listall/v2', params = {
         'token': owner_token
     }).json()
     

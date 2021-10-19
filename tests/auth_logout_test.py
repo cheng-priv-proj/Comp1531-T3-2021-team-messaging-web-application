@@ -53,13 +53,13 @@ def auth_id_v2(clear_server):
 # Not sure if return type is access or input error
 def test_standard_token_invalidation(clear_server, get_user_1):
     requests.post(config.url + 'auth/logout/v1', json={'token': get_user_1['token']}).json()
-    resp = requests.get(config.url + 'channels/listall/v2', json = {'token': get_user_1['token']})
+    resp = requests.get(config.url + 'channels/listall/v2', params = {'token': get_user_1['token']})
     assert(resp.status_code == 403)
 
 # 
 def test_standard_token_invalidation_2(clear_server, get_user_1):
     requests.post(config.url + 'auth/logout/v1', json={'token': get_user_1['token']}).json()
-    resp = requests.get(config.url + 'channels/list/v2', json = {'token': get_user_1['token']})
+    resp = requests.get(config.url + 'channels/list/v2', params = {'token': get_user_1['token']})
     assert(resp.status_code == 403)
 
 def test_standard_token_invalidation_3(clear_server, get_user_1):
@@ -85,7 +85,7 @@ def test_standard_token_invalidation_4(clear_server, get_user_1):
         'token': get_user_1['token']
     }).json()
 
-    resp = requests.get(config.url + 'channel/details/v2', json = {'token': get_user_1['token'], 'channel_id': c_id})
+    resp = requests.get(config.url + 'channel/details/v2', params = {'token': get_user_1['token'], 'channel_id': c_id})
     assert(resp.status_code == 403)
 
 # TEsts the case where one user logs in multiple times
@@ -95,10 +95,10 @@ def test_multiple_logins(clear_server, get_user_1):
 
     c_id = requests.post(config.url + 'channels/create/v2', json={'token': get_user_1['token'], 'name': 'channel', 'is_public': True}).json().get('channel_id')
     requests.post(config.url + 'auth/logout/v1', json={'token': token_1}).json()
-    resp_1 = requests.get(config.url + 'channels/listall/v2', json = {'token': token_1})
+    resp_1 = requests.get(config.url + 'channels/listall/v2', params = {'token': token_1})
     assert(resp_1.status_code == 403)
 
-    resp_2 = requests.get(config.url + 'channels/listall/v2', json = {'token': token_2}).json()
+    resp_2 = requests.get(config.url + 'channels/listall/v2', params = {'token': token_2}).json()
     assert resp_2 == { 
         'channels': [
             {
@@ -121,6 +121,6 @@ def test_logout_interference(clear_server, get_user_1):
         'token': get_user_1['token']
     }).json()
 
-    resp = requests.get(config.url + 'channels/listall/v2', json = {'token': user_2['token']})
+    resp = requests.get(config.url + 'channels/listall/v2', params = {'token': user_2['token']})
     assert (resp.status_code != 403)
 

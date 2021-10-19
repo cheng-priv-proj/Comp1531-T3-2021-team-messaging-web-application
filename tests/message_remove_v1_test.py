@@ -84,7 +84,7 @@ def test_normal_case_channel(clear_server, get_user_1):
         'message_id': message_id
     })
     
-    message_dict = requests.get(config.url + 'channel/messages/v2', json = {
+    message_dict = requests.get(config.url + 'channel/messages/v2', params = {
         'token': get_user_1['token'],
         'channel_id': extracted_channel_id, 
         'start': 0 }).json()
@@ -121,7 +121,7 @@ def test_normal_case_non_owner(clear_server, get_user_1, auth_id_v2):
         'message_id': message_id
     })
     
-    message_dict = requests.get(config.url + 'channel/messages/v2', json = {
+    message_dict = requests.get(config.url + 'channel/messages/v2', params = {
         'token': auth_id_v2['token'],
         'channel_id': extracted_channel_id, 
         'start': 0 }).json()
@@ -159,7 +159,7 @@ def test_owner_perms(clear_server, get_user_1, auth_id_v2):
         'message_id': message_id
     })
     
-    message_dict = requests.get(config.url + 'channel/messages/v2', json = {
+    message_dict = requests.get(config.url + 'channel/messages/v2', params = {
         'token': get_user_1['token'],
         'channel_id': extracted_channel_id, 
         'start': 0 }).json()
@@ -246,7 +246,7 @@ def test_normal_case_dms(clear_server, get_user_1, auth_id_v2):
         'message_id': message_id
     })
 
-    message_dict = requests.get(config.url + 'dm/messages/v1', json = {
+    message_dict = requests.get(config.url + 'dm/messages/v1', params = {
         'token': get_user_1['token'],
         'dm_id': dm_id, 
         'start': 0 }).json()
@@ -276,7 +276,7 @@ def test_normal_case_non_owner_dms(clear_server, get_user_1, auth_id_v2):
         'message_id': message_id
     })
 
-    message_dict = requests.get(config.url + 'dm/messages/v1', json = {
+    message_dict = requests.get(config.url + 'dm/messages/v1', params = {
         'token': auth_id_v2['token'],
         'dm_id': dm_id, 
         'start': 0 }).json()
@@ -308,7 +308,7 @@ def test_owner_perms_dms(clear_server, get_user_1, auth_id_v2):
         'message_id': message_id
     })
 
-    message_dict = requests.get(config.url + 'dm/messages/v1', json = {
+    message_dict = requests.get(config.url + 'dm/messages/v1', params = {
         'token': get_user_1['token'],
         'dm_id': dm_id, 
         'start': 0 }).json()

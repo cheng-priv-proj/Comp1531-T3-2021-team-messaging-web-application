@@ -21,7 +21,7 @@ def extract_user():
 @pytest.fixture
 def user_profile():
     def user_profile_function(token, u_id):
-        return requests.get(url + 'user/profile/v1', json = {
+        return requests.get(url + 'user/profile/v1', params = {
             'token': token,
             'u_id': u_id
          })
