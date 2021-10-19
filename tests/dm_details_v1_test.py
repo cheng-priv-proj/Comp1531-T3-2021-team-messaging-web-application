@@ -42,14 +42,14 @@ def test_invalid_token(clear_server, get_valid_token, get_valid_token_2):
         'u_ids': [user2['auth_user_id']]
     }).json()
 
-    resp_details = requests.get(config.url + 'dm/details/v1', json={
+    resp_details = requests.get(config.url + 'dm/details/v1', params={
         'token': invalid_token, 
         'dm_id': dm_id['dm_id']
         })
     assert resp_details.status_code == 403
 
 def test_dm_details_v1_invalid_dm_id(clear_server, get_valid_token):
-    resp_details = requests.get(config.url + 'dm/details/v1', json={
+    resp_details = requests.get(config.url + 'dm/details/v1', params={
         'token': get_valid_token['token'], 
         'dm_id': -1
         })
@@ -64,14 +64,14 @@ def test_dm_details_v1_auth_user_not_member(clear_server, get_valid_token, get_v
         'u_ids': [user1['auth_user_id']]
         }).json()
 
-    resp_details = requests.get(config.url + 'dm/details/v1', json={
+    resp_details = requests.get(config.url + 'dm/details/v1', params={
         'token': user2['token'], 
         'dm_id': dm_id['dm_id']
         })
     assert resp_details.status_code == 403
 
 def test_dm_details_v1_invalid_auth_user_and_dm_id(clear_server, get_valid_token):
-    resp_details = requests.get(config.url + 'dm/details/v1', json={
+    resp_details = requests.get(config.url + 'dm/details/v1', params={
         'token': 'asdasdasd', 
         'dm_id': -1
         })
@@ -87,7 +87,7 @@ def test_dm_details_v1_returns_name(clear_server, get_valid_token, get_valid_tok
         'u_ids': [user2['auth_user_id']]
         }).json()
 
-    resp_details = requests.get(config.url + 'dm/details/v1', json={
+    resp_details = requests.get(config.url + 'dm/details/v1', params={
         'token': user1['token'], 
         'dm_id': dm_id['dm_id']
         }).json()
@@ -103,7 +103,7 @@ def test_dm_details_v1_returns_members(clear_server, get_valid_token, get_valid_
         'u_ids': [user2['auth_user_id']]
         }).json()
 
-    resp_details = requests.get(config.url + 'dm/details/v1', json={
+    resp_details = requests.get(config.url + 'dm/details/v1', params={
         'token': user1['token'], 
         'dm_id': dm_id['dm_id']
         }).json()

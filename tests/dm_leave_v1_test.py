@@ -63,13 +63,13 @@ def test_standard(clear_server, register, dm_factory):
         'dm_id': dm_id
     })
 
-    assert requests.get(url + 'dm/list/v1', json = {
+    assert requests.get(url + 'dm/list/v1', params = {
         'token': register[1]['token']
     }).json() == {
         'dms': []
     }
 
-    assert requests.get(url + 'dm/list/v1', json = {
+    assert requests.get(url + 'dm/list/v1', params = {
         'token': register[0]['token']
     }).json() == {
         'dms': [
@@ -88,13 +88,13 @@ def test_creator_leaves(clear_server, register, dm_factory):
         'dm_id': dm_id
     })
 
-    assert requests.get(url + 'dm/list/v1', json = {
+    assert requests.get(url + 'dm/list/v1', params = {
         'token': register[0]['token']
     }).json() == {
         'dms':[]
     }
 
-    assert requests.get(url + 'dm/list/v1', json = {
+    assert requests.get(url + 'dm/list/v1', params = {
         'token': register[1]['token']
     }).json() == {
         'dms': [

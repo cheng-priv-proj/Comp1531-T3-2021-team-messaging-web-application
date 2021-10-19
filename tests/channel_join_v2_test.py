@@ -68,7 +68,7 @@ def test_valid_id(clear, first_register, register_user):
     token2 = register_user('member2@test.com')
     channel_id = first_register.get('channel_id')
     requests.post(url + 'channel/join/v2', json = {'token': token2,'channel_id': channel_id})
-    channel_list = requests.get(url + 'channels/list/v2', json = {'token': token2}).json()
+    channel_list = requests.get(url + 'channels/list/v2', params = {'token': token2}).json()
     assert channel_list == {
         'channels': [
         	{
@@ -89,7 +89,7 @@ def test_multiple_servers(clear, first_register, register_user, register_channel
     requests.post(url + 'channel/join/v2', json = {'token': member_token, 'channel_id': channel_id1})
     requests.post(url + 'channel/join/v2', json = {'token': member_token, 'channel_id': channel_id2})
 
-    channel_list = requests.get(url + 'channels/list/v2', json = {"token": member_token}).json()
+    channel_list = requests.get(url + 'channels/list/v2', params = {"token": member_token}).json()
 
     assert channel_list == {
         'channels': [
@@ -161,7 +161,7 @@ def test_global_owner(clear, register_user, register_channel):
     private_channel_id = register_channel(owner_token, 'channel', False)
 
     requests.post(url + 'channel/join/v2', json = {'token': global_owner_token, "channel_id": private_channel_id})
-    channel_list = requests.get(url + 'channels/list/v2', json = {'token': global_owner_token}).json()
+    channel_list = requests.get(url + 'channels/list/v2', params = {'token': global_owner_token}).json()
 
     assert channel_list == { 
         'channels': [

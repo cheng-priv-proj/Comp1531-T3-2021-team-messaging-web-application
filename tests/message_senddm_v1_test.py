@@ -79,7 +79,7 @@ def test_senddm_one_valid_message(clear, register, extract_token, extract_user, 
         'token': owner_token,
         'dm_id': dm_id,
         'message': 'testmessage' }).json())
-    messages = requests.get(url + 'dm/messages/v1', json = {
+    messages = requests.get(url + 'dm/messages/v1', params = {
         'token': owner_token,
         'dm_id': dm_id, 
         'start': 0 }).json()
@@ -117,7 +117,7 @@ def test_senddm_multiple_valid_messages(clear, register, extract_token, extract_
         'dm_id': dm_id,
         'message': 'testmessage2' }).json())
 
-    messages = requests.get(url + 'dm/messages/v1', json = {
+    messages = requests.get(url + 'dm/messages/v1', params = {
         'token': owner_token,
         'dm_id': dm_id, 
         'start': 0 }).json()

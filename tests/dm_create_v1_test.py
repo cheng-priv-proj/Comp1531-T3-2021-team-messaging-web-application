@@ -116,7 +116,7 @@ def test_dm_id_correct(clear, user1, extract_dm, extract_token, extract_id):
         'u_ids': u_ids
     }).json())
 
-    dm_details = requests.get(config.url + 'dm/details/v1', json = {
+    dm_details = requests.get(config.url + 'dm/details/v1', params = {
         'token': token1,
         'dm_id': dm_id
     }).json()
@@ -147,7 +147,7 @@ def test_only_creator_dm(clear, user1, extract_dm, extract_token, extract_id):
         'u_ids': u_ids
     }).json())
 
-    dm_details = requests.get(config.url + 'dm/details/v1', json = {
+    dm_details = requests.get(config.url + 'dm/details/v1', params = {
         'token': token1,
         'dm_id': dm_id
     }).json()
@@ -179,7 +179,7 @@ def test_multiple_handles(clear, user1, user2, extract_dm, extract_id, extract_t
         'u_ids': u_ids
     }).json())
 
-    dm_details = requests.get(config.url + 'dm/details/v1', json = {
+    dm_details = requests.get(config.url + 'dm/details/v1', params = {
         'token': token1,
         'dm_id': dm_id
     }).json()
@@ -219,7 +219,7 @@ def test_name_alphabetically_sorted(clear, user1, user2, user3, extract_dm, extr
         'u_ids': u_ids
     }).json())
 
-    dm_details = requests.get(config.url + 'dm/details/v1', json = {
+    dm_details = requests.get(config.url + 'dm/details/v1', params = {
         'token': token1,
         'dm_id': dm_id
     }).json()

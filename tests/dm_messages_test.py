@@ -54,7 +54,7 @@ def test_no_messages(register, dm_factory):
 
     dm_id = dm_factory(register[0]['token'], [])
 
-    messages_dict = requests.get(url + 'dm/messages/v1', json = {
+    messages_dict = requests.get(url + 'dm/messages/v1', params = {
         'token': register[0]['token'],
         'dm_id': dm_id,
         'start': 0
@@ -69,7 +69,7 @@ def test_no_messages(register, dm_factory):
 def test_invalid_token_valid_dm_id(register, dm_factory):
     dm_id = dm_factory(register[0]['token'], [])
 
-    assert requests.get(url + 'dm/messages/v1', json = {
+    assert requests.get(url + 'dm/messages/v1', params = {
         'token': register[1]['token'],
         'dm_id': dm_id,
         'start': 0
@@ -77,7 +77,7 @@ def test_invalid_token_valid_dm_id(register, dm_factory):
 
 def test_invalid_dm_id(register):
 
-    assert requests.get(url + 'dm/messages/v1', json = {
+    assert requests.get(url + 'dm/messages/v1', params = {
         'token': register[0]['token'],
         'dm_id': 0,
         'start': 0
@@ -86,7 +86,7 @@ def test_invalid_dm_id(register):
 def test_invalid_start(register, dm_factory):
     dm_id = dm_factory(register[0]['token'], [])
 
-    assert requests.get(url + 'dm/messages/v1', json = {
+    assert requests.get(url + 'dm/messages/v1', params = {
         'token': register[0]['token'],
         'dm_id': dm_id,
         'start': 50
@@ -94,7 +94,7 @@ def test_invalid_start(register, dm_factory):
     pass
 
 def test_invalid_dm_and_token(clear):
-    assert requests.get(url + 'dm/messages/v1', json = {
+    assert requests.get(url + 'dm/messages/v1', params = {
         'token': 'no token has been registered',
         'dm_id': 1,
         'start': 0

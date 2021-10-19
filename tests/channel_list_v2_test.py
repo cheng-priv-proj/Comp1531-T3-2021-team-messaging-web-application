@@ -70,7 +70,7 @@ def test_channel_list_valid(clear, first_register, register_channel):
     token = first_register.get('token')
     channel_id1 = first_register.get('channel_id')
 
-    channel_list = requests.get(url + 'channels/list/v2', json = {'token': token}).json()
+    channel_list = requests.get(url + 'channels/list/v2', params = {'token': token}).json()
 
     assert channel_list == { 
         'channels': [
@@ -82,7 +82,7 @@ def test_channel_list_valid(clear, first_register, register_channel):
     }
 
     channel_id2 = register_channel(token, 'channel2', True)
-    channel_list = requests.get(url + 'channels/list/v2', json = {'token': token}).json()
+    channel_list = requests.get(url + 'channels/list/v2', params = {'token': token}).json()
 
     assert channel_list == { 
         'channels': [
@@ -100,7 +100,7 @@ def test_channel_list_valid(clear, first_register, register_channel):
 # Testing for an empty list of channels.
 def test_channel_list_nochannels(clear, register_user):
     no_server_token = register_user('noserver@test.com')
-    channel_list = requests.get(url + 'channels/list/v2', json = {'token': no_server_token}).json()
+    channel_list = requests.get(url + 'channels/list/v2', params = {'token': no_server_token}).json()
 
     assert channel_list == { 
         'channels': [
@@ -116,8 +116,8 @@ def test_channel_list_other_owners_test(clear, first_register, register_user, re
     token2 = register_user('owner2@test.com')
     channel_id2 = register_channel(token2, 'channel2', True)
 
-    channel_list1 = requests.get(url + 'channels/list/v2', json = {'token': token1}).json()
-    channel_list2 = requests.get(url + 'channels/list/v2', json = {'token': token2}).json()
+    channel_list1 = requests.get(url + 'channels/list/v2', params = {'token': token1}).json()
+    channel_list2 = requests.get(url + 'channels/list/v2', params = {'token': token2}).json()
 
     assert channel_list1 == { 
         'channels': [
@@ -144,7 +144,7 @@ def test_channel_list_after_newjoin_test(clear, first_register, register_user):
 
     requests.post(url + 'channel/join/v2', json = {'token': token2, 'channel_id': channel_id})
 
-    channel_list = requests.get(url + 'channels/list/v2', json = {'token': token2}).json()
+    channel_list = requests.get(url + 'channels/list/v2', params = {'token': token2}).json()
     assert channel_list == { 
         'channels': [
             {
@@ -158,7 +158,7 @@ def test_channel_list_after_newjoin_test(clear, first_register, register_user):
 def test_invalid_auth_id(clear):
     invalid_token = 1000
     
-    invalid_request = requests.get(url + 'channels/list/v2', json = {'token': invalid_token})
+    invalid_request = requests.get(url + 'channels/list/v2', params = {'token': invalid_token})
     assert (invalid_request.status_code) == 403
 
 

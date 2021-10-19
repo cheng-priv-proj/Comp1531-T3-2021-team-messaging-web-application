@@ -68,7 +68,7 @@ def test_standard(register):
     })
 
     # check if user info has been correctly overwritten
-    assert requests.get(url + 'user/profile/v1', json={
+    assert requests.get(url + 'user/profile/v1', params = {
         'token': register[0].get('token'),
         'u_id': register[1].get('auth_user_id')
     }).json() == {
@@ -80,7 +80,7 @@ def test_standard(register):
     }
 
     # check if channel message has been overwritten
-    assert requests.get(url + 'channel/messages/v2', json={
+    assert requests.get(url + 'channel/messages/v2', params = {
         'token': register[0].get('token'),
         'channel_id': channel_id_dict.get('channel_id'),
         'start': 0
@@ -96,7 +96,7 @@ def test_standard(register):
     }
 
     # check if dm message has been overwritten
-    assert requests.get(url + 'dm/messages/v1', json={
+    assert requests.get(url + 'dm/messages/v1', params = {
         'token': register[0].get('token'),
         'dm_id': dm_id_dict.get('dm_id'),
         'start': 0
@@ -112,7 +112,7 @@ def test_standard(register):
     }
 
     # check if user appears in user/all 
-    assert requests.get(url + 'users/all/v1', json={
+    assert requests.get(url + 'users/all/v1', params = {
         'token': register[0].get('token')
     }).json() == {
         'users': [{
@@ -132,7 +132,7 @@ def test_standard(register):
         'name_last': 'one'
     }).json()
 
-    assert requests.get(url + 'user/profile/v1', json={
+    assert requests.get(url + 'user/profile/v1', params = {
         'token': register[0].get('token'),
         'u_id': new_user.get('auth_user_id')
     }).json() == {

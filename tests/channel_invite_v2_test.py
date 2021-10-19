@@ -46,7 +46,7 @@ def test_member_invite_v2(clear_server, get_invitee, get_user_1):
     extracted_channel_id = channel_dict['channel_id']
 
     requests.post(config.url + 'channel/invite/v2', json={'token': get_user_1['token'], 'channel_id': extracted_channel_id, 'u_id': get_invitee['auth_user_id']}).json()
-    details = requests.get(config.url + 'channel/details/v2', json={'token': get_user_1['token'], 'channel_id': extracted_channel_id}).json()
+    details = requests.get(config.url + 'channel/details/v2', params={'token': get_user_1['token'], 'channel_id': extracted_channel_id}).json()
 
     assert details["all_members"] == [
         {
@@ -81,7 +81,7 @@ def test_invite_multiple_v2(clear_server, get_invitee, get_user_1):
     requests.post(config.url + 'channel/invite/v2', json={'token': get_user_1['token'], 'channel_id': extracted_channel_id, 'u_id': get_invitee['auth_user_id']}).json()
     requests.post(config.url + 'channel/invite/v2', json={'token': get_invitee['token'], 'channel_id': extracted_channel_id, 'u_id': user_3_dict['auth_user_id']}).json()
 
-    details = requests.get(config.url + 'channel/details/v2', json={'token': get_user_1['token'], 'channel_id': extracted_channel_id}).json()
+    details = requests.get(config.url + 'channel/details/v2', params={'token': get_user_1['token'], 'channel_id': extracted_channel_id}).json()
     assert details["all_members"] == [
         {
             'u_id': get_user_1['auth_user_id'],
@@ -112,7 +112,7 @@ def test_private_invite(clear_server, get_invitee, get_user_1):
     extracted_channel_id = channel_dict['channel_id']
 
     requests.post(config.url + 'channel/invite/v2', json={'token': get_user_1['token'], 'channel_id': extracted_channel_id, 'u_id': get_invitee['auth_user_id']}).json()
-    details = requests.get(config.url + 'channel/details/v2', json={'token': get_user_1['token'], 'channel_id': extracted_channel_id}).json()
+    details = requests.get(config.url + 'channel/details/v2', params={'token': get_user_1['token'], 'channel_id': extracted_channel_id}).json()
 
     assert details["all_members"] == [
         {

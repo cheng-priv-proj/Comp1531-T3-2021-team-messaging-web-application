@@ -234,14 +234,13 @@ def channel_messages_ep():
       
         channel_id is valid and the authorised user is not a member of the channel
     '''
-    message_get_details = request.get_json(force = True)
 
-    token = message_get_details.get('token')
+    token = request.args.get('token')
     auth_user_id = token_to_auth_id(token)
-    channel_id = message_get_details.get('channel_id')
-    start = message_get_details.get('start')
+    channel_id = request.args.get('channel_id')
+    start = request.args.get('start')
 
-    return channel_messages_v1(auth_user_id, channel_id, start)
+    return channel_messages_v1(auth_user_id, int(channel_id), int(start))
 
 @APP.route('/channel/leave/v1', methods = ['POST'])
 def channel_leave_endpt():
@@ -286,9 +285,7 @@ def channel_list_endpt():
     Return Type:{ channels }
     '''
 
-    list_details = request.get_json(force = True)
-
-    token = list_details.get('token')
+    token = request.args.get('token')
     auth_user_id = token_to_auth_id(token)
 
     return channels_list_v1(auth_user_id)
@@ -306,9 +303,8 @@ def list_all_endpt():
     Return Type:
     
     '''
-    listall_details = request.get_json(force = True)
 
-    token = listall_details.get('token')
+    token = request.args.get('token')
     auth_user_id = token_to_auth_id(token)
 
     return channels_listall_v1(auth_user_id)
@@ -378,14 +374,12 @@ def channel_details_endpt():
     
     '''
 
-    request_data = request.get_json()
-
-    token = request_data['token']
+    token = request.args.get('token')
     auth_id = token_to_auth_id(token)
-    channel_id = request_data['channel_id']
+    channel_id = request.args.get('channel_id')
 
 
-    return channel_details_v1(auth_id, channel_id)
+    return channel_details_v1(auth_id, int(channel_id))
 
 ################################ DM #########################################
 
@@ -443,15 +437,12 @@ def dm_details_endpt():
         Returns {name, members} on success
     '''
 
-    request_data = request.get_json(force = True)
-    token = request_data.get('token')
-    print(3)
-    print(request_data)
-    print(token)
+    
+    token = request.args.get('token')
     auth_user_id = token_to_auth_id(token)
-    dm_id = request_data['dm_id']
+    dm_id = request.args.get('dm_id')
 
-    return_dict = dm_details_v1(auth_user_id, dm_id)
+    return_dict = dm_details_v1(auth_user_id, int(dm_id))
     return return_dict
 
 @APP.route('/channel/addowner/v1', methods=['POST'])
@@ -517,7 +508,7 @@ def channel_removeowner_endpt():
     return channel_removeowner_v1(auth_id, channel_id, u_id)
 
 ################## User ###################################
-@APP.route("/user/profile/v1", methods=['get'])
+@APP.route("/user/profile/v1", methods=['GET'])
 def user_profile_ep():
     '''
     For a valid user, returns information about their user_id, email, 
@@ -535,19 +526,17 @@ def user_profile_ep():
         Returns user on success
     '''
 
-    request_data = request.get_json()
-    token = request_data['token']
+    token = request.args.get('token')
     auth_user_id = token_to_auth_id(token)
-    u_id = request_data.get('u_id')
+    u_id = request.args.get('u_id')
 
-    user_details = user_profile_v1(auth_user_id, u_id)
+    user_details = user_profile_v1(auth_user_id, int(u_id))
     return user_details
 
 @APP.route("/users/all/v1", methods=['GET'])
 def users_all_ep():
     
-    request_data = request.get_json()
-    token = request_data['token']
+    token = request.args.get('token')
     auth_user_id = token_to_auth_id(token)
 
     return users_all_v1(auth_user_id)
@@ -654,8 +643,8 @@ def dm_list_ep():
             Returns nothing on success
     '''
 
-    request_data = request.get_json(force = True)
-    auth_user_id = token_to_auth_id(request_data['token'])
+    token = request.args.get('token')
+    auth_user_id = token_to_auth_id(token)
 
     dm_list = dm_list_v1(auth_user_id)
 
@@ -749,13 +738,13 @@ def message_send_endpt():
 
 @APP.route("/dm/messages/v1", methods=['GET'])
 def dm_messages_endpt():
-    request_data = request.get_json()
-    token = request_data['token']
+    
+    token = request.args.get('token')
     auth_id = token_to_auth_id(token)
-    dm_id = request_data['dm_id']
-    start = request_data['start']
+    dm_id = request.args.get('dm_id')
+    start = request.args.get('start')
 
-    return dm_messages_v1(auth_id, dm_id, start)
+    return dm_messages_v1(auth_id, int(dm_id), int(start))
 
 @APP.route("/message/senddm/v1", methods=['POST'])
 def message_senddm_endpt():

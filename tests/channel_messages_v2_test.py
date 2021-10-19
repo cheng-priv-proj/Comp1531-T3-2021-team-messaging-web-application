@@ -29,7 +29,7 @@ def test_empty_messages(clear_server, get_user_1):
     channel_dict = requests.post(config.url + 'channels/create/v2', json={'token': get_user_1['token'], 'name': 'test channel', 'is_public': True}).json()
     extracted_channel_id = channel_dict['channel_id']
 
-    channel_messages = requests.get(config.url + 'channel/messages/v2', json={'token': get_user_1['token'], 'channel_id': extracted_channel_id, 'start': 0}).json()
+    channel_messages = requests.get(config.url + 'channel/messages/v2', params={'token': get_user_1['token'], 'channel_id': extracted_channel_id, 'start': 0}).json()
     
     assert channel_messages == {
         'messages': [], 
@@ -51,7 +51,7 @@ def test_valid_channel_id_and_unauthorized_auth_user_id(clear, register, extract
 
 '''
 def test_invalid_channel_id(clear_server, get_user_1):
-    channel_messages = requests.get(config.url + 'channel/messages/v2', json={'token': get_user_1['token'], 'channel_id': 9912901, 'start': 0})
+    channel_messages = requests.get(config.url + 'channel/messages/v2', params={'token': get_user_1['token'], 'channel_id': 9912901, 'start': 0})
     assert(channel_messages.status_code == 400)
 
 # Test expecting InputError when given a negative starting index.
@@ -60,7 +60,7 @@ def test_negative_start(clear_server, get_user_1):
     channel_dict = requests.post(config.url + 'channels/create/v2', json={'token': get_user_1['token'], 'name': 'test channel', 'is_public': True}).json()
     extracted_channel_id = channel_dict['channel_id']
 
-    channel_messages = requests.get(config.url + 'channel/messages/v2', json={'token': get_user_1['token'], 'channel_id': extracted_channel_id, 'start': -42})
+    channel_messages = requests.get(config.url + 'channel/messages/v2', params={'token': get_user_1['token'], 'channel_id': extracted_channel_id, 'start': -42})
     assert(channel_messages.status_code == 400)
 
 # Test expecting an error code 400 (input error) when the starting index is greater than the amount of messages avaliable.
@@ -68,7 +68,7 @@ def test_start_greater_than_messages(clear_server, get_user_1):
     channel_dict = requests.post(config.url + 'channels/create/v2', json={'token': get_user_1['token'], 'name': 'test channel', 'is_public': True}).json()
     extracted_channel_id = channel_dict['channel_id']
 
-    channel_messages = requests.get(config.url + 'channel/messages/v2', json={'token': get_user_1['token'], 'channel_id': extracted_channel_id, 'start': 10000})
+    channel_messages = requests.get(config.url + 'channel/messages/v2', params={'token': get_user_1['token'], 'channel_id': extracted_channel_id, 'start': 10000})
     assert(channel_messages.status_code == 400)
 
 # ASSUMES THAT message/send/v1 COMPLETELY WORKS
@@ -78,7 +78,7 @@ def test_message_is_sent(clear_server, get_user_1):
 
     requests.post(config.url + 'message/send/v1', json={'token': get_user_1['token'], 'channel_id': extracted_channel_id, 'message': "Hello there, General Kenobi"}).json()
 
-    channel_messages = requests.get(config.url + 'channel/messages/v2', json={'token': get_user_1['token'], 'channel_id': extracted_channel_id, 'start': 0}).json()
+    channel_messages = requests.get(config.url + 'channel/messages/v2', params={'token': get_user_1['token'], 'channel_id': extracted_channel_id, 'start': 0}).json()
     messages_list = channel_messages['messages']
     specific_message_info = messages_list[0]
     assert specific_message_info['message'] == "Hello there, General Kenobi"

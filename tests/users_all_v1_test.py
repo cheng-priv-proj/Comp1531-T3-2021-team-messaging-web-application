@@ -16,7 +16,7 @@ def extract_token():
 @pytest.fixture
 def users_all():
     def users_all_function(token):
-        return requests.get(url + 'users/all/v1', json = {
+        return requests.get(url + 'users/all/v1', params = {
             'token': token
          })
     return users_all_function
