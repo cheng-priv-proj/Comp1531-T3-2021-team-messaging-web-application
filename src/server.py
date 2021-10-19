@@ -17,10 +17,12 @@ from src.data_store import data_store
 from src.error import InputError
 from src.other import clear_v1
 from src.other import token_to_auth_id
+from src.config import SECRET
 
 from src.admin import admin_userpermission_change_v1
 from src.admin import admin_user_remove_v1
 
+import jwt 
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -79,7 +81,13 @@ def register_ep():
     
     auth_id_dict = auth_register_v1(email, password, name_first, name_last)
     auth_id = auth_id_dict.get('auth_user_id')
-    token = str(auth_id) # Change to jwt later
+    
+    token = jwt.encode({
+                'auth_user_id': auth_id,
+                'token_count': len(data_store.get_u_ids_from_token_dict())
+                },
+                 SECRET, algorithm='HS256')
+
     data_store.insert_token(token, auth_id)
 
     return {'token': token, 'auth_user_id': auth_id}

@@ -1,6 +1,10 @@
 from src.data_store import data_store
 import re
 from src.error import AccessError
+from src.config import SECRET
+import jwt
+import hashlib
+
 def clear_v1():
     '''
     Resets the internal data of the application to its initial state, clearing the
@@ -128,9 +132,14 @@ def token_to_auth_id(token):
 
     if data_store.is_token_invalid(token):
         raise AccessError ('Token is invalid')
-    
-    return data_store.get_u_id_from_token(token)
+    # data_store.get_u_id_from_token(token)
+    token_dict = jwt.decode(token, SECRET, algorithms=['HS256'])
+    print(token_dict)
+    return token_dict['auth_user_id']
 
+
+def hash_str(string):
+    return hashlib.sha256(string.encode()).hexdigest()
 
 stream_owner = 1
 stream_member = 2
