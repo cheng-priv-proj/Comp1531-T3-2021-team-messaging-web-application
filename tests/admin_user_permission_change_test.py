@@ -123,7 +123,7 @@ def test_success_perms_change(clear, first_register, second_register):
         'token': first_token, 
         'u_id': second_u_id,
         'permission_id': become_member
-    }).status_code == 403
+    }).status_code == 400
 
 # Access if not global owner
 def test_no_perms(clear, first_register, second_register):
