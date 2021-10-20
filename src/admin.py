@@ -38,14 +38,13 @@ def admin_userpermission_change_v1(auth_user_id, u_id, permission_id):
     if data_store.is_invalid_user_id(u_id) == True:
         raise InputError (' u_id is invalid')
 
-
     if data_store.is_stream_owner(auth_user_id) == False:
         raise AccessError('Token(auth_id) is not a global owner')
     
-    if permission_id < 1 or permission_id > 2:
+    if permission_id != 1 or permission_id != 2:
         raise InputError('permission_id is invalid')
 
-    if (data_store.is_stream_owner(auth_user_id) == False) and (permission_id < 1 or permission_id > 2):
+    if data_store.is_stream_owner(auth_user_id) == False:
         raise AccessError('Token(auth_id) is not a global owner')
     
     perm_dict = data_store.get_user_perms_from_u_id_dict()
@@ -54,13 +53,8 @@ def admin_userpermission_change_v1(auth_user_id, u_id, permission_id):
         if perm_dict[u_id_key] == 1:
             owner_count += 1
 
-    if owner_count == 1 and data_store.is_stream_owner(u_id) == True:
+    if owner_count == 1 and data_store.is_stream_owner(u_id):
         raise InputError ('u_id refers to a user who is the only global owner and they are being demoted to a user')
-    
-    if data_store.is_invalid_user_id(auth_user_id) == True:
-        raise AccessError (' auth_id is invalid')
-
-    
     
     data_store.insert_user_perm(u_id, permission_id)
     
