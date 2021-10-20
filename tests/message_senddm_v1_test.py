@@ -149,6 +149,30 @@ def test_senddm_multiple_valid_messages(clear, register, extract_token, extract_
 
     assert extract_message(messages['messages'][0]) != extract_message(messages['messages'][1]) != extract_message(messages['messages'][2])
 
+def test_senddm_51_valid_messages(clear, register, extract_token, extract_user, extract_dm, extract_message):
+    dm_id = extract_dm(register)
+    owner_token = extract_token(register)
+
+    for _ in range(51):
+        requests.post(url + 'message/senddm/v1', json = {
+            'token': owner_token,
+            'dm_id': dm_id,
+            'message': 'testmessage' }).json()
+
+    messages = requests.get(url + 'dm/messages/v1', params = {
+        'token': owner_token,
+        'dm_id': dm_id, 
+        'start': 0 }).json()
+
+    for specific_message_info in messages['messages']:
+        assert specific_message_info['message'] == "testmessage"
+
+    assert messages['start'] == 0
+    assert messages['end'] == 50
+
+    assert extract_message(messages['messages'][0]) != extract_message(messages['messages'][1]) != extract_message(messages['messages'][2])
+
+
 def test_senddm_invalid_message_to_short(clear, register, extract_token, extract_dm):
     dm_id = extract_dm(register)
     owner_token = extract_token(register)
