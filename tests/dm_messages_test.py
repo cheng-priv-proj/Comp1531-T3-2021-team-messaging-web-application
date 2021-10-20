@@ -93,7 +93,7 @@ def test_invalid_start(register, dm_factory):
     }).status_code == 400
     pass
 
-def test_invalid_start(register, dm_factory):
+def test_negative_start(register, dm_factory):
     dm_id = dm_factory(register[0]['token'], [])
 
     assert requests.get(url + 'dm/messages/v1', params = {
