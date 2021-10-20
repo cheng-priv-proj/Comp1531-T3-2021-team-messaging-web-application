@@ -96,7 +96,9 @@ def test_user_not_member_of_channel(clear_server, get_user_1):
         'name_last': 'one'
     }).json()
 
-    requests.post(config.url + 'message/send/v1', json={'token': user_2['token'], 'channel_id': extracted_channel_id, 'message': "Hello there, General Kenobi"}).json()
+    assert requests.post(config.url + 'message/send/v1', json={'token': user_2['token'], 'channel_id': extracted_channel_id, 'message': "Hello there, General Kenobi"}).status_code == 403
+
+
 
 ''' Auth id is not a parameter yet the spec still considers it so. Need to clarify what it means 
 it says in the spec:
@@ -124,11 +126,11 @@ def test_invalid_auth_user_id(clear, register, extract_channel):
 
 '''
 
-def test_message_is_sent(clear_server, get_user_1):
+def test_long(clear_server, get_user_1):
     channel_dict = requests.post(config.url + 'channels/create/v2', json={'token': get_user_1['token'], 'name': 'test channel', 'is_public': True}).json()
     extracted_channel_id = channel_dict['channel_id']
 
-    for x in range(51):
+    for _ in range(51):
         requests.post(config.url + 'message/send/v1', json={'token': get_user_1['token'], 'channel_id': extracted_channel_id, 'message': "Hello there, General Kenobi"}).json()
 
     channel_messages = requests.get(config.url + 'channel/messages/v2', params={'token': get_user_1['token'], 'channel_id': extracted_channel_id, 'start': 0}).json()
