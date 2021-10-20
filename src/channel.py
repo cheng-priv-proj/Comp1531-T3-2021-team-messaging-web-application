@@ -107,8 +107,6 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         recent message
     '''
 
-    print("AAAAAAAAA")
-
     check_type(auth_user_id, int)
     check_type(channel_id, int)
     check_type(start, int)
@@ -123,6 +121,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
 
     # Checking that auth_id exists in channel
     if not data_store.is_user_member_of_channel(channel_id, auth_user_id):
+        print("AAAA")
         raise AccessError('the authorised user is not a member of the channel')
 
     messages = data_store.get_messages_from_channel_or_dm_id(channel_id)
