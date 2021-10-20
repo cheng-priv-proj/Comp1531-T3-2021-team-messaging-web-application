@@ -24,12 +24,12 @@ def get_user_1():
     return response.json()
 
 @pytest.fixture
-def get_user_2():
+def get_valid_token():
     response = requests.post(config.url + 'auth/register/v2', json={
-        'email': 'owner2@test.com', 
-        'password': 'spotato', 
-        'name_first': 'owner', 
-        'name_last' : 'one'
+        'email': 'example@email.com', 
+        'password': 'potato', 
+        'name_first': 'John', 
+        'name_last' : 'smith'
     })
     return response.json()
 
@@ -95,7 +95,7 @@ def test_message_is_sent(clear_server, get_user_1):
     assert channel_messages['start'] == 0
     assert channel_messages['end'] == -1
 
-def test_user_not_member_of_channel(clear_server, get_user_1, get_user_2):
+def test_user_not_member_of_channel(clear_server, get_user_1, get_valid_token):
     channel_dict = requests.post(config.url + 'channels/create/v2', json={
         'token': get_user_1['token'], 
         'name': 'test channel', 
@@ -103,11 +103,12 @@ def test_user_not_member_of_channel(clear_server, get_user_1, get_user_2):
     }).json()
     extracted_channel_id = channel_dict['channel_id']
 
-    token2 = get_user_2['token']
+    token2 = get_valid_token['token']
     
-    assert requests.get(config.url + 'channel/messages/v2', json={
+    assert requests.get(config.url + 'channel/messages/v2', params={
         'token': token2, 
-        'channel_id': extracted_channel_id, 'start': 0
+        'channel_id': extracted_channel_id, 
+        'start': 0
     }).status_code == 403
 
 
