@@ -165,7 +165,5 @@ def message_edit_v1(auth_user_id, message_id, message):
         if original_message.get('message_id') == message_id:
             messages[index]['message'] = message
             print(messages[index]['message'] )
-            break
-    
 
     return {}
