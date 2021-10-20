@@ -95,8 +95,8 @@ def test_user_not_member_of_channel(clear_server, get_user_1):
         'name_first': 'user',
         'name_last': 'one'
     }).json()
-
-    assert requests.get(config.url + 'channel/messages/v2', json={'token': user_2['token'], 'channel_id': extracted_channel_id, 'start': 0}).status_code == 403
+    print(user_2)
+    assert requests.get(config.url + 'channel/messages/v2', json={'token': user_2['token'], 'channel_id': extracted_channel_id, 'start': 0}).status_code == 400
 
 
 
