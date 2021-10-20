@@ -107,6 +107,8 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         recent message
     '''
 
+    print("AAAAAAAAA")
+
     check_type(auth_user_id, int)
     check_type(channel_id, int)
     check_type(start, int)

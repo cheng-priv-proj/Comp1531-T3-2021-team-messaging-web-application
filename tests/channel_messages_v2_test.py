@@ -23,6 +23,16 @@ def get_user_1():
     })
     return response.json()
 
+@pytest.fixture
+def get_user_2():
+    response = requests.post(config.url + 'auth/register/v2', json={
+        'email': 'owner2@test.com', 
+        'password': 'spotato', 
+        'name_first': 'owner', 
+        'name_last' : 'one'
+    })
+    return response.json()
+
 
 # No messages are sent
 def test_empty_messages(clear_server, get_user_1):
@@ -85,18 +95,20 @@ def test_message_is_sent(clear_server, get_user_1):
     assert channel_messages['start'] == 0
     assert channel_messages['end'] == -1
 
-def test_user_not_member_of_channel(clear_server, get_user_1):
-    channel_dict = requests.post(config.url + 'channels/create/v2', json={'token': get_user_1['token'], 'name': 'test channel', 'is_public': True}).json()
+def test_user_not_member_of_channel(clear_server, get_user_1, get_user_2):
+    channel_dict = requests.post(config.url + 'channels/create/v2', json={
+        'token': get_user_1['token'], 
+        'name': 'test channel', 
+        'is_public': True
+    }).json()
     extracted_channel_id = channel_dict['channel_id']
 
-    user_2 = requests.post(config.url + 'auth/register/v2', json={
-        'email': 'user@email.com',
-        'password': 'password',
-        'name_first': 'user',
-        'name_last': 'one'
-    }).json()
+    token2 = get_user_2['token']
     
-    assert requests.get(config.url + 'channel/messages/v2', json={'token': user_2['token'], 'channel_id': extracted_channel_id, 'start': 0}).status_code == 403
+    assert requests.get(config.url + 'channel/messages/v2', json={
+        'token': token2, 
+        'channel_id': extracted_channel_id, 'start': 0
+    }).status_code == 403
 
 
 
@@ -125,7 +137,6 @@ def test_invalid_auth_user_id(clear, register, extract_channel):
 
 
 '''
-
 def test_long(clear_server, get_user_1):
     channel_dict = requests.post(config.url + 'channels/create/v2', json={'token': get_user_1['token'], 'name': 'test channel', 'is_public': True}).json()
     extracted_channel_id = channel_dict['channel_id']
