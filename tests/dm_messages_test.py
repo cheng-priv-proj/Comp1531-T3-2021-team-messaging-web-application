@@ -93,6 +93,16 @@ def test_invalid_start(register, dm_factory):
     }).status_code == 400
     pass
 
+def test_invalid_start(register, dm_factory):
+    dm_id = dm_factory(register[0]['token'], [])
+
+    assert requests.get(url + 'dm/messages/v1', params = {
+        'token': register[0]['token'],
+        'dm_id': dm_id,
+        'start': -1
+    }).status_code == 400
+    pass
+
 def test_invalid_dm_and_token(clear):
     assert requests.get(url + 'dm/messages/v1', params = {
         'token': 'no token has been registered',

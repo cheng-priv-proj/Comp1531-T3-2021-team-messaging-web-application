@@ -193,6 +193,25 @@ def test_invalid_message_id(clear_server, get_user_1):
     }).status_code == 400
 
 
+def test_user_is_not_member(clear_server, get_user_1, auth_id_v2):
+    channel_dict = requests.post(config.url + 'channels/create/v2', json= {
+        'token': get_user_1['token'], 
+        'name': 'test channel', 
+        'is_public': True
+    }).json()
+
+    extracted_channel_id = channel_dict['channel_id']
+
+    message_dict = requests.post(config.url + 'message/send/v1', json = {
+        'token': get_user_1['token'],
+        'channel_id': extracted_channel_id,
+        'message': 'Hello there' }).json()
+
+    assert requests.delete(config.url + 'message/remove/v1', json = {
+        'token' : auth_id_v2['token'],
+        'message_id': message_dict['message_id']
+    }).status_code == 400
+
 
 '''
 # AccessError when message_id refers to a valid message in a joined channel/DM and none of the following are true:
