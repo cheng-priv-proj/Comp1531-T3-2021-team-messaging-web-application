@@ -185,7 +185,8 @@ def dm_leave_v1(auth_id, dm_id):
     for person in members:
         if person['u_id'] == auth_id:
             members.remove(person)
-            return {}
+
+    return {}
 
 def dm_remove_v1(auth_id, dm_id):
     '''
