@@ -35,6 +35,9 @@ def admin_userpermission_change_v1(auth_user_id, u_id, permission_id):
     '''
 
     # order of these errors are really dodgy need to double check.
+    if data_store.is_invalid_user_id(u_id) == True:
+        raise InputError (' u_id is invalid')
+
 
     if data_store.is_stream_owner(auth_user_id) == False:
         raise AccessError('Token(auth_id) is not a global owner')
