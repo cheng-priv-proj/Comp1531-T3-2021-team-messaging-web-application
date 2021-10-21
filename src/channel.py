@@ -14,7 +14,6 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
 
     Exceptions:
         TypeError   - occurs when auth_user_id, channel_id, u_id are not ints
-        AccessError - occurs when auth_id is invalid
         AccessError - occurs when channel_id is valid but the authorised user is not
                     a member of the channel
         InputError  - occurs when channel_id is invalid
@@ -29,11 +28,6 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     check_type(auth_user_id, int)
     check_type(channel_id, int)
     check_type(u_id, int)
-
-    # checking if auth_id is valid
-    if data_store.is_invalid_user_id(auth_user_id):
-        raise AccessError('Invalid auth_user_id')
-    
 
     # Checking if channel_id is valid
     if data_store.is_invalid_channel_id(channel_id):
@@ -67,7 +61,6 @@ def channel_details_v1(auth_user_id, channel_id):
 
     Exceptions:
         TypeError   - occurs when auth_user_id, channel_id are not ints
-        AccessError - occurs when auth_id is invalid
         InputError  - occurs when channel_id is invalid
         AccessError - occurs when channel_id is valid but the authorised user is
                     not a member of the channel
@@ -79,9 +72,6 @@ def channel_details_v1(auth_user_id, channel_id):
     check_type(auth_user_id, int)
     check_type(channel_id, int)
 
-    if data_store.is_invalid_user_id(auth_user_id):
-        raise AccessError ('auth_id is invalid')
-        
     if data_store.is_invalid_channel_id(channel_id):
         raise InputError (' channel_id is invalid')
 
@@ -106,7 +96,6 @@ def channel_messages_v1(auth_user_id, channel_id, start):
 
     Exceptions:
         TypeError   - occurs when auth_user_id, channel_id are not ints
-        AccessError - occurs when auth_id is invalid
         InputError  - occurs when channel_id is invalid
         InputError  - occurs when start is negative
         InputError  - occurs when start is greater than the total number of messages
@@ -122,9 +111,6 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     check_type(channel_id, int)
     check_type(start, int)
 
-    if data_store.is_invalid_user_id(auth_user_id):
-        raise AccessError ('auth_id is invalid')
-
     # ASSUMPTION: negative start index causes an InputError exception
     if start < 0:
         raise InputError('start is a negative integer')
@@ -135,6 +121,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
 
     # Checking that auth_id exists in channel
     if not data_store.is_user_member_of_channel(channel_id, auth_user_id):
+        print("AAAA")
         raise AccessError('the authorised user is not a member of the channel')
 
     messages = data_store.get_messages_from_channel_or_dm_id(channel_id)
@@ -165,7 +152,6 @@ def channel_join_v1(auth_user_id, channel_id):
 
     Exceptions:
         TypeError   - occurs when auth_user_id, channel_id are not ints
-        AccessError - occurs when auth_id is invalid
         InputError  - occurs when channel_id is invalid
         AccessError - occurs when channel is not public
         InputError  - occurs when user is already part of the channel
@@ -176,10 +162,7 @@ def channel_join_v1(auth_user_id, channel_id):
 
     check_type(auth_user_id, int)
     check_type(channel_id, int)
-
-    if data_store.is_invalid_user_id(auth_user_id):
-        raise AccessError (' auth_id is invalid')
-
+    
     if data_store.is_invalid_channel_id(channel_id):
         raise InputError ('channel_id is invalid')
 
@@ -209,7 +192,6 @@ def channel_leave_v1(auth_user_id, channel_id):
 
     Exceptions:
         TypeError   - occurs when auth_user_id, channel_id are not ints
-        AccessError - occurs when auth_id is invalid
         InputError  - occurs when channel_id is invalid
         AccessError - occurs when channel_id is valid and the authorised user is
                       not a member of the channel
@@ -220,9 +202,6 @@ def channel_leave_v1(auth_user_id, channel_id):
 
     check_type(auth_user_id, int)
     check_type(channel_id, int)
-
-    if data_store.is_invalid_user_id(auth_user_id):
-        raise AccessError('auth_id is invalid')
     
     if data_store.is_invalid_channel_id(channel_id):
         raise InputError('channel_id is invalid')
@@ -252,7 +231,6 @@ def channel_addowner_v1(auth_user_id, channel_id, u_id):
         u_id            (int)   - unique user id
 
     Exceptions:
-        AccessError - occurs when auth_user_id is invalid
         InputError  - occurs when channel_id is invalid
         AccessError - occurs when channel_id is valid and the authorised user does not have owner permissions in the channel
         InputError  - occurs when u_id does not refer to a valid user
@@ -265,9 +243,6 @@ def channel_addowner_v1(auth_user_id, channel_id, u_id):
     check_type(auth_user_id, int)
     check_type(channel_id, int)
     check_type(u_id, int)
-
-    if data_store.is_invalid_user_id(auth_user_id):
-        raise AccessError ('auth_user_id is invalid')
     
     if data_store.is_invalid_channel_id(channel_id):
         raise InputError ('channel_id is invalid')
@@ -298,7 +273,6 @@ def channel_removeowner_v1(auth_user_id, channel_id, u_id):
         u_id            (int)   - unique user id
 
     Exceptions:
-        AccessError - occurs when auth_user_id is invalid
         InputError  - occurs when channel_id is invalid
         AccessError - occurs when channel_id is valid and the authorised user does not have owner permissions in the channel
         InputError  - occurs when u_id does not refer to a valid user
@@ -312,9 +286,6 @@ def channel_removeowner_v1(auth_user_id, channel_id, u_id):
     check_type(auth_user_id, int)
     check_type(channel_id, int)
     check_type(u_id, int)
-
-    if data_store.is_invalid_user_id(auth_user_id):
-        raise AccessError ('auth_user_id is invalid')
     
     if data_store.is_invalid_channel_id(channel_id):
         raise InputError ('channel_id is invalid')
@@ -326,9 +297,9 @@ def channel_removeowner_v1(auth_user_id, channel_id, u_id):
         raise InputError ('u_id does not refer to a valid user')
     
     if not data_store.is_channel_owner(channel_id, u_id) and not data_store.is_stream_owner(u_id): 
-        raise InputError ('u_id refers to a user who is already an owner of the channel')
+        raise InputError ('u_id refers to a user who is not an owner of the channel')
     
-    if data_store.is_channel_only_owner(channel_id):
+    if data_store.is_channel_only_owner(channel_id) and auth_user_id == u_id:
         raise InputError ('u_id refers to a user who is the only owner')
     
     data_store.remove_channel_owner(channel_id, u_id)

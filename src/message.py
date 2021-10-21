@@ -17,7 +17,6 @@ def message_send_v1(auth_user_id, channel_id, message):
     Exceptions:
         TypeError   - occurs when auth_user_id, channel_id are not ints
         TypeError   - occurs when message is not a str
-        AccessError - occurs when auth_user_id is invalid
         AccessError - occurs when channel_id is valid but the authorised user is not
                     a member of the channel
         InputError  - occurs when message is less than 1 or more than 1000 characters
@@ -28,9 +27,6 @@ def message_send_v1(auth_user_id, channel_id, message):
     check_type(auth_user_id, int)
     check_type(channel_id, int)
     check_type(message, str)
-    
-    if data_store.is_invalid_user_id(auth_user_id):
-        raise AccessError('auth_user_id is invalid')
 
     if data_store.is_invalid_channel_id(channel_id):
         raise InputError('invalid channel_id')
@@ -69,7 +65,6 @@ def message_senddm_v1(auth_user_id, dm_id, message):
     Exceptions:
         TypeError   - occurs when auth_user_id, dm_id are not ints
         TypeError   - occurs when message is not a str
-        AccessError - occurs when auth_user_id is invalid
         AccessError - occurs when dm_id is valid but the authorised user is not
                     a member of the channel
         InputError  - occurs when message is less than 1 or more than 1000 characters
@@ -80,9 +75,6 @@ def message_senddm_v1(auth_user_id, dm_id, message):
     check_type(auth_user_id, int)
     check_type(dm_id, int)
     check_type(message, str)
-    
-    if data_store.is_invalid_user_id(auth_user_id):
-        raise AccessError('auth_user_id is invalid')
 
     if data_store.is_invalid_dm_id(dm_id):
         raise InputError('invalid dm_id')
@@ -117,7 +109,6 @@ def message_remove_v1(auth_user_id, message_id):
         message_id      (int)   - unique message id
 
     Exceptions:
-        AccessError - occurs when auth_user_id is invalid
         InputError  - occurs when message_id does not refer to a valid message within a channel/DM
         InputError  - occurs when user is not a member of channel
         AccessError - occurs when user does not have proper permissions
@@ -127,9 +118,6 @@ def message_remove_v1(auth_user_id, message_id):
     '''
     check_type(auth_user_id, int)
     check_type(message_id, int)
-
-    if data_store.is_invalid_user_id(auth_user_id):
-        raise AccessError ('auth_user_id is invalid')
 
     if data_store.is_invalid_message_id(message_id):
         raise InputError ('message_id does not refer to a valid message within a channel/DM')
@@ -152,9 +140,6 @@ def message_edit_v1(auth_user_id, message_id, message):
     check_type(auth_user_id, int)
     check_type(message_id, int)
     check_type(message, str)
-
-    if data_store.is_invalid_user_id(auth_user_id):
-        raise AccessError
 
     if data_store.is_invalid_message_id(message_id):
         raise InputError
@@ -180,7 +165,5 @@ def message_edit_v1(auth_user_id, message_id, message):
         if original_message.get('message_id') == message_id:
             messages[index]['message'] = message
             print(messages[index]['message'] )
-            break
-    
 
     return {}

@@ -137,11 +137,19 @@ def test_channel_removeowner_v1_works(clear, first_register, get_valid_token):
         'token': new_user['token'], 
         'channel_id': details['channel_id']
     })
-    requests.post(config.url + 'channel/removeowner/v1', json={
+
+    assert requests.post(config.url + 'channel/addowner/v1', json={
         'token': details['token'], 
         'channel_id': details['channel_id'], 
         'u_id': new_user['auth_user_id']
-    })
+    }).status_code == 200
+
+    assert requests.post(config.url + 'channel/removeowner/v1', json={
+        'token': details['token'], 
+        'channel_id': details['channel_id'], 
+        'u_id': new_user['auth_user_id']
+    }).status_code == 200
+
     channel_details = requests.get(config.url + 'channel/details/v2', params={
         'token': new_user['token'], 
         'channel_id': details['channel_id']

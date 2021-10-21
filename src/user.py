@@ -17,7 +17,6 @@ def user_profile_v1(auth_user_id, u_id):
     Exceptions:
         TypeError   - occurs when auth_user_id, u_id are not ints
         TypeError   - occurs when u_id does not refer to a valid user
-        AccessError - occurs when auth_user_id is invalid
         InputError  - occurs when u_id is invalid
 
     Return value:
@@ -26,9 +25,6 @@ def user_profile_v1(auth_user_id, u_id):
 
     check_type(auth_user_id, int)
     check_type(u_id, int)
-
-    if data_store.is_invalid_user_id(auth_user_id):
-        raise AccessError('auth_user_id is invalid')
     
     if data_store.is_invalid_user_id(u_id):
         raise InputError('u_id is invalid')
@@ -41,9 +37,6 @@ def users_all_v1(auth_id):
     Returns a list of all users and their associated details
     '''
     check_type(auth_id, int)
-
-    if data_store.is_invalid_user_id(auth_id):
-        raise AccessError('auth_user_id is invalid')
 
     user_list = {'users': []}
     user_dict = data_store.get_users_from_u_id_dict()
@@ -68,7 +61,6 @@ def user_setname_v1(auth_user_id, name_first, name_last):
     Exceptions:
         TypeError   - occurs when auth_user_id is not an int
         TypeError   - occurs when name_first, name_last are not str
-        AccessError - occurs when auth_user_id is invalid
         InputError  - occurs when name_first, name_last are not between 1 and 50 characters
 
     Return value:
@@ -79,8 +71,6 @@ def user_setname_v1(auth_user_id, name_first, name_last):
     check_type(name_first, str)
     check_type(name_last, str)
 
-    if data_store.is_invalid_user_id(auth_user_id):
-        raise AccessError('auth_user_id is invalid')
     if len(name_first) < 1 or len(name_first) > 50:
         raise InputError ('name_first is less than 1 character or more than 50')
     if len(name_last) < 1 or len(name_last) > 50:
@@ -101,7 +91,6 @@ def user_setemail_v1(auth_id, email):
     Exceptions:
         TypeError   - occurs when auth_user_id is not an int
         TypeError   - occurs when name_first, name_last are not str
-        AccessError - occurs when auth_user_id is invalid
         InputError  - occurs when email is not valid
 
     Return value:
@@ -109,9 +98,6 @@ def user_setemail_v1(auth_id, email):
     '''
     check_type(auth_id, int)
     check_type(email, str)
-
-    if data_store.is_invalid_user_id(auth_id):
-        raise AccessError('auth_user_id is invalid')
 
     if not re.fullmatch(r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$', email):
         raise InputError ('incorrect email format')
@@ -144,7 +130,6 @@ def user_sethandle_v1(auth_id, handle_str):
     Exceptions:
         TypeError   - occurs when auth_user_id is not an int
         TypeError   - occurs when name_first, name_last are not str
-        AccessError - occurs when auth_user_id is invalid
         InputError  - occurs when handle is invalid
 
     Return value:
@@ -152,9 +137,6 @@ def user_sethandle_v1(auth_id, handle_str):
     '''
     check_type(auth_id, int)
     check_type(handle_str, str)
-
-    if data_store.is_invalid_user_id(auth_id):
-        raise AccessError('auth_user_id is invalid')
 
     if len(handle_str) < 3:
         raise InputError('Handle str shorter than 3 characters')

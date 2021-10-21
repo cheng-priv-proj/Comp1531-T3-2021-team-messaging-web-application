@@ -23,6 +23,16 @@ def get_user_1():
     })
     return response.json()
 
+@pytest.fixture
+def get_valid_token():
+    response = requests.post(config.url + 'auth/register/v2', json={
+        'email': 'example@email.com', 
+        'password': 'potato', 
+        'name_first': 'John', 
+        'name_last' : 'smith'
+    })
+    return response.json()
+
 
 # No messages are sent
 def test_empty_messages(clear_server, get_user_1):
@@ -85,6 +95,23 @@ def test_message_is_sent(clear_server, get_user_1):
     assert channel_messages['start'] == 0
     assert channel_messages['end'] == -1
 
+def test_user_not_member_of_channel(clear_server, get_user_1, get_valid_token):
+    channel_dict = requests.post(config.url + 'channels/create/v2', json={
+        'token': get_user_1['token'], 
+        'name': 'test channel', 
+        'is_public': True
+    }).json()
+    extracted_channel_id = channel_dict['channel_id']
+
+    token2 = get_valid_token['token']
+    
+    assert requests.get(config.url + 'channel/messages/v2', params={
+        'token': token2, 
+        'channel_id': extracted_channel_id, 
+        'start': 0
+    }).status_code == 403
+
+
 
 ''' Auth id is not a parameter yet the spec still considers it so. Need to clarify what it means 
 it says in the spec:
@@ -111,3 +138,18 @@ def test_invalid_auth_user_id(clear, register, extract_channel):
 
 
 '''
+def test_long(clear_server, get_user_1):
+    channel_dict = requests.post(config.url + 'channels/create/v2', json={'token': get_user_1['token'], 'name': 'test channel', 'is_public': True}).json()
+    extracted_channel_id = channel_dict['channel_id']
+
+    for _ in range(51):
+        requests.post(config.url + 'message/send/v1', json={'token': get_user_1['token'], 'channel_id': extracted_channel_id, 'message': "Hello there, General Kenobi"}).json()
+
+    channel_messages = requests.get(config.url + 'channel/messages/v2', params={'token': get_user_1['token'], 'channel_id': extracted_channel_id, 'start': 0}).json()
+    messages_list = channel_messages['messages']
+    for specific_message_info in messages_list:
+
+        assert specific_message_info['message'] == "Hello there, General Kenobi"
+
+    assert channel_messages['start'] == 0
+    assert channel_messages['end'] == 50

@@ -158,6 +158,16 @@ def test_not_in_channel(clear, first_register, register_user):
         'channel_id': channel_id}
     ).status_code == 403
 
+# test invalid channel_id
+def test_invalid_channel_id(clear, register_user):
+
+    member_token = register_user('member@member.com')
+
+    assert requests.post(url + 'channel/leave/v1', json = {
+        'token': member_token,
+        'channel_id': 123123}
+    ).status_code == 400
+
 # Test invalid token
 def test_invalid_token(clear, first_register, register_user):
     channel_id = first_register.get('channel_id')

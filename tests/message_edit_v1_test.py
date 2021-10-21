@@ -96,6 +96,42 @@ def test_normal_case_channel(clear_server, get_user_1, auth_id_v2):
 
     assert message['message'] == "GENERAL KENOBI"
 
+def test_normal_multiple_messages_case_channel(clear_server, get_user_1, auth_id_v2):
+    channel_dict = requests.post(config.url + 'channels/create/v2', json= {
+        'token': get_user_1['token'], 
+        'name': 'test channel', 
+        'is_public': True
+    }).json()
+
+    extracted_channel_id = channel_dict['channel_id']
+    requests.post(config.url + 'message/send/v1', json = {
+        'token': get_user_1['token'],
+        'channel_id': extracted_channel_id,
+        'message': 'Hello there 1' }).json()
+
+    message_dict = requests.post(config.url + 'message/send/v1', json = {
+        'token': get_user_1['token'],
+        'channel_id': extracted_channel_id,
+        'message': 'Hello there' }).json()
+
+    message_id = message_dict['message_id']
+
+    requests.put(config.url + 'message/edit/v1', json = {
+        'token' : get_user_1['token'],
+        'message_id': message_id,
+        'message' : "GENERAL KENOBI"
+    })
+
+    message_dict = requests.get(config.url + 'channel/messages/v2', params = {
+        'token': get_user_1['token'],
+        'channel_id': extracted_channel_id, 
+        'start': 0 }).json()
+    messages = message_dict['messages']
+    message = messages[0]
+
+
+    assert message['message'] == "GENERAL KENOBI"
+
 def test_normal_case_non_owner(clear_server, get_user_1, auth_id_v2):
     channel_dict = requests.post(config.url + 'channels/create/v2', json= {
         'token': get_user_1['token'], 
