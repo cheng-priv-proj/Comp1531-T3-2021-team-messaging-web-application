@@ -155,16 +155,16 @@ def test_only_global_owner(register):
         'u_id': register[0].get('auth_user_id')
     }).status_code == 400
 
-    requests.post(url + 'admin/userpermission/change/v1', json={
+    assert requests.post(url + 'admin/userpermission/change/v1', json={
         'token': register[0].get('token'),
         'u_id': register[1].get('auth_user_id'),
         'permission_id': 1
-    })
+    }).status_code == 200
 
-    requests.delete(url + 'admin/user/remove/v1', json={
+    assert requests.delete(url + 'admin/user/remove/v1', json={
         'token': register[0].get('token'),
         'u_id': register[0].get('auth_user_id')
-    })
+    }).status_code == 200
 
     assert requests.delete(url + 'admin/user/remove/v1', json={
         'token': register[1].get('token'),
