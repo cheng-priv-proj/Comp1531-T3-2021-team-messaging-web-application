@@ -61,7 +61,7 @@ def test_user_setemail_test_valid(clear, register_user, extract_user, extract_to
 
     set_email(extract_token(owner_info), 'valid@email.com')
 
-    userone_profile = user_profile(extract_token(owner_info), extract_user(owner_info)).json()
+    userone_profile = user_profile(extract_token(owner_info), extract_user(owner_info)).json().get('user')
 
     assert userone_profile == {
         'u_id': extract_user(owner_info),

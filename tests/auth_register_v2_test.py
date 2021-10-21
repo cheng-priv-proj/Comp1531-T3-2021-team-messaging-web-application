@@ -136,7 +136,7 @@ def test_invalid_last_name_v2(clear_server):
 
 def test_appended_handle_number(clear_server, get_user_1):
     user_1_dict = requests.get(config.url + 'user/profile/v1', params={'token': get_user_1['token'], 'u_id': get_user_1['auth_user_id']}).json()
-    assert(user_1_dict['handle_str'] == "ownerone")
+    assert(user_1_dict['user']['handle_str'] == "ownerone")
 
     response = requests.post(config.url + 'auth/register/v2', json={
         'email': 'owner1@test.com', 
@@ -147,7 +147,7 @@ def test_appended_handle_number(clear_server, get_user_1):
     user_2 = response.json()
     user_2_dict = requests.get(config.url + 'user/profile/v1', params={'token': user_2['token'], 'u_id': user_2['auth_user_id']}).json()
 
-    assert(user_2_dict['handle_str'] == "ownerone0"), 'handle generation of appended handle number'
+    assert(user_2_dict['user']['handle_str'] == "ownerone0"), 'handle generation of appended handle number'
 
 #<<<assume that user profiles is working>>
 # TEsting handle generation on a name that is longer than 20 characters 
@@ -161,5 +161,5 @@ def test_concatenated_length(clear_server):
     user_2 = response.json()
     user_2_dict = requests.get(config.url + 'user/profile/v1', params={'token': user_2['token'], 'u_id': user_2['auth_user_id']}).json()
 
-    assert len(user_2_dict['handle_str']) <= 20
+    assert len(user_2_dict['user']['handle_str']) <= 20
 

@@ -71,7 +71,7 @@ def test_standard(register):
     assert requests.get(url + 'user/profile/v1', params = {
         'token': register[0].get('token'),
         'u_id': register[1].get('auth_user_id')
-    }).json() == {
+    }).json().get('user') == {
         'u_id': register[1].get('auth_user_id'),
         'email': '',
         'name_first': 'Removed',
@@ -135,7 +135,7 @@ def test_standard(register):
     assert requests.get(url + 'user/profile/v1', params = {
         'token': register[0].get('token'),
         'u_id': new_user.get('auth_user_id')
-    }).json() == {
+    }).json().get('user') == {
         'u_id': new_user.get('auth_user_id'),
         'email': 'user@email.com',
         'name_first': 'user',

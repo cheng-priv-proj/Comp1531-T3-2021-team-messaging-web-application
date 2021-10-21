@@ -29,7 +29,9 @@ def user_profile_v1(auth_user_id, u_id):
     if data_store.is_invalid_user_id(u_id):
         raise InputError('u_id is invalid')
 
-    return data_store.get_user_from_u_id(u_id)
+    return {
+        'user': data_store.get_user_from_u_id(u_id)
+    }
 
 
 def users_all_v1(auth_id):
