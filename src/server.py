@@ -828,5 +828,4 @@ def admin_user_remove_v1_endpt():
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, quit_gracefully) # For coverage
     APP.run(port=config.port) # Do not edit this port
-    debug = True
     
