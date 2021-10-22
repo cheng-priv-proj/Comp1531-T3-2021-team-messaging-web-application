@@ -587,20 +587,17 @@ def dm_leave_endpt():
     The creator is allowed to leave and the DM will still exist if this happens. 
     This does not update the name of the DM.
 
-    POST
+    Arguments:
+        token       (string)    - unique user token
+        dm_id           (int)   - unique dm id
 
-    Parameters:
-        { token, dm_id }
-    Return Type:
-        {}
+    Exceptions:
+        TypeError   - occurs when auth_user_id, dm_id are not ints
+        InputError   - dm_id does not refer to a valid DM
+        AccessError - dm_id is valid and the authorised user is not a member of the DM
 
-    InputError when:
-      
-        dm_id does not refer to a valid DM
-      
-    AccessError when:
-      
-        dm_id is valid and the authorised user is not a member of the DM
+    Return values:
+        Returns {} on success
 
     '''
     req_details = request.get_json(force = True)
@@ -629,7 +626,7 @@ def dm_remove_endpt():
         AccessError - Occurs when dm_id is valid but auth_id is not a creator of the DM
 
     Return Value:
-        Returns nothing on success
+        Returns {} on success
     '''
     request_data = request.get_json(force = True)
     auth_id = token_to_auth_id(request_data['token'])
@@ -747,7 +744,31 @@ def message_send_endpt():
 
 @APP.route("/dm/messages/v1", methods=['GET'])
 def dm_messages_endpt():
-    
+    '''
+    Returns a list of messages between index 'start' and up to 'start' + 50 from a
+    given DM that the authorised user has access to. Additionally returns
+    'start', and 'end' = 'start' + 50
+
+    Arguments:
+        token           (str)   - unique user token
+        dm_id           (int)   - unique dm id
+        start           (int)   - message index (most recent message has index 0)
+
+    Exceptions:
+        TypeError   - occurs when auth_user_id, dm_id, start are not ints
+        InputError   - dm_id does not refer to a valid DM
+        InputError  - occurs when start is negative
+        InputError  - occurs when start is greater than the total number of messages
+                    in the channel
+        AccessError - dm_id is valid and the authorised user is not a member of the DM
+
+    Return value:
+        Returns { messages, start, end } on success
+        Returns { messages, start, -1 } if the function has returned the least
+        recent message
+
+    '''
+
     token = request.args.get('token')
     auth_id = token_to_auth_id(token)
     dm_id = request.args.get('dm_id')
