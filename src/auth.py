@@ -117,6 +117,18 @@ def auth_register_v1(email, password, name_first, name_last):
 
 
 def auth_logout_v1(token):
+    '''
+    Given an active token, invalidates the token to log the user out.
+
+    Arguments:
+        token           (str) - unique user token
+
+    Exceptions:
+        N/A
+
+    Return value:
+        Returns {} on success
+    '''
     data_store.invalidate_token(token)
 
     return {}

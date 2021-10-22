@@ -48,30 +48,34 @@ APP.register_error_handler(Exception, defaultHandler)
 #### NO NEED TO MODIFY ABOVE THIS POINT, EXCEPT IMPORTS
 
 ###################### Auth ######################
-# Auth register 
-# Change to dictionary?
-# Return errors?
 @APP.route('/auth/register/v2', methods = ['POST'])
 def register_ep():
+
     '''
-    Given a user's first and last name, email address, and password, create a new account for them and return a new `token`.
+    Updates data store with a new user's information
+    Generates a u_id, auth_id and handle_str.
 
-    Parameters: { email, password, name_first, name_last }
+    Arguments:
+        email       (string)    - users email
+        password    (string)    - users password
+        name_first  (string)    - users first name
+        name_last   (string)    - users last name
 
-    Return Type: { token, auth_user_id }
-    
     Exceptions:
+        TypeError   - occurs when email, password, name_first or name_last
+                    are not strings
+        InputError  - occurs when email is not a valid email
+        InputError  - occurs when email is already being used by another user
+        InputError  - occurs when password is less than 6 characters
+        InputError  - occurs when name_first is less than 1 character
+                    or more than 50
+        InputError  - occurs when name_last is less than 1 character
+                    or more than 50
 
-    InputError when any of:
-      
-        email entered is not a valid email (more in section 6.4)
-        email address is already being used by another user
-        length of password is less than 6 characters
-        length of name_first is not between 1 and 50 characters inclusive
-        length of name_last is not between 1 and 50 characters inclusive
-    
-    
+    Return value:
+        Returns auth_id on success
     '''
+
     register_details = request.get_json(force = True)
 
     email = register_details.get('email')
@@ -97,22 +101,21 @@ def register_ep():
 def login_ep():
 
     '''
-    auth/login/v2
-    POST
+    Given the email and password of a registered user, returns the corresponding
+    auth_id.
+    Arguments:
+        email       (string)   - users email
+        password    (string)   - users password
 
-    Given a registered user's email and password, returns their `token` value.
+    Exceptions:
+        TypeError  - occurs when email or password given are not strings
+        InputError - occurs when email does not belong to a user
+        InputError - occurs when password is not correct
 
-    Parameters:{ email, password }
-    
-    Return Type:{ token, auth_user_id }
-
-    exceptions:
-    InputError when any of:
-      
-        email entered does not belong to a user
-        password is not correct
-    
+    Return value:
+        Returns auth_id on success
     '''
+
     login_details = request.get_json(force = True)
 
     email = login_details.get('email')
@@ -127,12 +130,12 @@ def logout_endpt():
     Given a valid token, invalidates it for future use
     
     Arguments:
-        token (str)
+        token           (str) - unique user token
         
     Exceptions:
         AccessError - Token is invalid
         
-    Returns nothing when successful
+    Returns {} when successful
     '''
     token = request.get_json(force = True).get('token')
     token_to_auth_id(token)
@@ -832,7 +835,7 @@ def admin_userpermission_change_v1_endpt():
 
 @APP.route("/admin/user/remove/v1", methods=['DELETE'])
 def admin_user_remove_v1_endpt():
-    
+
     '''
     admin/user/remove/v1
 
