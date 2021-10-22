@@ -182,6 +182,7 @@ class Datastore:
     # Check functions ##########################################################
 
     def is_token_invalid(self, token):
+        print(self.get_u_ids_from_token_dict())
         if token in self.get_u_ids_from_token_dict():
             return False
         return True
@@ -274,6 +275,19 @@ class Datastore:
 
     def is_invalid_user_id(self, u_id):
         users = self.get_users_from_u_id_dict()
+
+        if u_id not in users:
+            return True
+
+        if users[u_id]['email'] == '':
+            return True
+        
+        return False
+    
+    # returns True even if user is removed
+    def is_invalid_profile(self, u_id):
+        users = self.get_users_from_u_id_dict()
+        print(users)
         if u_id not in users:
             return True
         
@@ -415,12 +429,15 @@ class Datastore:
         dms = self.get_dms_from_dm_id_dict()
         perms = self.get_user_perms_from_u_id_dict()
         messages = self.__store['messages']
+        tokens = self.get_u_ids_from_token_dict()
 
         user = self.get_user_from_u_id(u_id)
-        print(user)
+
         email = user['email']
         del login[email]
-    
+
+        self.__store['token'] = {token: user_id for token, user_id in tokens.items() if user_id != u_id}
+
         # loop through channel to delete user from all channels
         for c_id in channels:
             for i, user in enumerate(channels[c_id]['all_members']):
@@ -444,7 +461,7 @@ class Datastore:
             for message in messages[dm_channel_id]:
                 if message['u_id'] == u_id:
                     message['message'] = 'Removed user'
-        
+
         # Update user/profile
         user['email'] = ''
         user['name_first'] = 'Removed'

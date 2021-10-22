@@ -213,7 +213,6 @@ def channel_leave_v1(auth_user_id, channel_id):
 
     if data_store.is_channel_owner(channel_id, auth_user_id):
         channel['owner_members'] = [owner for owner in members if owner.get('u_id') != auth_user_id]
-    
     return {}
 
 def channel_addowner_v1(auth_user_id, channel_id, u_id):
@@ -242,7 +241,7 @@ def channel_addowner_v1(auth_user_id, channel_id, u_id):
     if data_store.is_invalid_channel_id(channel_id):
         raise InputError ('channel_id is invalid')
 
-    if not (data_store.is_channel_owner(channel_id, auth_user_id) or data_store.is_stream_owner(auth_user_id)):
+    if not (data_store.is_channel_owner(channel_id, auth_user_id) or (data_store.is_stream_owner(auth_user_id) and data_store.is_user_member_of_channel(channel_id, auth_user_id))):
         raise AccessError ('channel_id is valid and the authorised user does not have owner permissions in the channel')
     
     if data_store.is_invalid_user_id(u_id):
@@ -285,13 +284,13 @@ def channel_removeowner_v1(auth_user_id, channel_id, u_id):
     if data_store.is_invalid_channel_id(channel_id):
         raise InputError ('channel_id is invalid')
 
-    if not (data_store.is_channel_owner(channel_id, auth_user_id) or data_store.is_stream_owner(auth_user_id)):
+    if not (data_store.is_channel_owner(channel_id, auth_user_id) or (data_store.is_stream_owner(auth_user_id) and data_store.is_user_member_of_channel(channel_id, auth_user_id))):
         raise AccessError ('channel_id is valid and the authorised user does not have owner permissions in the channel')
     
     if data_store.is_invalid_user_id(u_id):
         raise InputError ('u_id does not refer to a valid user')
     
-    if not data_store.is_channel_owner(channel_id, u_id) and not data_store.is_stream_owner(u_id): 
+    if not data_store.is_channel_owner(channel_id, u_id): 
         raise InputError ('u_id refers to a user who is not an owner of the channel')
     
     if data_store.is_channel_only_owner(channel_id) and auth_user_id == u_id:
@@ -300,5 +299,9 @@ def channel_removeowner_v1(auth_user_id, channel_id, u_id):
     data_store.remove_channel_owner(channel_id, u_id)
 
     return {}
+
+
+
+
 
 

@@ -131,7 +131,7 @@ def message_remove_v1(auth_user_id, message_id):
 
     if not (data_store.is_user_owner_of_channel_or_dm(channel_or_dm_id, auth_user_id) or 
         data_store.is_user_sender_of_message(auth_user_id, message_id) or 
-        data_store.is_stream_owner(auth_user_id)):
+        (data_store.is_stream_owner(auth_user_id) and channel_or_dm_id > 0)):
         raise AccessError ('user does not have proper permissions')
 
     data_store.remove_message(message_id)
