@@ -412,6 +412,7 @@ class Datastore:
         dms = self.get_dms_from_dm_id_dict()
         perms = self.get_user_perms_from_u_id_dict()
         messages = self.__store['messages']
+        tokens = self.get_u_ids_from_token_dict()
 
         user = self.get_user_from_u_id(u_id)
         print(user)
@@ -441,7 +442,7 @@ class Datastore:
             for message in messages[dm_channel_id]:
                 if message['u_id'] == u_id:
                     message['message'] = 'Removed user'
-        
+
         # Update user/profile
         user['email'] = ''
         user['name_first'] = 'Removed'

@@ -270,7 +270,7 @@ def channel_leave_endpt():
     auth_user_id = token_to_auth_id(token)
     channel_id = leave_input.get('channel_id')
 
-    channel_leave_v1(auth_user_id, channel_id)
+    return channel_leave_v1(auth_user_id, channel_id)
 
 @APP.route('/channels/list/v2', methods = ['GET'])
 def channel_list_endpt():

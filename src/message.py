@@ -45,7 +45,7 @@ def message_send_v1(auth_user_id, channel_id, message):
         'message_id': message_id,
         'u_id': auth_user_id,
         'message': message,
-        'time_created': datetime.utcnow().timestamp()
+        'time_created': datetime.now().timestamp()
     }
 
     data_store.insert_message(channel_id, message_dict)
@@ -93,7 +93,7 @@ def message_senddm_v1(auth_user_id, dm_id, message):
         'message_id': message_id,
         'u_id': auth_user_id,
         'message': message,
-        'time_created': datetime.utcnow().timestamp()
+        'time_created': datetime.now().timestamp()
     }
 
     data_store.insert_message(dm_id, message_dict)
@@ -128,7 +128,7 @@ def message_remove_v1(auth_user_id, message_id):
 
     if not (data_store.is_user_owner_of_channel_or_dm(channel_or_dm_id, auth_user_id) or 
         data_store.is_user_sender_of_message(auth_user_id, message_id) or 
-        data_store.is_stream_owner(auth_user_id)):
+        (data_store.is_stream_owner(auth_user_id) and channel_or_dm_id > 0)):
         raise AccessError ('user does not have proper permissions')
 
     data_store.remove_message(message_id)

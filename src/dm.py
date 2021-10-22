@@ -93,7 +93,8 @@ def dm_list_v1(auth_id):
     dm_list = { 'dms': [] }
 
     dms = data_store.get_dms_from_dm_id_dict()
-
+    print('test')
+    print(dms)
     for dm_id in dms:
         if data_store.is_user_member_of_dm(dm_id, auth_id):
             dm_list['dms'].append(
@@ -179,9 +180,9 @@ def dm_leave_v1(auth_id, dm_id):
     details_dict = data_store.get_dm_from_dm_id(dm_id)
     members = details_dict['members']
     
-    for person in members:
-        if person['u_id'] == auth_id:
-            members.remove(person)
+    details_dict['members'] = [person for person in members if person['u_id'] != auth_id]
+    print('sadsdasdasd')
+    print(members)
 
     return {}
 
