@@ -182,6 +182,7 @@ class Datastore:
     # Check functions ##########################################################
 
     def is_token_invalid(self, token):
+        print(self.get_u_ids_from_token_dict())
         if token in self.get_u_ids_from_token_dict():
             return False
         return True
@@ -430,15 +431,13 @@ class Datastore:
         messages = self.__store['messages']
         tokens = self.get_u_ids_from_token_dict()
 
-        users = self.get_users_from_u_id_dict()
-
         user = self.get_user_from_u_id(u_id)
-        print(users)
-        print("AAAAAAAAAAAAAAAAAA")
+
         email = user['email']
         del login[email]
-        print(users)
-    
+
+        self.__store['token'] = {token: user_id for token, user_id in tokens.items() if user_id != u_id}
+
         # loop through channel to delete user from all channels
         for c_id in channels:
             for i, user in enumerate(channels[c_id]['all_members']):
