@@ -56,7 +56,7 @@ def register():
 def test_send_one_valid_message(clear, register, extract_token, extract_user, extract_channel, extract_message):
     channel_id = extract_channel(register)
     owner_token = extract_token(register)
-    now = datetime.utcnow().timestamp()
+    now = datetime.now().timestamp()
 
     message_id = requests.post(url + 'message/send/v1', json = {
         'token': owner_token,
@@ -66,7 +66,7 @@ def test_send_one_valid_message(clear, register, extract_token, extract_user, ex
         'token': owner_token,
         'channel_id': channel_id, 
         'start': 0 }).json()
-    
+    print(messages)
     assert messages == {
         'messages': [
             {
@@ -84,7 +84,7 @@ def test_send_multiple_valid_messages(clear, register, extract_token, extract_us
     channel_id = extract_channel(register)
     owner_token = extract_token(register)
     owner_id = extract_user(register)
-    now = datetime.utcnow().timestamp()
+    now = datetime.now().timestamp()
     message_id0 = extract_message(requests.post(url + 'message/send/v1', json = {
         'token': owner_token,
         'channel_id': channel_id,
