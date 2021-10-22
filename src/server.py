@@ -730,7 +730,7 @@ def message_send_endpt():
         InputError  - occurs when message is less than 1 or more than 1000 characters
 
     Return value:
-        Returns message_id on success
+        Returns {message_id} on success
     '''
 
     request_data = request.get_json(force = True)
@@ -796,7 +796,7 @@ def message_senddm_endpt():
         InputError  - occurs when message is less than 1 or more than 1000 characters
 
     Return value:
-        Returns message_id on success
+        Returns {message_id} on success
     '''
 
     request_data = request.get_json(force = True)
@@ -809,8 +809,29 @@ def message_senddm_endpt():
     return return_dict
 
 @APP.route("/message/edit/v1", methods=['PUT'])
-
 def message_edit_endpt():
+    '''
+    Given a message, update its text with new text. 
+    If the new message is an empty string, the message is deleted.
+
+    Arguments:
+        token           (str)   - unique user token
+        dm_id           (int)   - unique dm id
+        message         (str)   - message string
+    
+    Exceptions:
+        AccessError - occurs when token is invalid
+        TypeError   - occurs when auth_user_id, dm_id are not ints
+        TypeError   - occurs when message is not a str
+        AccessError - occurs when auth_user_id is invalid
+        AccessError - occurs when dm_id is valid but the authorised user is not
+                    a member of the channel
+        InputError  - occurs when message is more than 1000 characters
+
+    Return value:
+        Returns {} on success
+    '''
+    
     request_data = request.get_json(force = True)
     message_id = request_data['message_id']
     message = request_data['message']
@@ -820,6 +841,22 @@ def message_edit_endpt():
 
 @APP.route("/message/remove/v1", methods=['DELETE'])
 def message_remove_endpt():
+    '''
+    Given a message_id for a message, this message is removed from the channel/DM
+
+    Arguments:
+        token           (str) - unique user token
+        message_id      (int)   - unique message id
+
+    Exceptions:
+        AccessError - occurs when token is invalid
+        InputError  - occurs when message_id does not refer to a valid message within a channel/DM
+        InputError  - occurs when user is not a member of channel
+        AccessError - occurs when user does not have proper permissions
+
+    Return Value:
+        Returns {} on success
+    '''
     request_data = request.get_json(force = True)
     message_id = request_data['message_id']
     token = request_data['token']
