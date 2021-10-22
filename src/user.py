@@ -29,7 +29,9 @@ def user_profile_v1(auth_user_id, u_id):
     if data_store.is_invalid_user_id(u_id):
         raise InputError('u_id is invalid')
 
-    return data_store.get_user_from_u_id(u_id)
+    return {
+        'user': data_store.get_user_from_u_id(u_id)
+    }
 
 
 def users_all_v1(auth_id):
@@ -49,10 +51,10 @@ def users_all_v1(auth_id):
 
     user_list = {'users': []}
     user_dict = data_store.get_users_from_u_id_dict()
-    for user in user_dict:
-        if not user_dict[user]['email'] == '':
+    for user in user_dict.values():
+        if not user['email'] == '':
             user_list['users'].append(
-                user_dict[user]
+                user
             )
     
     print(user_list)

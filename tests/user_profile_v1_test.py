@@ -61,7 +61,7 @@ def user_info_to_user_datatype():
 def test_user_profile_test_valid(clear, register_user, user_info_to_user_datatype, extract_user, extract_token, user_profile):
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     userone_info = register_user('user1@gmail.com', 'user', 'one')
-    userone_profile = user_profile(extract_token(owner_info), extract_user(userone_info)).json()
+    userone_profile = user_profile(extract_token(owner_info), extract_user(userone_info)).json().get('user')
 
     assert userone_profile == {
         'u_id': extract_user(userone_info),
@@ -90,7 +90,7 @@ def test_user_profile_invalid_id_and_token(clear, register_user, user_info_to_us
 
 def test_user_profile_get_your_own_profile(clear, register_user, user_info_to_user_datatype, extract_user, extract_token, user_profile):
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
-    owner_profile = user_profile(extract_token(owner_info), extract_user(owner_info)).json()
+    owner_profile = user_profile(extract_token(owner_info), extract_user(owner_info)).json().get('user')
 
     assert owner_profile == {
         'u_id': extract_user(owner_info),

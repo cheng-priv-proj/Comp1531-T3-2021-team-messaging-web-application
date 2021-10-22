@@ -105,22 +105,22 @@ def test_success_perms_change(clear, first_register, second_register):
     become_member = 2
 
     # Makes second user an owner
-    requests.post(url + 'admin/userpermission/change/v1', json = {
+    assert requests.post(url + 'admin/userpermission/change/v1', json = {
         'token': first_token, 
         'u_id': second_u_id,
         'permission_id': become_owner
-    })
+    }).status_code == 200
 
     # Makes first user member
-    requests.post(url + 'admin/userpermission/change/v1', json = {
+    assert requests.post(url + 'admin/userpermission/change/v1', json = {
         'token': second_token, 
         'u_id': first_u_id,
         'permission_id': become_member
-    })
+    }).status_code == 200
 
     # Tries to change second as user
     assert requests.post(url + 'admin/userpermission/change/v1', json = {
-        'token': first_token, 
+        'token': second_token, 
         'u_id': second_u_id,
         'permission_id': become_member
     }).status_code == 400

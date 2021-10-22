@@ -105,8 +105,7 @@ def dm_list_v1(auth_id):
                     'name': dm['details']['name']
                 }
                 for dm_id, dm in dm_dict
-                for member in dm['details']['members']
-                if member['u_id'] == auth_id
+                if data_store.is_user_member_of_dm(dm_id, auth_id)
               ]
 
     return { 'dms': dm_list }
@@ -152,7 +151,6 @@ def dm_messages_v1(auth_id, dm_id, start):
     messages = data_store.get_messages_from_channel_or_dm_id(dm_id)
     num_messages = len(messages)
 
-    end = start + 50
 
     if start < 0:
         raise InputError('start is a negative integer')
@@ -160,8 +158,7 @@ def dm_messages_v1(auth_id, dm_id, start):
         raise InputError('start is greater than the total number of messages in the channel')
 
     # accounts for when given empty channel and start = 0
-    elif start + 50 >= num_messages:
-        end = -1
+    end = start + 50 if start + 50 < no_of_messages else -1
     
     return {
         'messages' : messages[start: start + 50],
