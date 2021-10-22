@@ -1,9 +1,8 @@
 from src.data_store import data_store
 from src.error import InputError
-from src.other import check_type
+from src.other import check_type, check_email_valid
 from src.other import handle_str_generation
-from src.other import stream_owner
-from src.other import stream_member
+from src.other import stream_owner, stream_member
 from src.other import hash_str
 from src.config import SECRET
 import re
@@ -81,9 +80,7 @@ def auth_register_v1(email, password, name_first, name_last):
     check_type(name_first, str)
     check_type(name_last, str)
 
-    # check for valid email format
-    if not re.fullmatch(r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$', email):
-        raise InputError ('incorrect email format')
+    check_email_valid(email)
 
     # check for valid password, name_first and name_last lengths
     if len(password) < 6:

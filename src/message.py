@@ -41,7 +41,7 @@ def message_send_v1(auth_user_id, channel_id, message):
 
     # message ids will start from 0
     message_id = data_store.get_messages_count()
-    data_store.insert_message_count()
+    data_store.increment_message_count()
 
     message_dict = {
         'message_id': message_id,
@@ -89,8 +89,8 @@ def message_senddm_v1(auth_user_id, dm_id, message):
         raise InputError('message has invalid length')
 
     # message ids will start from 0
-    data_store.insert_message_count()
     message_id = data_store.get_messages_count()
+    data_store.increment_message_count()
 
     message_dict = {
         'message_id': message_id,
@@ -183,11 +183,8 @@ def message_edit_v1(auth_user_id, message_id, message):
     if message == '':
         data_store.remove_message(message_id)
     
-    print(messages)
-    for index, original_message in enumerate(messages):
-        print(original_message.get('message_id'))
+    for original_message in messages:
         if original_message.get('message_id') == message_id:
-            messages[index]['message'] = message
-            print(messages[index]['message'] )
+            original_message['message'] = message
 
     return {}

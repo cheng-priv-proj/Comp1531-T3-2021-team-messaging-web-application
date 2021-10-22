@@ -111,33 +111,29 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     check_type(channel_id, int)
     check_type(start, int)
 
-    # ASSUMPTION: negative start index causes an InputError exception
-    if start < 0:
-        raise InputError('start is a negative integer')
-
     # Checking if the channel id exists
     if data_store.is_invalid_channel_id(channel_id):
         raise InputError('channel_id does not refer to a valid channel')
 
     # Checking that auth_id exists in channel
     if not data_store.is_user_member_of_channel(channel_id, auth_user_id):
-        print("AAAA")
         raise AccessError('the authorised user is not a member of the channel')
 
+    # ASSUMPTION: negative start index causes an InputError exception
+    if start < 0:
+        raise InputError('start is a negative integer')
+
     messages = data_store.get_messages_from_channel_or_dm_id(channel_id)
-    no_of_messages = len(messages)
+    num_messages = len(messages)
 
-    end = start + 50
-
-    if start > no_of_messages:
+    if start > num_messages:
         raise InputError('start is greater than the total number of messages in the channel')
 
     # accounts for when given empty channel and start = 0
-    elif  start + 50 >= no_of_messages:
-        end = -1
+    end = start + 50 if start + 50 < num_messages else -1
     
     return {
-        'messages' : messages,
+        'messages' : messages[start: start + 50],
         'start': start,
         'end' : end
         }
@@ -166,11 +162,11 @@ def channel_join_v1(auth_user_id, channel_id):
     if data_store.is_invalid_channel_id(channel_id):
         raise InputError ('channel_id is invalid')
 
-    channel = data_store.get_channel_from_channel_id(channel_id)
-
     # Checking if user exists in all members
     if data_store.is_user_member_of_channel(channel_id, auth_user_id):
         raise InputError ('user is already part of the channel')
+
+    channel = data_store.get_channel_from_channel_id(channel_id)
 
     # Checking if channel is public
     if not channel.get('is_public') and not data_store.is_stream_owner(auth_user_id):
@@ -209,7 +205,6 @@ def channel_leave_v1(auth_user_id, channel_id):
     if not data_store.is_user_member_of_channel(channel_id, auth_user_id):
         raise AccessError('channel_id is valid and the authorised user is not a member of the channel')
 
-    # move everything below into a data_store method?
     channel = data_store.get_channel_from_channel_id(channel_id)
 
     members = channel.get('all_members')

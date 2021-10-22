@@ -2,7 +2,7 @@ from src.data_store import data_store
 
 from src.error import InputError
 from src.error import AccessError
-from src.other import check_type
+from src.other import check_type, check_email_valid
 import re
 
 def user_profile_v1(auth_user_id, u_id):
@@ -29,9 +29,7 @@ def user_profile_v1(auth_user_id, u_id):
     if data_store.is_invalid_user_id(u_id):
         raise InputError('u_id is invalid')
 
-    return {
-        'user': data_store.get_user_from_u_id(u_id)
-    }
+    return { 'user': data_store.get_user_from_u_id(u_id) }
 
 
 def users_all_v1(auth_id):
@@ -49,16 +47,10 @@ def users_all_v1(auth_id):
     '''
     check_type(auth_id, int)
 
-    user_list = {'users': []}
     user_dict = data_store.get_users_from_u_id_dict()
-    for user in user_dict.values():
-        if not user['email'] == '':
-            user_list['users'].append(
-                user
-            )
+    users = [user for user in user_dict.values() if not user['email'] == '']
     
-    print(user_list)
-    return user_list
+    return { 'users': users }
 
 def user_setname_v1(auth_user_id, name_first, name_last):
     '''
@@ -110,8 +102,7 @@ def user_setemail_v1(auth_id, email):
     check_type(auth_id, int)
     check_type(email, str)
 
-    if not re.fullmatch(r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$', email):
-        raise InputError ('incorrect email format')
+    check_email_valid(email)
 
     if data_store.is_duplicate_email(email):
         raise InputError ('email is already being used by another user')
@@ -142,10 +133,13 @@ def user_sethandle_v1(auth_id, handle_str):
 
     if len(handle_str) < 3:
         raise InputError('Handle str shorter than 3 characters')
+
     if len(handle_str) > 20:
         raise InputError('Handle str longer than 20 characters')
+
     if handle_str.isalnum() == False:
         raise InputError('Handle str not alphanumeric')
+
     if data_store.is_duplicate_handle(handle_str):
         raise InputError('Duplicate handle string')
 
