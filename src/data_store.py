@@ -271,6 +271,20 @@ class Datastore:
 
     def is_invalid_user_id(self, u_id):
         users = self.get_users_from_u_id_dict()
+        print(users)
+        if u_id not in users:
+            return True
+        
+        for u_id in users.keys():
+            print(users[u_id]['email'])
+            if users[u_id]['email'] == '':
+                return True
+        
+        return False
+    
+    def is_invalid_user_id_or_deleted(self, u_id):
+        users = self.get_users_from_u_id_dict()
+        print(users)
         if u_id not in users:
             return True
         
