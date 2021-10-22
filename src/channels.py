@@ -3,29 +3,26 @@ from src.error import InputError
 from src.error import AccessError
 from src.other import check_type
 
-'''
-Returns a list of channels that the authorised user is apart of.
-
-Arguments:
-    auth_user_id    (int)   - authorised user id
-
-Exceptions:
-    TypeError   - occurs when auth_user_id is not an int
-
-Return value:
-    Returns channels on success
-'''
 def channels_list_v1(auth_user_id):
+    '''
+    Returns a list of channels that the authorised user is apart of.
 
+    Arguments:
+        auth_user_id    (int)   - authorised user id
+
+    Exceptions:
+        TypeError   - occurs when auth_user_id is not an int
+
+    Return value:
+        Returns channels on success
+    '''
+    
     check_type(auth_user_id, int)
 
-    # Setup Dictionary
     channel_list = { 'channels': [] }
     
-    # Get datastore 
     channels = data_store.get_channels_from_channel_id_dict()
 
-    # Returns a dictionary of dictionaries. Loop through each key and append
     for channel_id in channels:
         if data_store.is_user_member_of_channel(channel_id, auth_user_id):
             channel_list.get('channels').append( 

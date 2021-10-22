@@ -48,30 +48,33 @@ APP.register_error_handler(Exception, defaultHandler)
 #### NO NEED TO MODIFY ABOVE THIS POINT, EXCEPT IMPORTS
 
 ###################### Auth ######################
-# Auth register 
-# Change to dictionary?
-# Return errors?
 @APP.route('/auth/register/v2', methods = ['POST'])
 def register_ep():
     '''
-    Given a user's first and last name, email address, and password, create a new account for them and return a new `token`.
+    Updates data store with a new user's information
+    Generates a u_id, auth_id and handle_str.
 
-    Parameters: { email, password, name_first, name_last }
+    Arguments:
+        email       (string)    - users email
+        password    (string)    - users password
+        name_first  (string)    - users first name
+        name_last   (string)    - users last name
 
-    Return Type: { token, auth_user_id }
-    
     Exceptions:
+        TypeError   - occurs when email, password, name_first or name_last
+                    are not strings
+        InputError  - occurs when email is not a valid email
+        InputError  - occurs when email is already being used by another user
+        InputError  - occurs when password is less than 6 characters
+        InputError  - occurs when name_first is less than 1 character
+                    or more than 50
+        InputError  - occurs when name_last is less than 1 character
+                    or more than 50
 
-    InputError when any of:
-      
-        email entered is not a valid email (more in section 6.4)
-        email address is already being used by another user
-        length of password is less than 6 characters
-        length of name_first is not between 1 and 50 characters inclusive
-        length of name_last is not between 1 and 50 characters inclusive
-    
-    
+    Return value:
+        Returns {token, auth_user_id} on success
     '''
+
     register_details = request.get_json(force = True)
 
     email = register_details.get('email')
@@ -97,22 +100,21 @@ def register_ep():
 def login_ep():
 
     '''
-    auth/login/v2
-    POST
+    Given the email and password of a registered user, returns the corresponding
+    auth_id.
+    Arguments:
+        email       (string)   - users email
+        password    (string)   - users password
 
-    Given a registered user's email and password, returns their `token` value.
+    Exceptions:
+        TypeError  - occurs when email or password given are not strings
+        InputError - occurs when email does not belong to a user
+        InputError - occurs when password is not correct
 
-    Parameters:{ email, password }
-    
-    Return Type:{ token, auth_user_id }
-
-    exceptions:
-    InputError when any of:
-      
-        email entered does not belong to a user
-        password is not correct
-    
+    Return value:
+        Returns {token, auth_user_id} on success
     '''
+
     login_details = request.get_json(force = True)
 
     email = login_details.get('email')
@@ -127,13 +129,14 @@ def logout_endpt():
     Given a valid token, invalidates it for future use
     
     Arguments:
-        token (str)
+        token           (str) - unique user token
         
     Exceptions:
         AccessError - Token is invalid
         
-    Returns nothing when successful
+    Returns {} when successful
     '''
+
     token = request.get_json(force = True).get('token')
     token_to_auth_id(token)
     return auth_logout_v1(token)
@@ -145,18 +148,22 @@ def logout_endpt():
 def channel_create_ep():
 
     '''
-    channels/create/v2
-    POST
-    Creates a new channel with the given name that is either a public or private channel. The user who created it automatically joins the channel.
+    Creates a new channel, generating a channel_id and storing the information in
+    the datastore. Returns the channel_id.
 
-    Parameters:{ token, name, is_public }
-    
-    Return Type:{ channel_id }
+    Arguments:
+        token           (str) - unique user token
+        name            (str)   - channel name
+        is_public       (bool)  - public/private status
 
-    exceptions:
-    InputError when:
-      
-        length of name is less than 1 or more than 20 characters
+    Exceptions:
+        TypeError   - occurs when auth_user_id is not an int
+        TypeError   - occurs when name is not a string
+        TypeError   - occurs when is_public is not a bool
+        InputError  - occurs when name is not between 1 and 20 characters
+
+    Return value:
+        Returns {channel_id} on success
     '''
     create_details = request.get_json(force = True)
 
@@ -175,29 +182,27 @@ def channel_create_ep():
 # Channel Invite 
 @APP.route('/channel/invite/v2', methods = ['POST'])
 def channel_invite_ep():
-
     '''
-    channel/invite/v2
-    POST
+    Adds another user to a channel that the auth_user is a member of.
 
-    Invites a user with ID u_id to join a channel with ID channel_id. 
-    Once invited, the user is added to the channel immediately. 
-    In both public and private channels, all members are able to invite users.
-    
-    Parameters:{ token, channel_id, u_id }
-    
-    Return Type:{}
+    Arguments:
+        token           (str)   - unique user token (inviter)
+        channel_id      (int)   - unique channel id
+        u_id            (int)   - user id (invitee)
 
-    InputError when any of:
-      
-        channel_id does not refer to a valid channel
-        u_id does not refer to a valid user
-        u_id refers to a user who is already a member of the channel
-      
-      AccessError when:
-      
-        channel_id is valid and the authorised user is not a member of the channel
+    Exceptions:
+        TypeError   - occurs when auth_user_id, channel_id, u_id are not ints
+        AccessError - occurs when channel_id is valid but the authorised user is not
+                    a member of the channel
+        InputError  - occurs when channel_id is invalid
+        InputError  - occurs when the u_id is invalid
+        InputError  - occurs when the u_id refers to a user who is already a member
+                    of the channel
+
+    Return value:
+        Returns {} on success
     '''
+
     invite_details = request.get_json(force = True)
 
     token = invite_details.get('token')
@@ -211,28 +216,28 @@ def channel_invite_ep():
 # Channel messages 
 @APP.route('/channel/messages/v2', methods = ['GET'])
 def channel_messages_ep():
+
     '''
-    channel/messages/v2
+    Returns a list of messages between index 'start' and up to 'start' + 50 from a
+    given channel that the authorised user has access to. Additionally returns
+    'start', and 'end' = 'start' + 50
 
-    GET
+    Arguments:
+        token           (str)   - unique user token
+        channel_id      (int)   - unique channel id
+        start           (int)   - message index (most recent message has index 0)
 
-    Given a channel with ID channel_id that the authorised user is a member of, return up to 50 messages between index "start" and "start + 50". 
-    Message with index 0 is the most recent message in the channel. 
-    This function returns a new index "end" which is the value of "start + 50", or, if this function has returned the least recent messages in the channel, 
-    returns -1 in "end" to indicate there are no more messages to load after this return.
+    Exceptions:
+        TypeError   - occurs when auth_user_id, channel_id are not ints
+        InputError  - occurs when channel_id is invalid
+        InputError  - occurs when start is negative
+        InputError  - occurs when start is greater than the total number of messages
+                    in the channel
 
-    Parameters:{ token, channel_id, start }
-
-    Return Type:{ messages, start, end }
-    
-    InputError when any of:
-      
-        channel_id does not refer to a valid channel
-        start is greater than the total number of messages in the channel
-      
-      AccessError when:
-      
-        channel_id is valid and the authorised user is not a member of the channel
+    Return value:
+        Returns { messages, start, end } on success
+        Returns { messages, start, -1 } if the function has returned the least
+        recent message
     '''
 
     token = request.args.get('token')
@@ -261,7 +266,7 @@ def channel_leave_endpt():
                       not a member of the channel
 
     Return value:
-        Returns nothing on success
+        Returns {} on success
     '''
 
     leave_input = request.get_json(force = True)
@@ -275,14 +280,16 @@ def channel_leave_endpt():
 @APP.route('/channels/list/v2', methods = ['GET'])
 def channel_list_endpt():
     '''
-    channels/list/v2
-    Provide a list of all channels (and their associated details) that the authorised user is part of.
+    Returns a list of channels that the authorised user is apart of.
 
-    GET
+    Arguments:
+        token           (str)   - unique user token
 
-    Parameters:{ token }
-    
-    Return Type:{ channels }
+    Exceptions:
+        TypeError   - occurs when converted auth_user_id is not an int
+
+    Return value:
+        Returns {channels} on success
     '''
 
     token = request.args.get('token')
@@ -293,15 +300,16 @@ def channel_list_endpt():
 @APP.route('/channels/listall/v2', methods = ['GET'])
 def list_all_endpt():
     '''
-    channels/listall/v2
-    Provide a list of all channels, including private channels, (and their associated details)
+    Returns a list of all channels, including private channels.
 
-    GET
+    Arguments:
+        token           (str)   - unique user token
 
-    Parameters:{ token }
-    
-    Return Type:
-    
+    Exceptions:
+        TypeError   - occurs when auth_user_id is not an int
+
+    Return value:
+        Returns {channels} on success
     '''
 
     token = request.args.get('token')
@@ -329,22 +337,20 @@ def echo():
 @APP.route("/channel/join/v2", methods=['POST'])
 def channel_join_endpt():
     '''
-    Given a channel_id of a channel that the authorised user can join, adds them to that channel.
-    Parameters:
-    { token, channel_id }
-    
-    Return Type:
-    {}
+    Adds an authorised user to a channel
+
+    Arguments:
+        auth_user_id    (int)   - authorised user id
+        channel_id      (int)   - unique channel id
 
     Exceptions:
+        TypeError   - occurs when auth_user_id, channel_id are not ints
+        InputError  - occurs when channel_id is invalid
+        AccessError - occurs when channel is not public
+        InputError  - occurs when user is already part of the channel
 
-      InputError when any of:
-        channel_id does not refer to a valid channel
-        the authorised user is already a member of the channel
-      
-      AccessError when:
-        channel_id refers to a channel that is private and the authorised user is not already a channel member and is not a global owner
-
+    Return value:
+        Returns {} on success
     '''
     
     join_details = request.get_json()
@@ -359,19 +365,22 @@ def channel_join_endpt():
 
 @APP.route("/channel/details/v2", methods=['GET'])
 def channel_details_endpt():
+
     '''
-    Given a channel with ID channel_id that the authorised user is a member of, provide basic details about the channel.
+    Returns the details of a given channel that an authorised user has access to.
 
-    Parameters: 
-    { token, channel_id }
+    Arguments:
+        auth_user_id    (int)   - authorised user id
+        channel_id      (int)   - unique channel id
 
-    Return Type: 
-    { name, is_public, owner_members, all_members }
+    Exceptions:
+        TypeError   - occurs when auth_user_id, channel_id are not ints
+        InputError  - occurs when channel_id is invalid
+        AccessError - occurs when channel_id is valid but the authorised user is
+                    not a member of the channel
 
-    Exceptions: 
-    InputError when:
-        channel_id does not refer to a valid channel
-    
+    Return value:
+        Returns {name, is_public, owner_members, all_members} on success
     '''
 
     token = request.args.get('token')
@@ -465,7 +474,7 @@ def channel_addowner_endpt():
         InputError  - occurs when u_id refers to a user who is already an owner of the channel
 
     Returns:
-        Returns nothing on success
+        Returns {} on success
     '''
     
     request_data = request.get_json()
@@ -496,7 +505,7 @@ def channel_removeowner_endpt():
         InputError  - occurs when u_id refers to a user who is currently the only owner of the channel
 
     Returns:
-        Returns nothing on success
+        Returns {} on success
     '''
     
     request_data = request.get_json()
@@ -523,7 +532,7 @@ def user_profile_ep():
         InputError  - occurs when u_id is invalid
 
     Return value:
-        Returns user on success
+        Returns {user} on success
     '''
 
     token = request.args.get('token')
@@ -535,6 +544,18 @@ def user_profile_ep():
 
 @APP.route("/users/all/v1", methods=['GET'])
 def users_all_ep():
+    '''
+    Returns a list of all users and their associated details
+
+    Arguments:
+        token           (str)   - valid token
+    
+    Exceptions:
+        TypeError   - occurs when auth_user_id is not int
+
+    Return value:
+        Returns {users} on success
+    '''
     
     token = request.args.get('token')
     auth_user_id = token_to_auth_id(token)
@@ -558,8 +579,9 @@ def user_profile_setname_ep():
         InputError  - occurs when name_first, name_last are not between 1 and 50 characters
 
     Return value:
-        Returns nothing on success
+        Returns {} on success
     '''
+
     request_data = request.get_json()
     token = request_data['token']
     auth_user_id = token_to_auth_id(token)
@@ -578,20 +600,17 @@ def dm_leave_endpt():
     The creator is allowed to leave and the DM will still exist if this happens. 
     This does not update the name of the DM.
 
-    POST
+    Arguments:
+        token       (string)    - unique user token
+        dm_id           (int)   - unique dm id
 
-    Parameters:
-        { token, dm_id }
-    Return Type:
-        {}
+    Exceptions:
+        TypeError   - occurs when auth_user_id, dm_id are not ints
+        InputError   - dm_id does not refer to a valid DM
+        AccessError - dm_id is valid and the authorised user is not a member of the DM
 
-    InputError when:
-      
-        dm_id does not refer to a valid DM
-      
-    AccessError when:
-      
-        dm_id is valid and the authorised user is not a member of the DM
+    Return values:
+        Returns {} on success
 
     '''
     req_details = request.get_json(force = True)
@@ -620,7 +639,7 @@ def dm_remove_endpt():
         AccessError - Occurs when dm_id is valid but auth_id is not a creator of the DM
 
     Return Value:
-        Returns nothing on success
+        Returns {} on success
     '''
     request_data = request.get_json(force = True)
     auth_id = token_to_auth_id(request_data['token'])
@@ -640,7 +659,7 @@ def dm_list_ep():
             AccessError - Occurs when token is invalid
 
         Return Value:
-            Returns nothing on success
+            Returns {} on success
     '''
 
     token = request.args.get('token')
@@ -666,7 +685,7 @@ def user_profile_setemail_ep():
         InputError  - occurs when email is not valid
 
     Return value:
-        Returns nothing on success
+        Returns {} on success
     '''
 
     request_data = request.get_json()
@@ -693,7 +712,7 @@ def user_profile_sethandle_ep():
         InputError  - occurs when handle is invalid
 
     Return value:
-        Returns nothing on success
+        Returns {} on success
     '''
 
     request_data = request.get_json()
@@ -724,7 +743,7 @@ def message_send_endpt():
         InputError  - occurs when message is less than 1 or more than 1000 characters
 
     Return value:
-        Returns message_id on success
+        Returns {message_id} on success
     '''
 
     request_data = request.get_json(force = True)
@@ -738,7 +757,31 @@ def message_send_endpt():
 
 @APP.route("/dm/messages/v1", methods=['GET'])
 def dm_messages_endpt():
-    
+    '''
+    Returns a list of messages between index 'start' and up to 'start' + 50 from a
+    given DM that the authorised user has access to. Additionally returns
+    'start', and 'end' = 'start' + 50
+
+    Arguments:
+        token           (str)   - unique user token
+        dm_id           (int)   - unique dm id
+        start           (int)   - message index (most recent message has index 0)
+
+    Exceptions:
+        TypeError   - occurs when auth_user_id, dm_id, start are not ints
+        InputError   - dm_id does not refer to a valid DM
+        InputError  - occurs when start is negative
+        InputError  - occurs when start is greater than the total number of messages
+                    in the channel
+        AccessError - dm_id is valid and the authorised user is not a member of the DM
+
+    Return value:
+        Returns { messages, start, end } on success
+        Returns { messages, start, -1 } if the function has returned the least
+        recent message
+
+    '''
+
     token = request.args.get('token')
     auth_id = token_to_auth_id(token)
     dm_id = request.args.get('dm_id')
@@ -766,7 +809,7 @@ def message_senddm_endpt():
         InputError  - occurs when message is less than 1 or more than 1000 characters
 
     Return value:
-        Returns message_id on success
+        Returns {message_id} on success
     '''
 
     request_data = request.get_json(force = True)
@@ -779,8 +822,29 @@ def message_senddm_endpt():
     return return_dict
 
 @APP.route("/message/edit/v1", methods=['PUT'])
-
 def message_edit_endpt():
+    '''
+    Given a message, update its text with new text. 
+    If the new message is an empty string, the message is deleted.
+
+    Arguments:
+        token           (str)   - unique user token
+        dm_id           (int)   - unique dm id
+        message         (str)   - message string
+    
+    Exceptions:
+        AccessError - occurs when token is invalid
+        TypeError   - occurs when auth_user_id, dm_id are not ints
+        TypeError   - occurs when message is not a str
+        AccessError - occurs when auth_user_id is invalid
+        AccessError - occurs when dm_id is valid but the authorised user is not
+                    a member of the channel
+        InputError  - occurs when message is more than 1000 characters
+
+    Return value:
+        Returns {} on success
+    '''
+
     request_data = request.get_json(force = True)
     message_id = request_data['message_id']
     message = request_data['message']
@@ -790,6 +854,22 @@ def message_edit_endpt():
 
 @APP.route("/message/remove/v1", methods=['DELETE'])
 def message_remove_endpt():
+    '''
+    Given a message_id for a message, this message is removed from the channel/DM
+
+    Arguments:
+        token           (str) - unique user token
+        message_id      (int)   - unique message id
+
+    Exceptions:
+        AccessError - occurs when token is invalid
+        InputError  - occurs when message_id does not refer to a valid message within a channel/DM
+        InputError  - occurs when user is not a member of channel
+        AccessError - occurs when user does not have proper permissions
+
+    Return Value:
+        Returns {} on success
+    '''
     request_data = request.get_json(force = True)
     message_id = request_data['message_id']
     token = request_data['token']
@@ -799,7 +879,24 @@ def message_remove_endpt():
 
 @APP.route("/admin/userpermission/change/v1", methods=['POST'])
 def admin_userpermission_change_v1_endpt():
+    '''
+        Given a user by their user ID, set their permissions to new permissions described by permission_id.
 
+        Arguments:
+            token           (str) - unique user token
+            u_id            (int) - unique user identifier
+            permission_id   (int) - integer specifying permission type
+
+        Exceptions:
+            InputError - Occurs when u_id does not refer to a valid user
+            InputError - Occurs when u_id refers to a user who is the only global owner and they are being demoted to a user
+            InputError - Occurs when permission_id is invalid
+            
+            AccessError - Occurs when the authorised user is not a global owner
+
+        Return Value:
+            Returns {} on successful change. 
+    '''
     request_data = request.get_json()
     token = request_data['token']
     auth_id = token_to_auth_id(token)
@@ -812,6 +909,25 @@ def admin_userpermission_change_v1_endpt():
 
 @APP.route("/admin/user/remove/v1", methods=['DELETE'])
 def admin_user_remove_v1_endpt():
+
+    '''
+    Given a user by their u_id, remove them from the Streams. 
+    This means they should be removed from all channels/DMs, and will not be included in the list of users returned by users/all. 
+
+    Arguments:
+        token           (str) - unique user token
+        u_id            (int) - unique user identifier
+
+    Exceptions:
+        InputError - Occurs when u_id does not refer to a valid user
+        InputError - Occurs when u_id refers to a user who is the only global owner 
+        
+        AccessError - Occurs when the authorised user is not a global owner
+
+    Return Value:
+        Returns {} on successful delete.
+
+    '''
     request_data = request.get_json()
     token = request_data['token']
     auth_id = token_to_auth_id(token)
@@ -819,7 +935,7 @@ def admin_user_remove_v1_endpt():
 
     admin_user_remove_v1(auth_id, u_id)
 
-    return{}
+    return {}
 
 
 

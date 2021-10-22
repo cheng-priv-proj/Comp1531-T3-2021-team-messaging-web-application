@@ -11,27 +11,22 @@ def admin_userpermission_change_v1(auth_user_id, u_id, permission_id):
     admin/userpermission/change/v1
     Given a user by their user ID, set their permissions to new permissions described by permission_id.
 
-    POST
+    Method: POST
 
-    Parameters:
-        { token, u_id, permission_id }
+    Arguments:
+        token           (str) - unique user token
+        u_id            (int) - unique user identifier
+        permission_id   (int) - integer specifying permission type
 
-    Return Type:
-        {}
-
-    InputError when any of:
+    Exceptions:
+        InputError - Occurs when u_id does not refer to a valid user
+        InputError - Occurs when u_id refers to a user who is the only global owner and they are being demoted to a user
+        InputError - Occurs when permission_id is invalid
         
-            u_id does not refer to a valid user
-            u_id refers to a user who is the only global owner and they are being demoted to a user
-            permission_id is invalid
-        
-    AccessError when:
-        
-            the authorised user is not a global owner
+        AccessError - Occurs when the authorised user is not a global owner
 
-
-    added exceptions (not in spec)
-        if for any reason, the 
+    Return Value:
+        Returns {} on successful change. 
     '''
 
     check_type(auth_user_id, int)
@@ -68,28 +63,24 @@ def admin_user_remove_v1(auth_user_id, u_id):
 
     Given a user by their u_id, remove them from the Streams. 
     This means they should be removed from all channels/DMs, and will not be included in the list of users returned by users/all. 
-    Streams owners can remove other Streams owners (including the original first owner). 
-    Once users are removed, the contents of the messages they sent will be replaced by 'Removed user'. 
-    Their profile must still be retrievable with user/profile, however name_first should be 'Removed' and name_last should be 'user'. 
-    The user's email and handle should be reusable.
 
-    DELETE
+    Method: DELETE
 
-    Parameters:
-        { token, u_id }
+    Arguments:
+        token           (str) - unique user token
+        u_id            (int) - unique user identifier
 
     Return Type:
         {}
 
-
-    InputError when any of:
+    Exceptions:
+        InputError - Occurs when u_id does not refer to a valid user
+        InputError - Occurs when u_id refers to a user who is the only global owner 
         
-            u_id does not refer to a valid user
-            u_id refers to a user who is the only global owner
+        AccessError - Occurs when the authorised user is not a global owner
 
-    AccessError when:
-        
-            the authorised user is not a global owner
+    Return Value:
+        Returns {} on successful delete.
 
     '''
     if data_store.is_stream_owner(auth_user_id) == False:

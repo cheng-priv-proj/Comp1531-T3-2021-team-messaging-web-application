@@ -86,8 +86,18 @@ def dm_details_v1(auth_id, dm_id):
 
 def dm_list_v1(auth_id):
     '''
-    Returns a list of DMs that the user is a member of
+        Returns the list of DMs that the user is a member of.
+
+        Arguments:
+            auth_id     (int)   - authorized user id
+
+        Exceptions:
+            AccessError - Occurs when token is invalid
+
+        Return Value:
+            Returns nothing on success
     '''
+
     check_type(auth_id, int)
 
     dm_list = { 'dms': [] }
@@ -111,6 +121,25 @@ def dm_messages_v1(auth_id, dm_id, start):
     Returns a list of messages between index 'start' and up to 'start' + 50 from a
     given DM that the authorised user has access to. Additionally returns
     'start', and 'end' = 'start' + 50
+
+    Arguments:
+        auth_id     (int)   - authorized user id
+        dm_id           (int)   - unique dm id
+        start           (int)   - message index (most recent message has index 0)
+
+    Exceptions:
+        TypeError   - occurs when auth_user_id, dm_id, start are not ints
+        InputError   - dm_id does not refer to a valid DM
+        InputError  - occurs when start is negative
+        InputError  - occurs when start is greater than the total number of messages
+                    in the channel
+        AccessError - dm_id is valid and the authorised user is not a member of the DM
+
+    Return value:
+        Returns { messages, start, end } on success
+        Returns { messages, start, -1 } if the function has returned the least
+        recent message
+
 
     '''
     check_type(auth_id, int)
@@ -152,20 +181,17 @@ def dm_leave_v1(auth_id, dm_id):
     The creator is allowed to leave and the DM will still exist if this happens. 
     This does not update the name of the DM.
 
-    POST
+    Arguments:
+        auth_id     (int)   - authorized user id
+        dm_id           (int)   - unique dm id
 
-    Parameters:
-        { token, dm_id }
-    Return Type:
-        {}
+    Exceptions:
+        TypeError   - occurs when auth_user_id, dm_id are not ints
+        InputError   - dm_id does not refer to a valid DM
+        AccessError - dm_id is valid and the authorised user is not a member of the DM
 
-    InputError when:
-      
-        dm_id does not refer to a valid DM
-      
-    AccessError when:
-      
-        dm_id is valid and the authorised user is not a member of the DM
+    Return values:
+        Returns {} on success
 
     '''
     check_type(auth_id, int)
@@ -203,7 +229,7 @@ def dm_remove_v1(auth_id, dm_id):
         AccessError - Occurs when dm_id is valid but auth_id is not a creator of the DM
 
     Return Value:
-        Retursn nothing on success
+        Returs {} on success
     '''
     check_type(auth_id, int)
     check_type(dm_id, int)
