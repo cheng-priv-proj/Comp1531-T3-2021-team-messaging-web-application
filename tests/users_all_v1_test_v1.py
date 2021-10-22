@@ -74,9 +74,8 @@ def test_users_all_multiple_users(clear, register_user_return_info, users_all, e
 
     user_token = extract_token(user_list[1])
     user_list_from_users_all = users_all(user_token).json()['users']
-    print(user_list_from_users_all)
-    assert False
-    assert sort_users(user_list_from_users_all) != sort_users([user_info_to_user_datatype(user) for user in user_list])
+
+    assert sort_users(user_list_from_users_all) == sort_users([user_info_to_user_datatype(user) for user in user_list])
 
 def test_users_all_works_for_non_owner(clear, register_user_return_info, users_all, extract_token, user_info_to_user_datatype, sort_users):
     owner_info = register_user_return_info('owner@gmail.com', 'owner', 'one')
