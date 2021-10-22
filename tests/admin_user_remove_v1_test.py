@@ -189,3 +189,4 @@ def test_invalid_u_id_and_token(clear):
         'token': 'not a real token',
         'u_id': 123123
     }).status_code == 403
+    

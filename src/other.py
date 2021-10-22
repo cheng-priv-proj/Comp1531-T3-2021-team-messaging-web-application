@@ -1,6 +1,6 @@
 from src.data_store import data_store
 import re
-from src.error import AccessError
+from src.error import AccessError, InputError
 from src.config import SECRET
 import jwt
 import hashlib
@@ -140,6 +140,10 @@ def token_to_auth_id(token):
 
 def hash_str(string):
     return hashlib.sha256(string.encode()).hexdigest()
+
+def check_email_valid(email):
+    if not re.fullmatch(r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$', email):
+        raise InputError ('incorrect email format')
 
 stream_owner = 1
 stream_member = 2

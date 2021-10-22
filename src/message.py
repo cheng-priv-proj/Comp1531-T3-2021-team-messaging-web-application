@@ -17,12 +17,14 @@ def message_send_v1(auth_user_id, channel_id, message):
     Exceptions:
         TypeError   - occurs when auth_user_id, channel_id are not ints
         TypeError   - occurs when message is not a str
+        AccessError - occurs when auth_user_id is invalid
         AccessError - occurs when channel_id is valid but the authorised user is not
                     a member of the channel
         InputError  - occurs when message is less than 1 or more than 1000 characters
 
     Return value:
-        Returns message_id on success'''
+        Returns {message_id} on success
+    '''
 
     check_type(auth_user_id, int)
     check_type(channel_id, int)
@@ -39,7 +41,7 @@ def message_send_v1(auth_user_id, channel_id, message):
 
     # message ids will start from 0
     message_id = data_store.get_messages_count()
-    data_store.insert_message_count()
+    data_store.increment_message_count()
 
     message_dict = {
         'message_id': message_id,
@@ -70,7 +72,8 @@ def message_senddm_v1(auth_user_id, dm_id, message):
         InputError  - occurs when message is less than 1 or more than 1000 characters
 
     Return value:
-        Returns message_id on success'''
+        Returns {message_id} on success
+    '''
 
     check_type(auth_user_id, int)
     check_type(dm_id, int)
@@ -86,8 +89,8 @@ def message_senddm_v1(auth_user_id, dm_id, message):
         raise InputError('message has invalid length')
 
     # message ids will start from 0
-    data_store.insert_message_count()
     message_id = data_store.get_messages_count()
+    data_store.increment_message_count()
 
     message_dict = {
         'message_id': message_id,
@@ -114,7 +117,7 @@ def message_remove_v1(auth_user_id, message_id):
         AccessError - occurs when user does not have proper permissions
 
     Return Value:
-        Returns nothing on success
+        Returns {} on success
     '''
     check_type(auth_user_id, int)
     check_type(message_id, int)
@@ -136,6 +139,27 @@ def message_remove_v1(auth_user_id, message_id):
     return {}
 
 def message_edit_v1(auth_user_id, message_id, message):
+    '''
+    Given a message, update its text with new text. 
+    If the new message is an empty string, the message is deleted.
+
+    Arguments:
+        auth_user_id    (int)   - authorised user id
+        dm_id           (int)   - unique dm id
+        message         (str)   - message string
+    
+    Exceptions:
+        AccessError - occurs when token is invalid
+        TypeError   - occurs when auth_user_id, dm_id are not ints
+        TypeError   - occurs when message is not a str
+        AccessError - occurs when auth_user_id is invalid
+        AccessError - occurs when dm_id is valid but the authorised user is not
+                    a member of the channel
+        InputError  - occurs when message is more than 1000 characters
+
+    Return value:
+        Returns {} on success
+    '''
 
     check_type(auth_user_id, int)
     check_type(message_id, int)
@@ -159,11 +183,8 @@ def message_edit_v1(auth_user_id, message_id, message):
     if message == '':
         data_store.remove_message(message_id)
     
-    print(messages)
-    for index, original_message in enumerate(messages):
-        print(original_message.get('message_id'))
+    for original_message in messages:
         if original_message.get('message_id') == message_id:
-            messages[index]['message'] = message
-            print(messages[index]['message'] )
+            original_message['message'] = message
 
     return {}

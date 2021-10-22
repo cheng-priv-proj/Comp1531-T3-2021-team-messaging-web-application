@@ -175,6 +175,9 @@ class Datastore:
     def get_user_perms_from_u_id(self, u_id):
         return self.get_user_perms_from_u_id_dict().get(u_id)
 
+    def get_num_streams_owners(self):
+        perms = self.get_user_perms_from_u_id_dict().items()
+        return len([u_id for u_id, perm_id in perms if perm_id == 1])
 
     # Check functions ##########################################################
 
@@ -357,9 +360,6 @@ class Datastore:
         self.get_messages_from_channel_or_dm_id(id).insert(0, message)
         self.get_channel_or_dm_id_from_message_id_dict()[message.get('message_id')] = id
         self.update_json()
-        
-    def insert_message_count(self):
-        self.__store['message_count'] += 1
 
     def update_value(self, dict_key, key, value):
         self.__store[dict_key][key] = value
@@ -404,6 +404,9 @@ class Datastore:
     def remove_dm(self, dm_id):
         dm = self.get_dm_from_dm_id(dm_id)
         dm['members'] = []
+        
+    def increment_message_count(self):
+        self.__store['message_count'] += 1
 
     def set(self, store):
         if not isinstance(store, dict):
