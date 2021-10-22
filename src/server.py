@@ -799,7 +799,27 @@ def message_remove_endpt():
 
 @APP.route("/admin/userpermission/change/v1", methods=['POST'])
 def admin_userpermission_change_v1_endpt():
+    '''
+        admin/userpermission/change/v1
+        Given a user by their user ID, set their permissions to new permissions described by permission_id.
 
+        Method: POST
+
+        Arguments:
+            token           (str) - unique user token
+            u_id            (int) - unique user identifier
+            permission_id   (int) - integer specifying permission type
+
+        Exceptions:
+            InputError - Occurs when u_id does not refer to a valid user
+            InputError - Occurs when u_id refers to a user who is the only global owner and they are being demoted to a user
+            InputError - Occurs when permission_id is invalid
+            
+            AccessError - Occurs when the authorised user is not a global owner
+
+        Return Value:
+            Returns {} on successful change. 
+    '''
     request_data = request.get_json()
     token = request_data['token']
     auth_id = token_to_auth_id(token)
@@ -812,6 +832,32 @@ def admin_userpermission_change_v1_endpt():
 
 @APP.route("/admin/user/remove/v1", methods=['DELETE'])
 def admin_user_remove_v1_endpt():
+    
+    '''
+    admin/user/remove/v1
+
+    Given a user by their u_id, remove them from the Streams. 
+    This means they should be removed from all channels/DMs, and will not be included in the list of users returned by users/all. 
+
+    Method: DELETE
+
+    Arguments:
+        token           (str) - unique user token
+        u_id            (int) - unique user identifier
+
+    Return Type:
+        {}
+
+    Exceptions:
+        InputError - Occurs when u_id does not refer to a valid user
+        InputError - Occurs when u_id refers to a user who is the only global owner 
+        
+        AccessError - Occurs when the authorised user is not a global owner
+
+    Return Value:
+        Returns {} on successful delete.
+
+    '''
     request_data = request.get_json()
     token = request_data['token']
     auth_id = token_to_auth_id(token)
