@@ -148,18 +148,22 @@ def logout_endpt():
 def channel_create_ep():
 
     '''
-    channels/create/v2
-    POST
-    Creates a new channel with the given name that is either a public or private channel. The user who created it automatically joins the channel.
+    Creates a new channel, generating a channel_id and storing the information in
+    the datastore. Returns the channel_id.
 
-    Parameters:{ token, name, is_public }
-    
-    Return Type:{ channel_id }
+    Arguments:
+        token           (str) - unique user token
+        name            (str)   - channel name
+        is_public       (bool)  - public/private status
 
-    exceptions:
-    InputError when:
-      
-        length of name is less than 1 or more than 20 characters
+    Exceptions:
+        TypeError   - occurs when auth_user_id is not an int
+        TypeError   - occurs when name is not a string
+        TypeError   - occurs when is_public is not a bool
+        InputError  - occurs when name is not between 1 and 20 characters
+
+    Return value:
+        Returns channel_id on success
     '''
     create_details = request.get_json(force = True)
 
@@ -276,14 +280,16 @@ def channel_leave_endpt():
 @APP.route('/channels/list/v2', methods = ['GET'])
 def channel_list_endpt():
     '''
-    channels/list/v2
-    Provide a list of all channels (and their associated details) that the authorised user is part of.
+    Returns a list of channels that the authorised user is apart of.
 
-    GET
+    Arguments:
+        token           (str)   - unique user token
 
-    Parameters:{ token }
-    
-    Return Type:{ channels }
+    Exceptions:
+        TypeError   - occurs when converted auth_user_id is not an int
+
+    Return value:
+        Returns channels on success
     '''
 
     token = request.args.get('token')
@@ -294,15 +300,16 @@ def channel_list_endpt():
 @APP.route('/channels/listall/v2', methods = ['GET'])
 def list_all_endpt():
     '''
-    channels/listall/v2
-    Provide a list of all channels, including private channels, (and their associated details)
+    Returns a list of all channels, including private channels.
 
-    GET
+    Arguments:
+        token           (str)   - unique user token
 
-    Parameters:{ token }
-    
-    Return Type:
-    
+    Exceptions:
+        TypeError   - occurs when auth_user_id is not an int
+
+    Return value:
+        Returns channels on success
     '''
 
     token = request.args.get('token')
