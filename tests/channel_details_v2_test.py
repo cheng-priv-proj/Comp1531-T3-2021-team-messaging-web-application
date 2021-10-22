@@ -116,4 +116,3 @@ def test_returns_all_info(clear, first_register):
             }
         ]
     }
-    

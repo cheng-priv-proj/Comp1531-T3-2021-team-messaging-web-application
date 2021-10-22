@@ -246,7 +246,7 @@ def channel_addowner_v1(auth_user_id, channel_id, u_id):
     if data_store.is_invalid_channel_id(channel_id):
         raise InputError ('channel_id is invalid')
 
-    if not (data_store.is_channel_owner(channel_id, auth_user_id) or data_store.is_stream_owner(auth_user_id)):
+    if not (data_store.is_channel_owner(channel_id, auth_user_id) or (data_store.is_stream_owner(auth_user_id) and data_store.is_user_member_of_channel(channel_id, auth_user_id))):
         raise AccessError ('channel_id is valid and the authorised user does not have owner permissions in the channel')
     
     if data_store.is_invalid_user_id(u_id):
@@ -304,5 +304,9 @@ def channel_removeowner_v1(auth_user_id, channel_id, u_id):
     data_store.remove_channel_owner(channel_id, u_id)
 
     return {}
+
+
+
+
 
 
