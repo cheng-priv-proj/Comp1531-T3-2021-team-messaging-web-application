@@ -50,7 +50,6 @@ APP.register_error_handler(Exception, defaultHandler)
 ###################### Auth ######################
 @APP.route('/auth/register/v2', methods = ['POST'])
 def register_ep():
-
     '''
     Updates data store with a new user's information
     Generates a u_id, auth_id and handle_str.
@@ -73,7 +72,7 @@ def register_ep():
                     or more than 50
 
     Return value:
-        Returns auth_id on success
+        Returns {token, auth_user_id} on success
     '''
 
     register_details = request.get_json(force = True)
@@ -113,7 +112,7 @@ def login_ep():
         InputError - occurs when password is not correct
 
     Return value:
-        Returns auth_id on success
+        Returns {token, auth_user_id} on success
     '''
 
     login_details = request.get_json(force = True)
@@ -137,6 +136,7 @@ def logout_endpt():
         
     Returns {} when successful
     '''
+
     token = request.get_json(force = True).get('token')
     token_to_auth_id(token)
     return auth_logout_v1(token)
@@ -163,7 +163,7 @@ def channel_create_ep():
         InputError  - occurs when name is not between 1 and 20 characters
 
     Return value:
-        Returns channel_id on success
+        Returns {channel_id} on success
     '''
     create_details = request.get_json(force = True)
 
@@ -289,7 +289,7 @@ def channel_list_endpt():
         TypeError   - occurs when converted auth_user_id is not an int
 
     Return value:
-        Returns channels on success
+        Returns {channels} on success
     '''
 
     token = request.args.get('token')
@@ -309,7 +309,7 @@ def list_all_endpt():
         TypeError   - occurs when auth_user_id is not an int
 
     Return value:
-        Returns channels on success
+        Returns {channels} on success
     '''
 
     token = request.args.get('token')
@@ -532,7 +532,7 @@ def user_profile_ep():
         InputError  - occurs when u_id is invalid
 
     Return value:
-        Returns user on success
+        Returns {user} on success
     '''
 
     token = request.args.get('token')
@@ -880,10 +880,7 @@ def message_remove_endpt():
 @APP.route("/admin/userpermission/change/v1", methods=['POST'])
 def admin_userpermission_change_v1_endpt():
     '''
-        admin/userpermission/change/v1
         Given a user by their user ID, set their permissions to new permissions described by permission_id.
-
-        Method: POST
 
         Arguments:
             token           (str) - unique user token
@@ -914,8 +911,6 @@ def admin_userpermission_change_v1_endpt():
 def admin_user_remove_v1_endpt():
 
     '''
-    admin/user/remove/v1
-
     Given a user by their u_id, remove them from the Streams. 
     This means they should be removed from all channels/DMs, and will not be included in the list of users returned by users/all. 
 

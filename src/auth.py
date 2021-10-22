@@ -23,20 +23,17 @@ def auth_login_v1(email, password):
         InputError - occurs when password is not correct
 
     Return value:
-        Returns auth_id on success
+        Returns {token, auth_user_id} on success
     '''
 
-    # check for valid input types
     check_type(email, str)
     check_type(password, str)
     
-    # input error if email doesn't belong to a user
     if data_store.is_invalid_email(email):
         raise InputError ('email does not belong to a user')
     
     login = data_store.get_login_from_email(email)
 
-    # input error if password is wrong
     if hash_str(password) != login.get('password'):
         raise InputError ('password is not correct')
 
@@ -75,7 +72,7 @@ def auth_register_v1(email, password, name_first, name_last):
                     or more than 50
 
     Return value:
-        Returns auth_id on success
+        Returns {auth_user_id} on success
     '''
 
     # checking for valid input types
@@ -129,6 +126,7 @@ def auth_logout_v1(token):
     Return value:
         Returns {} on success
     '''
+
     data_store.invalidate_token(token)
 
     return {}
