@@ -18,21 +18,18 @@ def channels_list_v1(auth_user_id):
     '''
     
     check_type(auth_user_id, int)
-
-    channel_list = { 'channels': [] }
     
-    channels = data_store.get_channels_from_channel_id_dict()
+    channels_dict = data_store.get_channels_from_channel_id_dict()
 
-    for channel_id in channels:
-        if data_store.is_user_member_of_channel(channel_id, auth_user_id):
-            channel_list.get('channels').append( 
-                {
+    channels = [{
                     'channel_id': channel_id,
-                    'name': channels.get(channel_id).get('name')
+                    'name': channels_dict.get(channel_id).get('name')
                 }
-            )
+                for channel_id in channels_dict
+                if data_store.is_user_member_of_channel(channel_id, auth_user_id)
+               ]
             
-    return channel_list
+    return { 'channels': channels }
 
 def channels_listall_v1(auth_user_id):
     '''
@@ -50,21 +47,16 @@ def channels_listall_v1(auth_user_id):
     
     check_type(auth_user_id, int)
 
-    # Setup Dictionary
-    all_channel_list = { 'channels': [] }
-
-    channels = data_store.get_channels_from_channel_id_dict()
+    channels_dict = data_store.get_channels_from_channel_id_dict()
     
     # Returns a dictionary of dictionaries. Loop through each key and append
-    for channel_id in channels:
-        all_channel_list.get('channels').append( 
-            {
-                'channel_id': channel_id,
-                'name': channels.get(channel_id).get('name')
-            }
-        )
+    channels = [{
+                        'channel_id': channel_id,
+                        'name': channels_dict.get(channel_id).get('name')
+                    }
+                    for channel_id in channels_dict]
 
-    return all_channel_list
+    return { 'channels': channels }
 
 def channels_create_v1(auth_user_id, name, is_public):
     '''
@@ -97,9 +89,7 @@ def channels_create_v1(auth_user_id, name, is_public):
     owner = data_store.get_user_from_u_id(auth_user_id)
 
     # ASSUMPTION: channel_id starts from 1
-    channels = data_store.get_channels_from_channel_id_dict()
-
-    new_id = len(channels) + 1
+    new_id = len(data_store.get_channels_from_channel_id_dict()) + 1
     
     data_store.insert_channel(new_id, name, is_public, [], [owner], [owner])
 

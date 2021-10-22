@@ -100,15 +100,15 @@ def dm_list_v1(auth_id):
 
     dm_dict = data_store.get_dms_from_dm_id_dict().items()
 
-    dm_list = [ {
-                    'dm_id': dm_id,
-                    'name': dm['details']['name']
-                }
-                for dm_id, dm in dm_dict
-                if data_store.is_user_member_of_dm(dm_id, auth_id)
-              ]
+    dms = [ {
+                'dm_id': dm_id,
+                'name': dm['details']['name']
+            }
+            for dm_id, dm in dm_dict
+            if data_store.is_user_member_of_dm(dm_id, auth_id)
+          ]
 
-    return { 'dms': dm_list }
+    return { 'dms': dms }
 
 def dm_messages_v1(auth_id, dm_id, start):
     '''
@@ -148,17 +148,17 @@ def dm_messages_v1(auth_id, dm_id, start):
     if not data_store.is_user_member_of_dm(dm_id, auth_id):
         raise AccessError ('dm_id is valid and the authorised user is not a member of the DM')
 
+    if start < 0:
+        raise InputError('start is a negative integer')
+
     messages = data_store.get_messages_from_channel_or_dm_id(dm_id)
     num_messages = len(messages)
 
-
-    if start < 0:
-        raise InputError('start is a negative integer')
     if start > num_messages:
         raise InputError('start is greater than the total number of messages in the channel')
 
     # accounts for when given empty channel and start = 0
-    end = start + 50 if start + 50 < no_of_messages else -1
+    end = start + 50 if start + 50 < num_messages else -1
     
     return {
         'messages' : messages[start: start + 50],
@@ -195,10 +195,9 @@ def dm_leave_v1(auth_id, dm_id):
     if not data_store.is_user_member_of_dm(dm_id, auth_id):
         raise AccessError ('dm_id is valid and the authorised user is not a member of the DM')
 
-    details_dict = data_store.get_dm_from_dm_id(dm_id)
-    members = details_dict['members']
+    dm = data_store.get_dm_from_dm_id(dm_id)
     
-    details_dict['members'] = [person for person in members if person['u_id'] != auth_id]
+    dm['members'] = [user for user in dm.get('members') if user.get('u_id') != auth_id]
 
     return {}
 
