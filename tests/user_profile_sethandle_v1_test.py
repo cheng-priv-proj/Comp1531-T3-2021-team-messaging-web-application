@@ -61,7 +61,7 @@ def test_user_profile_sethandle_basic_functionality(clear, register_user, user_p
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     user_profile_sethandle(extract_token(owner_info), 'owneronen')
 
-    assert user_profile(extract_token(owner_info), extract_user(owner_info)).json() == {
+    assert user_profile(extract_token(owner_info), extract_user(owner_info)).json().get('user') == {
         'u_id': extract_user(owner_info),
         'handle_str': 'owneronen',
         'name_first': 'owner',

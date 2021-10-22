@@ -264,10 +264,8 @@ class Datastore:
 
     def is_duplicate_handle(self, handle):
         users = self.get_users_from_u_id_dict()
-
-        for user in users:
-            if users[user]['handle_str'] == handle:
-                return True
+        if any (user['handle_str'] == handle for user in users.values()):
+            return True
 
         return False
 
@@ -379,20 +377,16 @@ class Datastore:
         login_info = self.get_logins_from_email_dict()
         old_email = user['email']
 
-        login_info[email] = login_info[old_email]
-        del login_info[old_email]
-
+        login_info[email] = login_info.pop(old_email)
         user['email'] = email
-
         self.update_json()
     
     def update_handle(self, auth_user_id, handle):
         user = self.get_users_from_u_id_dict().get(auth_user_id)
         user['handle_str'] = handle
 
-        print(user)
-
         self.update_json()
+
     def remove_dm(self, dm_id):
         dm = self.get_dm_from_dm_id(dm_id)
         dm['members'] = []
@@ -413,25 +407,17 @@ class Datastore:
         self.update_json()
 
     def admin_user_remove(self, u_id):
-        users = self.__store['users']
-        login = self.__store['login']
-        channels = self.__store['channels']
-        dms = self.__store['dms']
-        perms = self.__store['perms']
+        login = self.get_logins_from_email_dict()
+        channels = self.get_channels_from_channel_id_dict()
+        dms = self.get_dms_from_dm_id_dict()
+        perms = self.get_user_perms_from_u_id_dict()
         messages = self.__store['messages']
 
-        user = self.get_users_from_u_id_dict().get(u_id)
-        email = users[u_id]['email']
+        user = self.get_user_from_u_id(u_id)
+        print(user)
+        email = user['email']
         del login[email]
-
-        print(users[u_id])
-        user_details = users[u_id]
-        user_details['email'] = ''
-        user_details['name_first'] = 'Removed'
-        user_details['name_last'] = 'user'
-        user_details['handle_str'] = ''
-        # Update user/profile
-
+    
         # loop through channel to delete user from all channels
         for c_id in channels:
             for i, user in enumerate(channels[c_id]['all_members']):
@@ -446,6 +432,8 @@ class Datastore:
             for i, member in enumerate(dms[dm_id]['details']['members']):
                 if member['u_id'] == u_id:
                     del dms[dm_id]['details']['members'][i]
+            if dms[dm_id]['creator'] == u_id:
+                del dms[dm_id]['creator']
         
         del perms[u_id]
 
@@ -454,6 +442,12 @@ class Datastore:
                 if message['u_id'] == u_id:
                     message['message'] = 'Removed user'
         
+        # Update user/profile
+        user['email'] = ''
+        user['name_first'] = 'Removed'
+        user['name_last'] = 'user'
+        user['handle_str'] = ''
+
         self.update_json()
 
 print('Loading Datastore...')
