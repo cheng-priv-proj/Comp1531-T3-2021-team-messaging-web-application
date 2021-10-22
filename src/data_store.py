@@ -431,10 +431,14 @@ class Datastore:
         messages = self.__store['messages']
         tokens = self.get_u_ids_from_token_dict()
 
+        users = self.get_users_from_u_id_dict()
+
         user = self.get_user_from_u_id(u_id)
-        print(user)
+        print(users)
+        print("AAAAAAAAAAAAAAAAAA")
         email = user['email']
         del login[email]
+        print(users)
     
         # loop through channel to delete user from all channels
         for c_id in channels:
