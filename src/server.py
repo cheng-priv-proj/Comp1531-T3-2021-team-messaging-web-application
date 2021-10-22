@@ -178,29 +178,27 @@ def channel_create_ep():
 # Channel Invite 
 @APP.route('/channel/invite/v2', methods = ['POST'])
 def channel_invite_ep():
-
     '''
-    channel/invite/v2
-    POST
+    Adds another user to a channel that the auth_user is a member of.
 
-    Invites a user with ID u_id to join a channel with ID channel_id. 
-    Once invited, the user is added to the channel immediately. 
-    In both public and private channels, all members are able to invite users.
-    
-    Parameters:{ token, channel_id, u_id }
-    
-    Return Type:{}
+    Arguments:
+        token           (str)   - unique user token (inviter)
+        channel_id      (int)   - unique channel id
+        u_id            (int)   - user id (invitee)
 
-    InputError when any of:
-      
-        channel_id does not refer to a valid channel
-        u_id does not refer to a valid user
-        u_id refers to a user who is already a member of the channel
-      
-      AccessError when:
-      
-        channel_id is valid and the authorised user is not a member of the channel
+    Exceptions:
+        TypeError   - occurs when auth_user_id, channel_id, u_id are not ints
+        AccessError - occurs when channel_id is valid but the authorised user is not
+                    a member of the channel
+        InputError  - occurs when channel_id is invalid
+        InputError  - occurs when the u_id is invalid
+        InputError  - occurs when the u_id refers to a user who is already a member
+                    of the channel
+
+    Return value:
+        Returns {} on success
     '''
+
     invite_details = request.get_json(force = True)
 
     token = invite_details.get('token')
@@ -214,28 +212,28 @@ def channel_invite_ep():
 # Channel messages 
 @APP.route('/channel/messages/v2', methods = ['GET'])
 def channel_messages_ep():
+
     '''
-    channel/messages/v2
+    Returns a list of messages between index 'start' and up to 'start' + 50 from a
+    given channel that the authorised user has access to. Additionally returns
+    'start', and 'end' = 'start' + 50
 
-    GET
+    Arguments:
+        token           (str)   - unique user token
+        channel_id      (int)   - unique channel id
+        start           (int)   - message index (most recent message has index 0)
 
-    Given a channel with ID channel_id that the authorised user is a member of, return up to 50 messages between index "start" and "start + 50". 
-    Message with index 0 is the most recent message in the channel. 
-    This function returns a new index "end" which is the value of "start + 50", or, if this function has returned the least recent messages in the channel, 
-    returns -1 in "end" to indicate there are no more messages to load after this return.
+    Exceptions:
+        TypeError   - occurs when auth_user_id, channel_id are not ints
+        InputError  - occurs when channel_id is invalid
+        InputError  - occurs when start is negative
+        InputError  - occurs when start is greater than the total number of messages
+                    in the channel
 
-    Parameters:{ token, channel_id, start }
-
-    Return Type:{ messages, start, end }
-    
-    InputError when any of:
-      
-        channel_id does not refer to a valid channel
-        start is greater than the total number of messages in the channel
-      
-      AccessError when:
-      
-        channel_id is valid and the authorised user is not a member of the channel
+    Return value:
+        Returns { messages, start, end } on success
+        Returns { messages, start, -1 } if the function has returned the least
+        recent message
     '''
 
     token = request.args.get('token')
@@ -264,7 +262,7 @@ def channel_leave_endpt():
                       not a member of the channel
 
     Return value:
-        Returns nothing on success
+        Returns {} on success
     '''
 
     leave_input = request.get_json(force = True)
@@ -332,22 +330,20 @@ def echo():
 @APP.route("/channel/join/v2", methods=['POST'])
 def channel_join_endpt():
     '''
-    Given a channel_id of a channel that the authorised user can join, adds them to that channel.
-    Parameters:
-    { token, channel_id }
-    
-    Return Type:
-    {}
+    Adds an authorised user to a channel
+
+    Arguments:
+        auth_user_id    (int)   - authorised user id
+        channel_id      (int)   - unique channel id
 
     Exceptions:
+        TypeError   - occurs when auth_user_id, channel_id are not ints
+        InputError  - occurs when channel_id is invalid
+        AccessError - occurs when channel is not public
+        InputError  - occurs when user is already part of the channel
 
-      InputError when any of:
-        channel_id does not refer to a valid channel
-        the authorised user is already a member of the channel
-      
-      AccessError when:
-        channel_id refers to a channel that is private and the authorised user is not already a channel member and is not a global owner
-
+    Return value:
+        Returns {} on success
     '''
     
     join_details = request.get_json()
@@ -362,19 +358,22 @@ def channel_join_endpt():
 
 @APP.route("/channel/details/v2", methods=['GET'])
 def channel_details_endpt():
+
     '''
-    Given a channel with ID channel_id that the authorised user is a member of, provide basic details about the channel.
+    Returns the details of a given channel that an authorised user has access to.
 
-    Parameters: 
-    { token, channel_id }
+    Arguments:
+        auth_user_id    (int)   - authorised user id
+        channel_id      (int)   - unique channel id
 
-    Return Type: 
-    { name, is_public, owner_members, all_members }
+    Exceptions:
+        TypeError   - occurs when auth_user_id, channel_id are not ints
+        InputError  - occurs when channel_id is invalid
+        AccessError - occurs when channel_id is valid but the authorised user is
+                    not a member of the channel
 
-    Exceptions: 
-    InputError when:
-        channel_id does not refer to a valid channel
-    
+    Return value:
+        Returns {name, is_public, owner_members, all_members} on success
     '''
 
     token = request.args.get('token')
@@ -468,7 +467,7 @@ def channel_addowner_endpt():
         InputError  - occurs when u_id refers to a user who is already an owner of the channel
 
     Returns:
-        Returns nothing on success
+        Returns {} on success
     '''
     
     request_data = request.get_json()
@@ -499,7 +498,7 @@ def channel_removeowner_endpt():
         InputError  - occurs when u_id refers to a user who is currently the only owner of the channel
 
     Returns:
-        Returns nothing on success
+        Returns {} on success
     '''
     
     request_data = request.get_json()

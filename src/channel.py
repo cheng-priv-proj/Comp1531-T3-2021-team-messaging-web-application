@@ -157,7 +157,7 @@ def channel_join_v1(auth_user_id, channel_id):
         InputError  - occurs when user is already part of the channel
 
     Return value:
-        Returns nothing on success
+        Returns {} on success
     '''
 
     check_type(auth_user_id, int)
@@ -197,7 +197,7 @@ def channel_leave_v1(auth_user_id, channel_id):
                       not a member of the channel
 
     Return value:
-        Returns nothing on success
+        Returns {} on success
     '''
 
     check_type(auth_user_id, int)
@@ -238,7 +238,7 @@ def channel_addowner_v1(auth_user_id, channel_id, u_id):
         InputError  - occurs when u_id refers to a user who is already an owner of the channel
 
     Returns:
-        Returns nothing on success
+        Returns {} on success
     '''
     check_type(auth_user_id, int)
     check_type(channel_id, int)
