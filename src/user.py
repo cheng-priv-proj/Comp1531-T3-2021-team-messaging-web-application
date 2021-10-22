@@ -20,7 +20,7 @@ def user_profile_v1(auth_user_id, u_id):
         InputError  - occurs when u_id is invalid
 
     Return value:
-        Returns user on success
+        Returns {user} on success
     '''
 
     check_type(auth_user_id, int)
@@ -35,6 +35,15 @@ def user_profile_v1(auth_user_id, u_id):
 def users_all_v1(auth_id):
     '''
     Returns a list of all users and their associated details
+
+    Arguments:
+        auth_user_id    (int)   - authorised user id
+    
+    Exceptions:
+        TypeError   - occurs when auth_user_id is not int
+
+    Return value:
+        Returns {users} on success
     '''
     check_type(auth_id, int)
 
@@ -64,7 +73,7 @@ def user_setname_v1(auth_user_id, name_first, name_last):
         InputError  - occurs when name_first, name_last are not between 1 and 50 characters
 
     Return value:
-        Returns nothing on success
+        Returns {} on success
     '''
 
     check_type(auth_user_id, int)
@@ -94,7 +103,7 @@ def user_setemail_v1(auth_id, email):
         InputError  - occurs when email is not valid
 
     Return value:
-        Returns nothing on success
+        Returns {} on success
     '''
     check_type(auth_id, int)
     check_type(email, str)
@@ -104,16 +113,6 @@ def user_setemail_v1(auth_id, email):
 
     if data_store.is_duplicate_email(email):
         raise InputError ('email is already being used by another user')
-
-    # data_store.update_value(auth_id, 'email', email)
-
-    # password = ''
-    # email_dict = data_store.get_logins_from_email_dict()
-    # for login in email_dict:
-    #     if login['auth_user_id'] == auth_id:
-    #         password = login['password']
-
-    # data_store.insert_login(email, auth_id, password)
 
     data_store.update_email(auth_id, email)
 
@@ -133,8 +132,9 @@ def user_sethandle_v1(auth_id, handle_str):
         InputError  - occurs when handle is invalid
 
     Return value:
-        Returns nothing on success
+        Returns {} on success
     '''
+
     check_type(auth_id, int)
     check_type(handle_str, str)
 

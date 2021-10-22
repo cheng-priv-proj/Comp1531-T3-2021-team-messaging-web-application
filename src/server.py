@@ -544,6 +544,18 @@ def user_profile_ep():
 
 @APP.route("/users/all/v1", methods=['GET'])
 def users_all_ep():
+    '''
+    Returns a list of all users and their associated details
+
+    Arguments:
+        token           (str)   - valid token
+    
+    Exceptions:
+        TypeError   - occurs when auth_user_id is not int
+
+    Return value:
+        Returns {users} on success
+    '''
     
     token = request.args.get('token')
     auth_user_id = token_to_auth_id(token)
@@ -567,8 +579,9 @@ def user_profile_setname_ep():
         InputError  - occurs when name_first, name_last are not between 1 and 50 characters
 
     Return value:
-        Returns nothing on success
+        Returns {} on success
     '''
+
     request_data = request.get_json()
     token = request_data['token']
     auth_user_id = token_to_auth_id(token)
@@ -646,7 +659,7 @@ def dm_list_ep():
             AccessError - Occurs when token is invalid
 
         Return Value:
-            Returns nothing on success
+            Returns {} on success
     '''
 
     token = request.args.get('token')
@@ -672,7 +685,7 @@ def user_profile_setemail_ep():
         InputError  - occurs when email is not valid
 
     Return value:
-        Returns nothing on success
+        Returns {} on success
     '''
 
     request_data = request.get_json()
@@ -699,7 +712,7 @@ def user_profile_sethandle_ep():
         InputError  - occurs when handle is invalid
 
     Return value:
-        Returns nothing on success
+        Returns {} on success
     '''
 
     request_data = request.get_json()
@@ -831,7 +844,7 @@ def message_edit_endpt():
     Return value:
         Returns {} on success
     '''
-    
+
     request_data = request.get_json(force = True)
     message_id = request_data['message_id']
     message = request_data['message']
@@ -906,14 +919,9 @@ def admin_user_remove_v1_endpt():
     Given a user by their u_id, remove them from the Streams. 
     This means they should be removed from all channels/DMs, and will not be included in the list of users returned by users/all. 
 
-    Method: DELETE
-
     Arguments:
         token           (str) - unique user token
         u_id            (int) - unique user identifier
-
-    Return Type:
-        {}
 
     Exceptions:
         InputError - Occurs when u_id does not refer to a valid user
@@ -932,7 +940,7 @@ def admin_user_remove_v1_endpt():
 
     admin_user_remove_v1(auth_id, u_id)
 
-    return{}
+    return {}
 
 
 
