@@ -49,9 +49,7 @@ def dm_create_v1(auth_id, u_ids):
 
     data_store.insert_dm(auth_id, dm_id, user_list, dm_name)
 
-    return {
-        'dm_id': dm_id
-    }
+    return { 'dm_id': dm_id }
 
 def dm_details_v1(auth_id, dm_id):
     '''
@@ -92,7 +90,7 @@ def dm_list_v1(auth_id):
             auth_id     (int)   - authorized user id
 
         Exceptions:
-            AccessError - Occurs when token is invalid
+            AccessError         - Occurs when token is invalid
 
         Return Value:
             Returns nothing on success
@@ -100,21 +98,18 @@ def dm_list_v1(auth_id):
 
     check_type(auth_id, int)
 
-    dm_list = { 'dms': [] }
+    dm_dict = data_store.get_dms_from_dm_id_dict().items()
 
-    dms = data_store.get_dms_from_dm_id_dict()
+    dm_list = [ {
+                    'dm_id': dm_id,
+                    'name': dm['details']['name']
+                }
+                for dm_id, dm in dm_dict
+                for member in dm['details']['members']
+                if member['u_id'] == auth_id
+              ]
 
-    for dm_id in dms:
-        for member in dms[dm_id]['details']['members']:
-            if member['u_id'] == auth_id:
-                dm_list['dms'].append(
-                    {
-                        'dm_id': dm_id,
-                        'name': dms[dm_id]['details']['name']
-                    }
-                )
-
-    return dm_list
+    return { 'dms': dm_list }
 
 def dm_messages_v1(auth_id, dm_id, start):
     '''
@@ -123,13 +118,13 @@ def dm_messages_v1(auth_id, dm_id, start):
     'start', and 'end' = 'start' + 50
 
     Arguments:
-        auth_id     (int)   - authorized user id
+        auth_id         (int)   - authorized user id
         dm_id           (int)   - unique dm id
         start           (int)   - message index (most recent message has index 0)
 
     Exceptions:
         TypeError   - occurs when auth_user_id, dm_id, start are not ints
-        InputError   - dm_id does not refer to a valid DM
+        InputError  - dm_id does not refer to a valid DM
         InputError  - occurs when start is negative
         InputError  - occurs when start is greater than the total number of messages
                     in the channel
@@ -155,17 +150,17 @@ def dm_messages_v1(auth_id, dm_id, start):
         raise AccessError ('dm_id is valid and the authorised user is not a member of the DM')
 
     messages = data_store.get_messages_from_channel_or_dm_id(dm_id)
-    no_of_messages = len(messages)
+    num_messages = len(messages)
 
     end = start + 50
 
     if start < 0:
         raise InputError('start is a negative integer')
-    if start > no_of_messages:
+    if start > num_messages:
         raise InputError('start is greater than the total number of messages in the channel')
 
     # accounts for when given empty channel and start = 0
-    elif start + 50 >= no_of_messages:
+    elif start + 50 >= num_messages:
         end = -1
     
     return {
@@ -183,11 +178,11 @@ def dm_leave_v1(auth_id, dm_id):
 
     Arguments:
         auth_id     (int)   - authorized user id
-        dm_id           (int)   - unique dm id
+        dm_id       (int)   - unique dm id
 
     Exceptions:
         TypeError   - occurs when auth_user_id, dm_id are not ints
-        InputError   - dm_id does not refer to a valid DM
+        InputError  - dm_id does not refer to a valid DM
         AccessError - dm_id is valid and the authorised user is not a member of the DM
 
     Return values:
@@ -203,14 +198,10 @@ def dm_leave_v1(auth_id, dm_id):
     if not data_store.is_user_member_of_dm(dm_id, auth_id):
         raise AccessError ('dm_id is valid and the authorised user is not a member of the DM')
 
-    # ^^ yo inked from aleks code. if this is boken check his code.
-
     details_dict = data_store.get_dm_from_dm_id(dm_id)
     members = details_dict['members']
     
-    for person in members:
-        if person['u_id'] == auth_id:
-            members.remove(person)
+    details_dict['members'] = [person for person in members if person['u_id'] != auth_id]
 
     return {}
 
