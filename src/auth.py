@@ -1,9 +1,8 @@
 from src.data_store import data_store
 from src.error import InputError
-from src.other import check_type
+from src.other import check_type, check_email_valid
 from src.other import handle_str_generation
-from src.other import stream_owner
-from src.other import stream_member
+from src.other import stream_owner, stream_member
 from src.other import hash_str
 from src.config import SECRET
 import re
@@ -23,20 +22,17 @@ def auth_login_v1(email, password):
         InputError - occurs when password is not correct
 
     Return value:
-        Returns auth_id on success
+        Returns {token, auth_user_id} on success
     '''
 
-    # check for valid input types
     check_type(email, str)
     check_type(password, str)
     
-    # input error if email doesn't belong to a user
     if data_store.is_invalid_email(email):
         raise InputError ('email does not belong to a user')
     
     login = data_store.get_login_from_email(email)
 
-    # input error if password is wrong
     if hash_str(password) != login.get('password'):
         raise InputError ('password is not correct')
 
@@ -75,7 +71,7 @@ def auth_register_v1(email, password, name_first, name_last):
                     or more than 50
 
     Return value:
-        Returns auth_id on success
+        Returns {auth_user_id} on success
     '''
 
     # checking for valid input types
@@ -84,9 +80,7 @@ def auth_register_v1(email, password, name_first, name_last):
     check_type(name_first, str)
     check_type(name_last, str)
 
-    # check for valid email format
-    if not re.fullmatch(r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$', email):
-        raise InputError ('incorrect email format')
+    check_email_valid(email)
 
     # check for valid password, name_first and name_last lengths
     if len(password) < 6:
@@ -117,6 +111,19 @@ def auth_register_v1(email, password, name_first, name_last):
 
 
 def auth_logout_v1(token):
+    '''
+    Given an active token, invalidates the token to log the user out.
+
+    Arguments:
+        token           (str) - unique user token
+
+    Exceptions:
+        N/A
+
+    Return value:
+        Returns {} on success
+    '''
+
     data_store.invalidate_token(token)
 
     return {}
