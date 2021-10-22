@@ -33,11 +33,10 @@ def test_standard(clear, register):
         'u_ids': [register[1].get('auth_user_id')]
     }).json()
 
-    requests.delete(url + 'dm/remove/v1', json={
+    print(requests.delete(url + 'dm/remove/v1', json={
         'token': register[0].get('token'),
         'dm_id': dm_id_dict.get('dm_id')
-    })
-
+    }).status_code)
     assert requests.get(url + 'dm/list/v1', params={
         'token': register[0].get('token')
     }).json() == {
