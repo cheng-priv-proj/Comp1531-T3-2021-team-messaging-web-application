@@ -98,6 +98,13 @@ def test_senddm_one_valid_message(clear, register, extract_token, extract_user, 
     }
 
 def test_senddm_multiple_valid_messages(clear, register, extract_token, extract_user, extract_dm, extract_message):
+    '''
+    Standard test with one message.
+
+    Expects: 
+        Correct output from channel/messages.
+    '''
+
     dm_id = extract_dm(register)
     owner_token = extract_token(register)
     owner_id = extract_user(register)
@@ -150,6 +157,13 @@ def test_senddm_multiple_valid_messages(clear, register, extract_token, extract_
     assert extract_message(messages['messages'][0]) != extract_message(messages['messages'][1]) != extract_message(messages['messages'][2])
 
 def test_senddm_51_valid_messages(clear, register, extract_token, extract_user, extract_dm, extract_message):
+    '''
+    Standard test with multiple messages.
+
+    Expects: 
+        Correct output from channel/messages.
+    '''
+
     dm_id = extract_dm(register)
     owner_token = extract_token(register)
 
@@ -174,6 +188,13 @@ def test_senddm_51_valid_messages(clear, register, extract_token, extract_user, 
 
 
 def test_senddm_invalid_message_to_short(clear, register, extract_token, extract_dm):
+    '''
+    Test case where message sent is too short.
+
+    Expects: 
+        InputError (400 error)
+    '''
+
     dm_id = extract_dm(register)
     owner_token = extract_token(register)
 
@@ -184,6 +205,13 @@ def test_senddm_invalid_message_to_short(clear, register, extract_token, extract
     }).status_code == 400
 
 def test_senddm_invalid_message_to_long(clear, register, extract_token, extract_dm):
+    '''
+    Test case where message sent is too long.
+
+    Expects: 
+        InputError (400 error)
+    '''
+
     dm_id = extract_dm(register)
     owner_token = extract_token(register)
     
@@ -194,6 +222,13 @@ def test_senddm_invalid_message_to_long(clear, register, extract_token, extract_
     }).status_code == 400
 
 def test_senddm_valid_message_unauthorized_user(clear, register, extract_token, extract_dm):
+    '''
+    Test case where user is not authorized to send a message.
+
+    Expects: 
+        AccessError (403 error)
+    '''
+
     dm_id = extract_dm(register)
     user_token = extract_token(requests.post(url + 'auth/register/v2', json = {
     'email': 'user1@test.com', 
@@ -208,6 +243,13 @@ def test_senddm_valid_message_unauthorized_user(clear, register, extract_token, 
     }).status_code == 403
 
 def test_senddm_message_invalid_dm_id(clear, register, extract_token, extract_user, extract_message):
+    '''
+    Test case where dm_id is invalid.
+
+    Expects: 
+        InputError (400 error)
+    '''
+
     owner_token = extract_token(register)
     assert requests.post(url + 'message/senddm/v1', json = {
         'token': owner_token,
@@ -216,6 +258,13 @@ def test_senddm_message_invalid_dm_id(clear, register, extract_token, extract_us
     }).status_code == 400
 
 def test_senddm_valid_message_invalid_token(clear, register, extract_token):
+    '''
+    Test case where token is not valid.
+
+    Expects: 
+        AccessError (403 error)
+    '''
+
     dm_id = extract_token(register)
     assert requests.post(url + 'message/senddm/v1', json = {
         'token': '123123414',
@@ -224,6 +273,13 @@ def test_senddm_valid_message_invalid_token(clear, register, extract_token):
     }).status_code == 403
 
 def test_senddm_invalid__invalid_token(clear, register):
+    '''
+    Test case where access error is expected to take precedence.
+
+    Expects: 
+        AccessError (403 error)
+    '''
+
     assert requests.post(url + 'message/senddm/v1', json = {
         'token': '123123414',
         'dm_id': 23423,
