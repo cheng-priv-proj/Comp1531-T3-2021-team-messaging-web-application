@@ -59,6 +59,13 @@ def register_user():
     return register_user_function
 
 def test_user_profile_setname_basic_functionality(clear, register_user, user_profile, user_profile_setname, extract_user, extract_token):
+    '''
+    Standard valid test case.
+
+    Expects: 
+        Correct output from user/profile.
+    '''
+
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     user_profile_setname(extract_token(owner_info), 'ownera', 'asdd')
 
@@ -71,18 +78,46 @@ def test_user_profile_setname_basic_functionality(clear, register_user, user_pro
     }
 
 def test_user_profile_setname_invalid_token(clear, user_profile_setname):
+    '''
+    Test case where token is not valid.
+
+    Expects: 
+        AccessError (403 error)
+    '''
+
     assert user_profile_setname('asdasd', 'owner', 'one').status_code == 403
 
 def test_user_profile_setname_invalid_token_and_name(clear, user_profile_setname):
+    '''
+    Test case where access error is expected to take precedence.
+
+    Expects: 
+        AccessError (403 error)
+    '''
+
     assert user_profile_setname('asdasd', '', '').status_code == 403
 
 def test_user_profile_setname_too_long(clear, user_profile_setname, register_user, extract_token):
+    '''
+    Test case that expects an input error when the name string is too long.
+
+    Expects: 
+        InputError (400 error)
+    '''
+
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
 
     assert user_profile_setname(extract_token(owner_info), 'owner', 'a' * 51).status_code == 400
     assert user_profile_setname(extract_token(owner_info), 'a' * 51, 'one').status_code == 400
 
 def test_user_profile_setname_too_short(clear, user_profile_setname, register_user, extract_token):
+    '''
+    Test case that expects an input error when the name string is too short.
+
+    Expects: 
+        InputError (400 error)
+    '''
+
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
 
     assert user_profile_setname(extract_token(owner_info), '', 'one').status_code == 400
