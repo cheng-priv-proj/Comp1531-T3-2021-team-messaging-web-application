@@ -65,7 +65,7 @@ def test_users_all_one_user(clear, register_user_return_info, users_all, extract
     Standard valid test case with one user.
 
     Expects: 
-        Correct output from user/list.
+        Correct output from user/all.
     '''
 
     owner_info = register_user_return_info('owner@gmail.com', 'owner', 'one')
@@ -78,7 +78,7 @@ def test_users_all_multiple_users(clear, register_user_return_info, users_all, e
     Standard valid test case with multiple user.
 
     Expects: 
-        Correct output from user/list.
+        Correct output from user/all.
     '''
 
     owner_info = register_user_return_info('owner@gmail.com', 'owner', 'one')
@@ -96,7 +96,7 @@ def test_users_all_works_for_non_owner(clear, register_user_return_info, users_a
     Standard valid test case with one user(non owner).
 
     Expects: 
-        Correct output from user/list.
+        Correct output from user/all.
     '''
 
     owner_info = register_user_return_info('owner@gmail.com', 'owner', 'one')
@@ -115,7 +115,7 @@ def test_users_all_works_for_failed_registration(clear, register_user_return_inf
     Tests correct output when a failed registration occurs.
 
     Expects: 
-        Correct output from user/list.
+        Correct output from user/all.
     '''
 
     owner_info = register_user_return_info('owner@gmail.com', 'owner', 'one')
