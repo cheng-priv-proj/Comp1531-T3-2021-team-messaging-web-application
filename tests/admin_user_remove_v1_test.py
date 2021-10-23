@@ -33,7 +33,7 @@ def test_standard(register):
     A test for the standard valid case 
 
     Expects: 
-        Successfule removal (status code 200)
+        Successful removal (status code 200)
 
     '''
 
@@ -226,6 +226,7 @@ def test_invalid_u_id_and_token(clear):
     Expects: 
         AccessError (403 error) 
     '''
+    
     assert requests.delete(url + 'admin/user/remove/v1', json={
         'token': 'not a real token',
         'u_id': 123123
