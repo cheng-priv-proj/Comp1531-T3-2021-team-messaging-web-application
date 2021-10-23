@@ -59,6 +59,13 @@ def user_info_to_user_datatype():
 
 
 def test_user_profile_test_valid(clear, register_user, user_info_to_user_datatype, extract_user, extract_token, user_profile):
+    '''
+    Standard valid test case.
+
+    Expects: 
+        Correct output from user/profile.
+    '''
+
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     userone_info = register_user('user1@gmail.com', 'user', 'one')
     userone_profile = user_profile(extract_token(owner_info), extract_user(userone_info)).json().get('user')
@@ -72,23 +79,51 @@ def test_user_profile_test_valid(clear, register_user, user_info_to_user_datatyp
     }
 
 def test_user_profile_invalid_token(clear, register_user, user_info_to_user_datatype, extract_user, extract_token, user_profile):
+    '''
+    Test case where token is not valid.
+
+    Expects: 
+        AccessError (403 error)
+    '''
+
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     owner_profile = user_profile('123123123', extract_user(owner_info))
 
     assert owner_profile.status_code == 403
 
 def test_user_profile_invalid_u_id(clear, register_user, user_info_to_user_datatype, extract_user, extract_token, user_profile):
+    '''
+    Test case that expects an input error when the u_id does not exist.
+
+    Expects: 
+        InputError (400 error)
+    '''
+
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     invalid_profile = user_profile(extract_token(owner_info), 123123123)
 
     assert invalid_profile.status_code == 400
 
 def test_user_profile_invalid_id_and_token(clear, register_user, user_info_to_user_datatype, extract_user, extract_token, user_profile):
+    '''
+    Test case where access error is expected to take precedence.
+
+    Expects: 
+        AccessError (403 error)
+    '''
+
     invalid_profile = user_profile('123123', 212312)
     
     assert invalid_profile.status_code == 403
 
 def test_user_profile_get_your_own_profile(clear, register_user, user_info_to_user_datatype, extract_user, extract_token, user_profile):
+    '''
+    Test case where user requests their own data.
+
+    Expects: 
+        Correct output from user/profile.
+    '''
+
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     owner_profile = user_profile(extract_token(owner_info), extract_user(owner_info)).json().get('user')
 

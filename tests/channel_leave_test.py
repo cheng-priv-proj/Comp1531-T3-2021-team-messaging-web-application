@@ -62,8 +62,13 @@ def register_channel():
         return channel_id
     return register_channel_function
 
-# Test standard case
 def test_leave_member(clear, first_register, register_user):
+    '''
+    Test standard case
+
+    Expects: 
+        Correct output from channel/details.
+    '''
     channel_id = first_register.get('channel_id')
 
     member_token = register_user('member@member.com')
@@ -90,8 +95,13 @@ def test_leave_member(clear, first_register, register_user):
         'channel_id': channel_id}
     ).status_code == 403
 
-# Test multiple leavers
 def test_multiple_leavers(clear, first_register, register_user):
+    '''
+    Test multiple leavers
+
+    Expects: 
+        Correct output from channel/details.
+    '''
     channel_id = first_register.get('channel_id')
 
     member_token1 = register_user('member@member.com')
@@ -147,8 +157,14 @@ def test_multiple_leavers(clear, first_register, register_user):
         'channel_id': channel_id}
     ).status_code == 403
 
-# Test not part of channel
 def test_not_in_channel(clear, first_register, register_user):
+    '''
+    Test not part of channel
+
+    Expects: 
+        AccessError (403 error)
+    '''
+
     channel_id = first_register.get('channel_id')
 
     member_token = register_user('member@member.com')
@@ -158,8 +174,13 @@ def test_not_in_channel(clear, first_register, register_user):
         'channel_id': channel_id}
     ).status_code == 403
 
-# test invalid channel_id
 def test_invalid_channel_id(clear, register_user):
+    '''
+    Test invalid channel_id
+
+    Expects: 
+        InputError (400 error)
+    '''
 
     member_token = register_user('member@member.com')
 
@@ -168,8 +189,13 @@ def test_invalid_channel_id(clear, register_user):
         'channel_id': 123123}
     ).status_code == 400
 
-# Test invalid token
 def test_invalid_token(clear, first_register, register_user):
+    '''
+    Test invalid token
+
+    Expects: 
+        AccessError (403 error)
+    '''
     channel_id = first_register.get('channel_id')
 
     member_token = '-100000'
@@ -179,8 +205,14 @@ def test_invalid_token(clear, first_register, register_user):
         'channel_id': channel_id}
     ).status_code == 403
 
-# Test messages remain
 def test_messages_remain(clear, first_register, register_user):
+    '''
+    Test messages remain
+
+    Expects: 
+        Correct Output from channel/messages.
+    '''
+
     owner_token = first_register.get('token')
     channel_id = first_register.get('channel_id')
 
@@ -207,11 +239,17 @@ def test_messages_remain(clear, first_register, register_user):
         'channel_id': channel_id,
         'start': 0
     }).json()
-    # Dunno if this is correct
+
     assert messages_list.get('messages')[0].get('message') == 'i like eating apples'
 
-# Test only channel owner leaves still remains
 def test_channel_owner_leaves(clear, first_register):
+    '''
+    Test only channel owner leaves still remains
+
+    Expects: 
+        Correct output from channel/list
+    '''
+
     owner_token = first_register.get('token')
     channel_id = first_register.get('channel_id')
 

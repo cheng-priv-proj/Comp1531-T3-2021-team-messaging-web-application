@@ -57,6 +57,13 @@ def register_user():
     return register_user_function
 
 def test_user_setemail_test_valid(clear, register_user, extract_user, extract_token, user_profile, set_email):
+    '''
+    Standard valid test case.
+
+    Expects: 
+        Correct output from user/profile.
+    '''
+
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
 
     set_email(extract_token(owner_info), 'valid@email.com')
@@ -72,24 +79,50 @@ def test_user_setemail_test_valid(clear, register_user, extract_user, extract_to
     }
 
 def test_user_setemail_invalid_token(clear, set_email):
+    '''
+    Test case where token is not valid.
+
+    Expects: 
+        AccessError (403 error)
+    '''
 
     owner_profile = set_email('123123123', 'valid@email.com')
 
     assert owner_profile.status_code == 403
 
 def test_user_setemail_invalid_email(clear, register_user, set_email, extract_token):
+    '''
+    Test case where email is not valid.
+
+    Expects: 
+        InputError (400 error)
+    '''
+
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
 
     assert set_email(extract_token(owner_info), 'inv$alid@gmail.com').status_code == 400
 
 
 def test_user_setemail_duplicate_email(clear, register_user, extract_user, set_email, extract_token):
+    '''
+    Test case where email is a duplicate.
+
+    Expects: 
+        InputError (400 error)
+    '''
+
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     register_user('common@gmail.com', 'user', 'one')
 
     assert set_email(extract_token(owner_info), 'common@gmail.com').status_code == 400
 
 def test_user_setemail_invalid_token_and_email(clear, set_email):
+    '''
+    Test case where access error is expected to take precedence.
+
+    Expects: 
+        AccessError (403 error)
+    '''
 
     owner_profile = set_email('123123123', 'inv$alid@email.com')
 

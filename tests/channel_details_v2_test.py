@@ -5,11 +5,10 @@ from src.other import clear_v1
 
 import requests
 
-# Clears storage
+# Clears json
 @pytest.fixture
 def clear():
     requests.delete(url + "clear/v1") 
-
 
 # Generates the first user
 @pytest.fixture
@@ -64,8 +63,15 @@ def register_channel():
         return channel_id
     return register_channel_function
 
-# Test expecting AccessError when given a valid Auth_id that is not in the channel.
 def test_user_with_no_access_to_channel(clear, first_register, register_user):
+    '''
+    Test expecting AccessError when given a valid Auth_id that is not in the channel.
+
+
+    Expects: 
+        AccessError (403 error)
+    '''
+    
     invalid_token = register_user('user2@test.com')
     channel_id = first_register.get('channel_id')
 
@@ -75,6 +81,13 @@ def test_user_with_no_access_to_channel(clear, first_register, register_user):
 
 
 def test_invalid_channel_id(clear, first_register):
+    '''
+    Tests that ensures that channel id is valid.  
+
+    Expects: 
+        InputError (400 error)
+    '''
+    
     token = first_register.get('token')
     invalid_channel_id = 10000
 
@@ -82,6 +95,13 @@ def test_invalid_channel_id(clear, first_register):
     assert (invalid_request.status_code) == 400
 
 def test_invalid_auth_id(clear, first_register):
+    '''
+    Test that ensures validity of auth_id.
+
+    Expects: 
+        InputError (400 error)
+    '''
+    
     invalid_token = 10000
     channel_id = first_register.get('channel_id')
 
@@ -89,6 +109,13 @@ def test_invalid_auth_id(clear, first_register):
     assert (invalid_request.status_code) == 403
 
 def test_returns_all_info(clear, first_register):
+    '''
+    Tests that all info is returned correctly.
+
+    Expects: 
+        Correct output from channel/details.
+    '''
+    
     token = first_register.get('token')
     channel_id = first_register.get('channel_id')
 

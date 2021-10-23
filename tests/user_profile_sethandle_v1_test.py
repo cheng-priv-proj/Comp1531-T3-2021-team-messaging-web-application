@@ -70,29 +70,71 @@ def test_user_profile_sethandle_basic_functionality(clear, register_user, user_p
     }
 
 def test_user_profile_sethandle_invalid_token(clear, user_profile_sethandle):
+    '''
+    Test case where token is not valid.
+
+    Expects: 
+        AccessError (403 error)
+    '''
+
     assert user_profile_sethandle('asdasda', 'asdasda').status_code == 403
 
 def test_user_profile_sethandle_handle_str_short(clear, register_user, extract_token, user_profile_sethandle):
+    '''
+    Test case that expects an input error when the handle string is too short.
+
+    Expects: 
+        InputError (400 error)
+    '''
+
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
 
     assert user_profile_sethandle(extract_token(owner_info), '').status_code == 400
 
 def test_user_profile_sethandle_handle_str_long(clear, register_user, user_profile_sethandle, extract_token):
+    '''
+    Test case that expects an input error when the handle string is too long.
+
+    Expects: 
+        InputError (400 error)
+    '''
+
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
 
     assert user_profile_sethandle(extract_token(owner_info), 'a' * 21).status_code == 400
 
 def test_user_profile_sethandle_duplicate(clear, register_user, user_profile_sethandle, extract_token):
+    '''
+    Test case that expects an input error when the handle string is a duplicate.
+
+    Expects: 
+        InputError (400 error)
+    '''
+
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     register_user('user1@gmail.com', 'user', 'one')
 
     assert user_profile_sethandle(extract_token(owner_info), 'userone').status_code == 400
 
 def test_user_profile_sethandle_nonalphanumeric(clear, register_user, user_profile_sethandle, extract_token):
+    '''
+    Test case that expects an input error when the handle string is non alphanumerical.
+
+    Expects: 
+        InputError (400 error)
+    '''
+
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     
     assert user_profile_sethandle(extract_token(owner_info), '*1#$;').status_code == 400
 
 def test_user_profile_sethandle_invalid_handle_str_and_token(clear, user_profile_sethandle):
+    '''
+    Test case where access error is expected to take precedence.
+
+    Expects: 
+        AccessError (403 error)
+    '''
+
     assert user_profile_sethandle('asdasd', '').status_code == 403
 

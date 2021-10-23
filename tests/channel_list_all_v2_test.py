@@ -4,9 +4,6 @@ from src.config import url
 from src.other import clear_v1
 
 import requests
-
-# Clear_v2?
-# Error code?
  
 # Clears storage
 @pytest.fixture
@@ -66,8 +63,13 @@ def register_channel():
         return channel_id
     return register_channel_function
 
-# Testing the standard valid case.
 def test_channel_list_all_valid(clear, first_register, register_channel):
+    '''
+    Testing the standard valid case.
+
+    Expects: 
+        Correct output from channel/listall.
+    '''
     token = first_register.get('token')
     channel_id1 = first_register.get('channel_id')
     
@@ -98,8 +100,14 @@ def test_channel_list_all_valid(clear, first_register, register_channel):
         ]
     }
 
-# Testing the case where there are no channels 
 def test_channel_list_all_nochannels(clear, register_user):
+    '''
+    Testing the case where there are no channels.
+
+    Expects: 
+        Correct output from channel/listall.
+    '''
+
     token = register_user('noserver@test.com')
     channel_list = requests.get(url + 'channels/listall/v2', params = {'token': token}).json()
 
@@ -109,8 +117,14 @@ def test_channel_list_all_nochannels(clear, register_user):
         ]
     }
 
-# Testing that the function returns all channels regardless whether or not the auth id is part of them
 def test_channel_list_all_other_owners(clear, first_register, register_user, register_channel):
+    '''
+    Testing that the function returns all channels regardless whether or not the auth id is part of them
+
+    Expects: 
+        Correct Output from channel/listall
+    '''
+
     token1 = first_register.get('token')
     channel_id1 = first_register.get('channel_id')
 
@@ -146,8 +160,14 @@ def test_channel_list_all_other_owners(clear, first_register, register_user, reg
         ]
     }
 
-# Testing that whether a channel is public or private has no effect on the returning list
 def test_channel_list_all_public_private(clear, first_register, register_user, register_channel):
+    '''
+    Testing that whether a channel is public or private has no effect on the returning list.
+
+    Expects: 
+        Correct Output from channel/listall
+    '''
+
     token1 = first_register.get('token')
     channel_id1 = first_register.get('channel_id')
 
@@ -210,8 +230,14 @@ def test_channel_list_all_public_private(clear, first_register, register_user, r
         ]
     }
 
-# Tests whether the auth id is invalid.
 def test_invalid_auth_id(clear):
+    '''
+    Tests whether the auth id is invalid.
+
+    Expects: 
+        AccessError (403 error)
+    '''
+
     invalid_token = '1000'
     
     invalid_request = requests.get(url + 'channels/listall/v2', params = {'token': invalid_token})

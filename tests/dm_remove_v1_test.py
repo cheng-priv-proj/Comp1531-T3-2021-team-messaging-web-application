@@ -27,6 +27,12 @@ def register(clear):
     return [owner_id, user1_id]
 
 def test_standard(clear, register):
+    '''
+    Testing standard valid case.
+
+    Expects: 
+        Correct output from dm/list.
+    '''
     
     dm_id_dict = requests.post(url + 'dm/create/v1', json={
         'token': register[0].get('token'),
@@ -49,6 +55,12 @@ def test_standard(clear, register):
     }).status_code == 403
 
 def test_dm_id_invalid(clear, register):
+    '''
+    Test expecting input error when dm_id is invalid.
+
+    Expects: 
+        InputError (400 error)
+    '''
 
     assert requests.delete(url + 'dm/remove/v1', json={
         'token': register[0].get('token'),
@@ -56,6 +68,12 @@ def test_dm_id_invalid(clear, register):
     }).status_code == 400
 
 def test_user_not_creator(clear, register):
+    '''
+    Test expecting Access error when the request is not from the creator.
+
+    Expects: 
+        AccessError (403 error)
+    '''
 
     dm_id_dict = requests.post(url + 'dm/create/v1', json={
         'token': register[0].get('token'),
@@ -68,20 +86,32 @@ def test_user_not_creator(clear, register):
     }).status_code == 403
 
 def test_token_invalid(clear, register):
+    '''
+    Test expecting Access error when token is invalid.
 
+    Expects: 
+        AccessError (403 error)
+    '''
+    
     dm_id_dict = requests.post(url + 'dm/create/v1', json={
         'token': register[0].get('token'),
         'u_ids': [register[1].get('auth_user_id')]
     }).json()
 
-    requests.delete(url + 'dm/remove/v1', json={
+    assert requests.delete(url + 'dm/remove/v1', json={
         'token': 'not a valid token',
         'dm_id': dm_id_dict.get('dm_id')
-    })
+    }).status_code == 403
 
 def test_token_and_dm_id_invalid(clear):
+    '''
+    Test case where access error is expected to take precedence.
 
-    requests.delete(url + 'dm/remove/v1', json={
+    Expects: 
+        AccessError (403 error)
+    '''
+
+    assert requests.delete(url + 'dm/remove/v1', json={
         'token': 'not a valid token',
         'dm_id': -123123
-    })
+    }).status_code == 403

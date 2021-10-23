@@ -29,6 +29,13 @@ def register(clear):
     return [owner_info, user_info]
 
 def test_standard(register):
+    '''
+    A test for the standard valid case 
+
+    Expects: 
+        Successful removal (status code 200)
+
+    '''
 
     channel_now = datetime.utcnow().timestamp()
 
@@ -144,12 +151,26 @@ def test_standard(register):
     }
 
 def test_invalid_u_id(register):
+    '''
+    Test that expects input error when given an invalid u_id
+
+    Expects: 
+        InputError (400 error) 
+    '''
+
     assert requests.delete(url + 'admin/user/remove/v1', json={
         'token': register[0].get('token'),
         'u_id': 123123
     }).status_code == 400
 
 def test_only_global_owner(register):
+    '''
+    Test that expects input error when there is only one global owner
+
+    Expects: 
+        InputError (400 error) 
+    '''
+
     assert requests.delete(url + 'admin/user/remove/v1', json={
         'token': register[0].get('token'),
         'u_id': register[0].get('auth_user_id')
@@ -172,12 +193,26 @@ def test_only_global_owner(register):
     }).status_code == 400
 
 def test_auth_user_not_global_owner(register):
+    '''
+    Test that expects an Access error when the given auth_id is not a global owner.
+
+    Expects: 
+        AccessError (403 error) 
+    '''
+
     assert requests.delete(url + 'admin/user/remove/v1', json={
         'token': register[1].get('token'),
         'u_id': register[1].get('auth_user_id')
     }).status_code == 403
 
 def test_token_invalid(register):
+    '''
+    Test that expects Access error when given an invalid token.
+
+    Expects: 
+        AccessError (403 error) 
+    '''
+
     assert requests.delete(url + 'admin/user/remove/v1', json={
         'token': 'not a real token',
         'u_id': register[0].get('auth_user_id')
@@ -185,6 +220,13 @@ def test_token_invalid(register):
 
 
 def test_invalid_u_id_and_token(clear):
+    '''
+    Test that expects that Access error takes precedence when both u_id and token are invalid.
+
+    Expects: 
+        AccessError (403 error) 
+    '''
+    
     assert requests.delete(url + 'admin/user/remove/v1', json={
         'token': 'not a real token',
         'u_id': 123123

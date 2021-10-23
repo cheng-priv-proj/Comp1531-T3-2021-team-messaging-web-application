@@ -7,7 +7,7 @@ from src import config
 import pytest
 from src.other import clear_v1
 
-#NEED TO IMPLEMENT CLEAR v2
+# Clears the datastore.
 @pytest.fixture
 def clear():
     requests.delete(config.url + "clear/v1")
@@ -48,6 +48,13 @@ def first_register():
 
 
 def test_channel_removeowner_v1_invalid_token(clear, first_register, get_valid_token):
+    '''
+    Tests case where the given token is invalid. 
+
+    Expects: 
+        AccessError (403 error)
+    '''
+
     details = first_register
     new_user = get_valid_token
     resp = requests.post(config.url + 'channel/removeowner/v1', json={
@@ -59,6 +66,13 @@ def test_channel_removeowner_v1_invalid_token(clear, first_register, get_valid_t
     assert resp.status_code == 403
 
 def test_channel_removeowner_v1_invalid_channel_id(clear, first_register, get_valid_token):
+    '''
+    Tests case where channel_id is invalid.
+
+    Expects: 
+        InputError (400 error)
+    '''
+
     details = first_register
     new_user = get_valid_token
     resp = requests.post(config.url + 'channel/removeowner/v1', json={
@@ -69,9 +83,14 @@ def test_channel_removeowner_v1_invalid_channel_id(clear, first_register, get_va
 
     assert resp.status_code == 400
 
-# make sure access error has priority
 
 def test_channel_removeowner_v1_invalid_token_and_channel_id(clear, get_valid_token):
+    '''
+    Test ensuring access error has priority when token and channel_id are invalid. 
+
+    Expects: 
+        AccessError (403 error)
+    '''
     new_user = get_valid_token
     resp = requests.post(config.url + 'channel/removeowner/v1', json={
         'token': -1, 
@@ -82,6 +101,13 @@ def test_channel_removeowner_v1_invalid_token_and_channel_id(clear, get_valid_to
     assert resp.status_code == 403
 
 def test_channel_removeowner_v1_invalid_u_id(clear, first_register):
+    '''
+    Tests case where u_id is invalid.
+
+    Expects: 
+        InputError (400 error)
+    '''
+
     details = first_register
     resp = requests.post(config.url + 'channel/removeowner/v1', json={
         'token': details['token'], 
@@ -91,6 +117,13 @@ def test_channel_removeowner_v1_invalid_u_id(clear, first_register):
     assert resp.status_code == 400
 
 def test_channel_removeowner_v1_user_not_member_of_channel(clear, first_register, get_valid_token):
+    '''
+    Tests case where the user is not a member of the channel.
+
+    Expects: 
+        InputError (400 error)
+    '''
+
     details = first_register
     new_user = get_valid_token
     resp = requests.post(config.url + 'channel/removeowner/v1', json={
@@ -101,6 +134,13 @@ def test_channel_removeowner_v1_user_not_member_of_channel(clear, first_register
     assert resp.status_code == 400
 
 def test_channel_removeowner_v1_user_only_owner_of_channel(clear, first_register):
+    '''
+    Tests case where channel_id is invalid.
+
+    Expects: 
+        InputError (400 error)
+    '''
+
     details = first_register
     requests.post(config.url + 'channel/join/v2', json={
         'token': details['token'], 
@@ -115,6 +155,13 @@ def test_channel_removeowner_v1_user_only_owner_of_channel(clear, first_register
     assert resp.status_code == 400
     
 def test_channel_removeowner_v1_user_without_owner_permissions(clear, first_register, get_valid_token):
+    '''
+    Tests case where the user does not have the correct perms.
+
+    Expects: 
+        AccessError (403 error)
+    '''
+
     details = first_register
     new_user = get_valid_token
     requests.post(config.url + 'channel/join/v2', json={
@@ -131,6 +178,12 @@ def test_channel_removeowner_v1_user_without_owner_permissions(clear, first_regi
     assert resp.status_code == 403
 
 def test_channel_removeowner_v1_works(clear, first_register, get_valid_token):
+    '''
+    Testing standard valid case.
+
+    Expects: 
+        Correct output from channel/details.
+    '''
     details = first_register
     new_user = get_valid_token
     requests.post(config.url + 'channel/join/v2', json={

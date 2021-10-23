@@ -33,6 +33,13 @@ def get_valid_token_2():
     return response.json()
     
 def test_invalid_token(clear_server, get_valid_token, get_valid_token_2):
+    '''
+    Tests case where token is invalid.
+
+    Expects: 
+        AccessError (403 error)
+    '''
+
     user1 = get_valid_token
     user2 = get_valid_token_2
     invalid_token = '-10000'
@@ -49,6 +56,13 @@ def test_invalid_token(clear_server, get_valid_token, get_valid_token_2):
     assert resp_details.status_code == 403
 
 def test_dm_details_v1_invalid_dm_id(clear_server, get_valid_token):
+    '''
+    Tests case where dm_id is invalid.
+
+    Expects: 
+        InputError (400 error)
+    '''
+
     resp_details = requests.get(config.url + 'dm/details/v1', params={
         'token': get_valid_token['token'], 
         'dm_id': -1
@@ -56,6 +70,13 @@ def test_dm_details_v1_invalid_dm_id(clear_server, get_valid_token):
     assert resp_details.status_code == 400
 
 def test_dm_details_v1_auth_user_not_member(clear_server, get_valid_token, get_valid_token_2):
+    '''
+    Tests case where auth_id is not a member of the dm.
+
+    Expects: 
+        AccessError (403 error)
+    '''
+
     user1 = get_valid_token
     user2 = get_valid_token_2
     
@@ -71,14 +92,27 @@ def test_dm_details_v1_auth_user_not_member(clear_server, get_valid_token, get_v
     assert resp_details.status_code == 403
 
 def test_dm_details_v1_invalid_auth_user_and_dm_id(clear_server, get_valid_token):
+    '''
+    Tests returning access error as priority
+
+    Expects: 
+        AccessError (403 error)
+    '''
+
     resp_details = requests.get(config.url + 'dm/details/v1', params={
         'token': 'asdasdasd', 
         'dm_id': -1
         })
-    # should return access error as priority
     assert resp_details.status_code == 403
 
 def test_dm_details_v1_returns_name(clear_server, get_valid_token, get_valid_token_2):
+    '''
+    Testing correct output.
+
+    Expects: 
+        Correct output from dm_details.
+    '''
+
     user1 = get_valid_token
     user2 = get_valid_token_2
 
@@ -95,6 +129,13 @@ def test_dm_details_v1_returns_name(clear_server, get_valid_token, get_valid_tok
     assert resp_details['name'] == 'johnsmith, ownerone'
 
 def test_dm_details_v1_returns_members(clear_server, get_valid_token, get_valid_token_2):
+    '''
+    Testing correct output.
+
+    Expects: 
+        Correct output from dm_details.
+    '''
+    
     user1 = get_valid_token
     user2 = get_valid_token_2
 
