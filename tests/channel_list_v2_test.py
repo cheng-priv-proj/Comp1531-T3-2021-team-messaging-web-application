@@ -10,7 +10,6 @@ import requests
 def clear():
     requests.delete(url + "clear/v1")
 
-
 # Generates the first user
 @pytest.fixture
 def first_register():
@@ -65,8 +64,13 @@ def register_channel():
     return register_channel_function
 
 
-# Standard test for a valid input/output.
 def test_channel_list_valid(clear, first_register, register_channel):
+    '''
+    Standard test for a valid input/output.
+
+    Expects: 
+        Correct output from channel/List
+    '''
     token = first_register.get('token')
     channel_id1 = first_register.get('channel_id')
 
@@ -97,8 +101,14 @@ def test_channel_list_valid(clear, first_register, register_channel):
         ]
     }
 
-# Testing for an empty list of channels.
 def test_channel_list_nochannels(clear, register_user):
+    '''
+    Testing for an empty list of channels.
+
+    Expects: 
+        Correct output from channel/list.
+    '''
+
     no_server_token = register_user('noserver@test.com')
     channel_list = requests.get(url + 'channels/list/v2', params = {'token': no_server_token}).json()
 
@@ -108,8 +118,14 @@ def test_channel_list_nochannels(clear, register_user):
         ]
     }
 
-# Testing if the function returns any channels the user is not part of.
 def test_channel_list_other_owners_test(clear, first_register, register_user, register_channel):
+    '''
+    Testing if the function returns any channels the user is not part of.
+
+    Expects: 
+        Correct output from channel/list
+    '''
+
     token1 = first_register.get('token')
     channel_id1 = first_register.get('channel_id')
 
@@ -137,8 +153,14 @@ def test_channel_list_other_owners_test(clear, first_register, register_user, re
         ]
     }
 
-# Tests the case that a user joins a new channel, and looking for an update the the list.
 def test_channel_list_after_newjoin_test(clear, first_register, register_user):
+    '''
+    Tests the case that a user joins a new channel, and looking for an update the the list.
+
+    Expects: 
+        Correct output from channel/list
+    '''
+
     channel_id = first_register.get('channel_id')
     token2 = register_user('user2@test.com')
 
@@ -154,45 +176,15 @@ def test_channel_list_after_newjoin_test(clear, first_register, register_user):
         ]
     }
 
-# Tests whether the auth id is invalid.
 def test_invalid_auth_id(clear):
+    '''
+    Tests whether the auth id is invalid.
+
+    Expects: 
+        AccessError (403 error)
+    '''
+
     invalid_token = 1000
     
     invalid_request = requests.get(url + 'channels/list/v2', params = {'token': invalid_token})
     assert (invalid_request.status_code) == 403
-
-
-
-## Ignore this
-# # Generates a number of tokens given a number
-# @pytest.fixture
-# def token_factory():
-#     def token_factory_function(token_quantity):
-#         tokens = []
-#         for i in range(0, token_quantity):
-#             register_details = {
-#                 'email': 'user' + str(i) + '@test.com',
-#                 'password': 'password', 
-#                 'name_first': 'user' + str(i), 
-#                 'name_last': 'user'
-#             }
-#             registered = requests.get(url + 'auth/register/v2', json = register_details)
-#             tokens.append(registered['tokens'])
-#         return tokens
-#     return token_factory_function
-
-# # Generates a number of channels given a list of tokens
-# def channel_factory():
-#     def channel_factory_function(token_list):
-#         for token in token_list:
-#             channel_id_list = []
-#             register_details = {
-#                 'token': token,
-#                 'name': 'channel' + str(token),
-#                 'is_public': True
-#             }
-
-#             created = requests.get(url + 'channels/create/v2', json = register_details)
-#             channel_id_list.append(created['channel_id'])
-#         return channel_id_list
-#     return channel_factory_function
