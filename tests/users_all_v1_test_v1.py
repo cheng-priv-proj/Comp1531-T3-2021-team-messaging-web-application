@@ -61,12 +61,26 @@ def sort_users():
     return sort_users_function
 
 def test_users_all_one_user(clear, register_user_return_info, users_all, extract_token, user_info_to_user_datatype, sort_users):
+    '''
+    Standard valid test case with one user.
+
+    Expects: 
+        Correct output from user/list.
+    '''
+
     owner_info = register_user_return_info('owner@gmail.com', 'owner', 'one')
     owner_token = extract_token(owner_info)
     user_list = users_all(owner_token).json()['users']
     assert sort_users(user_list) == sort_users(user_info_to_user_datatype(owner_info))
 
 def test_users_all_multiple_users(clear, register_user_return_info, users_all, extract_token, user_info_to_user_datatype, sort_users):
+    '''
+    Standard valid test case with multiple user.
+
+    Expects: 
+        Correct output from user/list.
+    '''
+
     owner_info = register_user_return_info('owner@gmail.com', 'owner', 'one')
     user_list = [owner_info]
     for i in range(0, 100):
@@ -78,6 +92,13 @@ def test_users_all_multiple_users(clear, register_user_return_info, users_all, e
     assert sort_users(user_list_from_users_all) == sort_users([user_info_to_user_datatype(user) for user in user_list])
 
 def test_users_all_works_for_non_owner(clear, register_user_return_info, users_all, extract_token, user_info_to_user_datatype, sort_users):
+    '''
+    Standard valid test case with one user(non owner).
+
+    Expects: 
+        Correct output from user/list.
+    '''
+
     owner_info = register_user_return_info('owner@gmail.com', 'owner', 'one')
     user_info1 = register_user_return_info('user1@gmail.com', 'user', 'two')
     user_info2 = register_user_return_info('user2@gmail.com', 'user', 'three')
@@ -90,6 +111,13 @@ def test_users_all_works_for_non_owner(clear, register_user_return_info, users_a
     assert sort_users(user_list_from_users_all) == sort_users([user_info_to_user_datatype(user) for user in user_list])
 
 def test_users_all_works_for_failed_registration(clear, register_user_return_info, users_all, extract_token, user_info_to_user_datatype, sort_users):
+    '''
+    Tests correct output when a failed registration occurs.
+
+    Expects: 
+        Correct output from user/list.
+    '''
+
     owner_info = register_user_return_info('owner@gmail.com', 'owner', 'one')
     user_info1 = register_user_return_info('user1@gmail.com', 'user', 'two')
     register_user_return_info('user1@gmail.com', 'user', 'three')
@@ -102,6 +130,13 @@ def test_users_all_works_for_failed_registration(clear, register_user_return_inf
     assert sort_users(user_lists_from_users_all) == sort_users([user_info_to_user_datatype(user) for user in user_list])
 
 def test_users_all_invalid_token(clear, register_user_return_info, users_all):
+    '''
+    Test case where token is not valid.
+
+    Expects: 
+        AccessError (403 error)
+    '''
+
     register_user_return_info('owner@gmail.com', 'owner', 'one')
 
     assert users_all(-123123).status_code() == 403
