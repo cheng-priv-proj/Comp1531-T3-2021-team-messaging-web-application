@@ -164,7 +164,27 @@ def test_invalid_last_name_v2(clear_server):
         }))
     assert(long_last_name.status_code == 400)
 
+def test_non_alphanumeric_names(clear_server, get_user_1):
+    '''
+    A test that checks if handle genneration has been correctly generated for
+    non alphanumeric names. 
 
+    Expects: 
+        a non empty handle exists from user/profile/v1
+    '''
+    response = requests.post(config.url + 'auth/register/v2', json={
+        'email': 'example@email.com', 
+        'password': 'password', 
+        'name_first': '@#($*$(', 
+        'name_last' : '@#$($#$'
+        })
+    
+    assert response.status_code == 200
+    user = response.json()
+
+    user_dict = requests.get(config.url + 'user/profile/v1', params={'token': get_user_1['token'], 'u_id': user['auth_user_id']}).json()
+
+    assert user_dict['user']['handle_str'] != ''
 
 
 def test_appended_handle_number(clear_server, get_user_1):
