@@ -149,7 +149,6 @@ def test_dm_details_v1_returns_members(clear_server, get_valid_token, get_valid_
         'dm_id': dm_id['dm_id']
         }).json()
 
-    print(resp_details['members'])
     assert resp_details['members'] == [
         {
             'u_id': user2['auth_user_id'],

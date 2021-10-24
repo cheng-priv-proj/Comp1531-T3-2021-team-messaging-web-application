@@ -95,6 +95,9 @@ def base_handle_str_generation(firstname, lastname):
     if len(base_handle) > 20:
         base_handle = base_handle[0:20]
 
+    if base_handle == '':
+        base_handle = 'defaultname'
+
     return base_handle
 
 # helper function to handle TypeError exceptions
@@ -134,9 +137,8 @@ def token_to_auth_id(token):
         raise AccessError ('Token is invalid')
     # data_store.get_u_id_from_token(token)
     token_dict = jwt.decode(token, SECRET, algorithms=['HS256'])
-    print(token_dict)
-    return token_dict['auth_user_id']
 
+    return token_dict['auth_user_id']
 
 def hash_str(string):
     return hashlib.sha256(string.encode()).hexdigest()
