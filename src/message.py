@@ -171,8 +171,7 @@ def message_edit_v1(auth_user_id, message_id, message):
     id = data_store.get_channel_or_dm_id_from_message_id(message_id)
 
     if not (data_store.is_user_sender_of_message(auth_user_id, message_id) or
-        data_store.is_user_owner_of_channel_or_dm(id, auth_user_id)
-        or data_store.is_stream_owner(auth_user_id)): 
+        (data_store.is_user_owner_of_channel_or_dm(id, auth_user_id) or data_store.is_stream_owner(auth_user_id))): 
         raise AccessError
 
     messages = data_store.get_messages_from_channel_or_dm_id(id)
