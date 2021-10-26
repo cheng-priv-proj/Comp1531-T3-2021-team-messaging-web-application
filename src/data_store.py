@@ -450,6 +450,23 @@ class Datastore:
         self.get_channels_or_dms_id_from_message_id_dict()[message.get('message_id')] = id
         self.update_json()
 
+    def insert_notification(self, u_id, notification_message, channel_or_dm_id):
+        notifications = self.get_notifications_from_u_id(u_id)
+
+        channel_id = -1
+        dm_id = -1
+
+        if channel_or_dm_id < 0:
+            dm_id = channel_or_dm_id
+        else:
+            channel_id = channel_or_dm_id
+        
+        notifications.insert(0, {
+                                'channel_id': channel_id,
+                                'dm_id': dm_id,
+                                'notification_message': notification_message
+                                })
+
     # Remove ##############################################
 
     def invalidate_token(self, token):
