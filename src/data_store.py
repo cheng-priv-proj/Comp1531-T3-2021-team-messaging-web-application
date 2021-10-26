@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 
 ######### DATASTORE STRUCTURE ##################################################
 #  
@@ -28,6 +29,13 @@ import json
 #               details : { name, members}
 #               creator 
 #               }
+# 
+# standups:
+#   key: channel_id:
+#   value: dict {
+#               messages: '',
+#               time_finish 
+#               }
 #
 # message ids:
 #   key: message_id
@@ -49,10 +57,31 @@ import json
 #               handle_str
 #               }
 #
+# notifications:
+#   key: u_id
+#   value: [notifications]
+#
 # permissions:
 #   key: u_id
 #   value: { 1 or 2 }
 #
+# user_stats:
+#   key: u_id
+#   value: dict {
+#               channels_joined: [{num_channels_joined, time_stamp}],
+#               dms_joined: [{num_dms_joined, time_stamp}], 
+#               messages_sent: [{num_messages_sent, time_stamp}], 
+#               involvement_rate 
+#               } 
+#
+# workplace_stats:
+# value: dict {
+#              channels_exist: [{num_channels_exist, time_stamp}], 
+#              dms_exist: [{num_dms_exist, time_stamp}], 
+#              messages_exist: [{num_messages_exist, time_stamp}], 
+#              utilization_rate 
+#              }
+    
 # message_count: num_messages
 #
 ################################################################################
@@ -62,15 +91,23 @@ initial_object = {
     'token' : {},
     'channels' : {},
     'dms': {},
+    'standups': {},
     'message_ids' : {},
     'messages' : {},
     'users': {},
+    'notifications': {},
     'perms' : {},
+    'user_stats': {},
+    'workplace_stats': { 
+                        'channels_exist': [{0, 0}], 
+                        'dms_exist': [{0, 0}], 
+                        'messages_exist': [{0, 0}], 
+                        'utilization_rate': 0 
+                        },
     'message_count': 0
 }
 
 class Datastore:
-
     # Initialisation and Resetting Methods #####################################
     def __init__(self):
         with open('src/json_dump/data_store.txt', 'r') as FILE:
@@ -85,10 +122,19 @@ class Datastore:
                 'token' : {},
                 'channels' : {},
                 'dms': {},
+                'standsups': {},
                 'message_ids' : {},
                 'messages' : {},
                 'users': {},
+                'notifications': {},
                 'perms' : {},
+                'workplace_stats': { 
+                                    'channels_exist': [{0, 0}], 
+                                    'dms_exist': [{0, 0}], 
+                                    'messages_exist': [{0, 0}], 
+                                    'utilization_rate': 0 
+                                    },
+                'user_stats': {},
                 'message_count': 0
             }, 
             FILE
@@ -141,6 +187,14 @@ class Datastore:
     def get_dm_creator_from_dm_id(self, dm_id):
         return self.get_dms_from_dm_id_dict().get(dm_id).get('creator')
 
+    # standups
+
+    def get_standups_from_channel_id_dict(self):
+        return self.__store['standups']
+
+    def get_standup_from_channel_id(self, channel_id):
+        return self.get_standups_from_channel_id_dict.get(channel_id)
+
     # messages
 
     def get_channels_or_dms_id_from_message_id_dict(self):
@@ -181,6 +235,25 @@ class Datastore:
     def get_num_streams_owners(self):
         perms = self.get_user_perms_from_u_id_dict().items()
         return len([u_id for u_id, perm_id in perms if perm_id == 1])
+
+    # stats
+
+    def get_user_stats_from_u_id_dict(self):
+        return self.__store['user_stats']
+    
+    def get_user_stats_from_u_id(self, u_id):
+        return self.get_user_stats_from_u_id_dict().get(u_id)
+    
+    def get_workplace_stats(self):
+        return self.__store['workplace_stats']
+
+    # notifications
+
+    def get_notifications_from_u_id_dict(self):
+        return self.__store['notifications']
+
+    def get_notifications_from_u_id(self, u_id):
+        return self.get_notifications_from_u_id_dict().get(u_id)
 
     # Check Methods ############################################################
 
@@ -243,6 +316,13 @@ class Datastore:
             return self.get_dm_creator_from_dm_id(channel_or_dm_id) == u_id
         
         return self.is_channel_owner(channel_or_dm_id, u_id) 
+
+    def is_standup_active(self, channel_id):
+        standups = self.get_standups_from_channel_id_dict()
+        if channel_id not in standups:
+            return True
+        
+        return False
 
     def is_stream_owner(self, u_id):
         return self.get_user_perms_from_u_id_dict().get(u_id) == 1
@@ -320,10 +400,18 @@ class Datastore:
             'email': email,
             'name_first': name_first,
             'name_last': name_last,
-            'handle_str': handle_str
+            'handle_str': handle_str,
+            'profile_img_url': 'link_to_default'
         }
+        self.get_user_stats_from_u_id_dict()[u_id] = {
+            'channels_exist': [{0, 0}], 
+            'dms_exist': [{0, 0}], 
+            'messages_exist': [{0, 0}], 
+            'utilization_rate': 0
+        }
+        self.get_notifications_from_u_id_dict()[u_id] = []
         self.update_json()
-    
+
     def insert_user_perm(self, u_id, global_id):
         self.get_user_perms_from_u_id_dict()[u_id] = global_id
         self.update_json()
@@ -342,6 +430,13 @@ class Datastore:
     def insert_channel_owner(self, channel_id, u_id):
         self.get_channel_from_channel_id(channel_id).get('owner_members').append(data_store.get_user_from_u_id(u_id))
 
+    def insert_standup(self, channel_id, time_finish):
+        standups = self.get_standups_from_channel_id_dict()
+        standups[channel_id] = {
+            'messages': '',
+            'time_finish': time_finish
+        }
+
     def insert_dm(self, creator, dm_id, u_ids, name):
         self.get_dms_from_dm_id_dict()[dm_id] = {
             'details' : {'name': name, 'members': u_ids},
@@ -355,11 +450,12 @@ class Datastore:
         self.get_channels_or_dms_id_from_message_id_dict()[message.get('message_id')] = id
         self.update_json()
 
-    def update_value(self, dict_key, key, value):
-        self.__store[dict_key][key] = value
-        self.update_json()
+    # Remove ##############################################
 
-    # Remove ###################################################################
+    def invalidate_token(self, token):
+        tokens = self.get_u_ids_from_token_dict()
+        del tokens[token]
+        self.update_json()
 
     def remove_message(self, message_id):
         channel_or_dm_id = self.get_channel_or_dm_id_from_message_id(message_id)
@@ -367,50 +463,16 @@ class Datastore:
         del self.get_channels_or_dms_id_from_message_id_dict()[message_id]
         self.update_json()
 
-    # Other ####################################################################
-
-    def invalidate_token(self, token):
-        tokens = self.get_u_ids_from_token_dict()
-        del tokens[token]
-        self.update_json()
-    
-    def update_name(self, auth_user_id, name_first, name_last):
-        user = self.get_users_from_u_id_dict().get(auth_user_id)
-        user['name_first'] = name_first
-        user['name_last'] = name_last
-
-        self.update_json()
-    
-    def update_email(self, auth_user_id, email):
-        user = self.get_users_from_u_id_dict().get(auth_user_id)
-        login_info = self.get_logins_from_email_dict()
-        old_email = user['email']
-
-        login_info[email] = login_info.pop(old_email)
-        user['email'] = email
-
-        self.update_json()
-    
-    def update_handle(self, auth_user_id, handle):
-        user = self.get_users_from_u_id_dict().get(auth_user_id)
-        user['handle_str'] = handle
-
-        self.update_json()
-
     def remove_dm(self, dm_id):
         dm = self.get_dm_from_dm_id(dm_id)
         dm['members'] = []
 
         self.update_json()
-        
-    def increment_message_count(self):
-        self.__store['message_count'] += 1
-
-    def set(self, store):
-        if not isinstance(store, dict):
-            raise TypeError('store must be of type dictionary')
-        self.__store = store
     
+    def remove_standup(self, channel_id):
+        standups = self.get_standups_from_channel_id_dict()
+        del standups[channel_id]
+
     def remove_channel_owner(self, channel_id, u_id):
         channels = self.get_channels_from_channel_id_dict().get(channel_id)
         members = channels['owner_members']
@@ -461,6 +523,10 @@ class Datastore:
         # remove user permissions
         del self.get_user_perms_from_u_id_dict()[u_id]
 
+        # remove user_stats
+        del self.get_user_stats_from_u_id_dict()[u_id]
+        
+
         # Update user/profile
         user['email'] = ''
         user['name_first'] = 'Removed'
@@ -468,6 +534,97 @@ class Datastore:
         user['handle_str'] = ''
 
         self.update_json()
+
+    # Update ##################################################################
+    
+    def update_name(self, auth_user_id, name_first, name_last):
+        user = self.get_users_from_u_id_dict().get(auth_user_id)
+        user['name_first'] = name_first
+        user['name_last'] = name_last
+
+        self.update_json()
+    
+    def update_user_stats_channels_joined(self, u_id, change):
+        user_stats_channels = self.get_user_stat_from_u_id(u_id)['channels_joined']
+        user_stats_channels['num_channels_joined'] += change
+        user_stats_channels['timestamp'] = datetime.utcnow().timestamp()
+        self.update_user_stats_involment_rate(u_id)
+    
+    def update_user_stats_dms_joined(self, u_id, change):
+        user_stats_dms = self.get_user_stat_from_u_id(u_id)['dms_joined']
+        user_stats_dms['num_dms_joined'] += change
+        user_stats_dms['timestamp'] = datetime.utcnow().timestamp()
+        self.update_user_stats_involment_rate(u_id)
+
+    def update_user_stats_dms_joined(self, u_id, change):
+        user_stats_messages = self.get_user_perms_from_u_id(u_id)['messages_sent']
+        user_stats_messages['messages_sent'] += change
+        user_stats_messages['timestamp'] = datetime.utcnow().timestamp()
+        self.update_user_stats_involment_rate(u_id)
+
+    def update_user_stats_involment_rate(self, u_id):
+        user_stats = self.get_user_perms_from_u_id(u_id)
+        workplace_stats = self.get_workplace_stats()
+
+        user_sum = sum(user_stats['messages_sent'], user_stats['num_dms_joined'], user_stats['num_channels_joined'])
+        workplace_sum = sum(
+            workplace_stats['channels_exist']['num_channels_exist'], 
+            workplace_stats['dms_exist']['num_dms_exist'],
+            workplace_stats['messages_exist']['num_messages_exist'])
+        
+        user_stats['involvement_rate'] = user_sum / workplace_sum
+    
+    def update_workspace_stats_channels_exist(self, change):
+        workplace_stats_channels = self.get_workplace_stats()['channels_exist']
+        workplace_stats_channels['num_channels_exist'] += change
+        workplace_stats_channels['timestamp'] = datetime.utcnow().timestamp
+        self.update_workplace_stats_utilization_rate()
+
+    def update_workplace_stats_dms_exist(self, change):
+        workplace_stats_dms = self.get_workplace_stats()['dms_exist']
+        workplace_stats_dms['num_dms_exist'] += change
+        workplace_stats_dms['timestamp'] = datetime.utcnow().timestamp
+        self.update_workplace_stats_utilization_rate()
+
+    def update_workplace_stats_messages_exist(self, change):
+        workplace_stats_messages = self.get_workplace_stats()['messages_exist']
+        workplace_stats_messages['num_messages_exist'] += change
+        workplace_stats_messages['timestamp'] = datetime.utcnow().timestamp
+        self.update_workplace_stats_utilization_rate()
+
+    def update_workplace_stats_utilization_rate(self):
+        pass
+
+    def update_email(self, auth_user_id, email):
+        user = self.get_users_from_u_id_dict().get(auth_user_id)
+        login_info = self.get_logins_from_email_dict()
+        old_email = user['email']
+
+        login_info[email] = login_info.pop(old_email)
+        user['email'] = email
+
+        self.update_json()
+    
+    def update_handle(self, auth_user_id, handle):
+        user = self.get_users_from_u_id_dict().get(auth_user_id)
+        user['handle_str'] = handle
+
+        self.update_json()
+
+    def update_value(self, dict_key, key, value):
+        self.__store[dict_key][key] = value
+        self.update_json()
+
+    # Other ####################################################################
+        
+    def increment_message_count(self):
+        self.__store['message_count'] += 1
+
+    def set(self, store):
+        if not isinstance(store, dict):
+            raise TypeError('store must be of type dictionary')
+        self.__store = store
+    
 
 print('Loading Datastore...')
 
