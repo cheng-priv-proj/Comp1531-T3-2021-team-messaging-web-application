@@ -319,7 +319,7 @@ class Datastore:
 
     def is_standup_active(self, channel_id):
         standups = self.get_standups_from_channel_id_dict()
-        if channel_id not in standups:
+        if channel_id in standups:
             return True
         
         return False
