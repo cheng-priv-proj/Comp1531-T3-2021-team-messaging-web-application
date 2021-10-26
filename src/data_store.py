@@ -525,7 +525,7 @@ class Datastore:
 
         # remove user_stats
         del self.get_user_stats_from_u_id_dict()[u_id]
-        
+        self.update_workplace_stats_utilization_rate()
 
         # Update user/profile
         user['email'] = ''
