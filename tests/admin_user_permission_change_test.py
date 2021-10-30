@@ -116,6 +116,7 @@ def test_demote_only_owner(clear, first_register):
         'u_id': u_id,
         'permission_id': permission_id
     }).status_code == 400
+    
 
 def test_success_perms_change(clear, first_register, second_register):
     '''
