@@ -1,4 +1,5 @@
-import json
+import pickle
+import os
 from datetime import datetime
 
 ######### DATASTORE STRUCTURE ##################################################
@@ -110,13 +111,16 @@ initial_object = {
 class Datastore:
     # Initialisation and Resetting Methods #####################################
     def __init__(self):
-        with open('src/json_dump/data_store.txt', 'r') as FILE:
-            self.__store = json.load(FILE)
+        if os.stat('src/pickle_dump/data_store.txt').st_size == 0:
+            self.__store = initial_object
+        else:
+            with open('src/pickle_dump/data_store.txt', 'rb') as FILE:
+                self.__store = pickle.load(FILE)
 
     def hard_reset(self):
         # replace json dump with a fresh copy of datastore
-        with open('src/json_dump/data_store.txt', 'w') as FILE:
-            json.dump(
+        with open('src/pickle_dump/data_store.txt', 'wb') as FILE:
+            pickle.dump(
             {
                 'login' : {},
                 'token' : {},
@@ -143,9 +147,9 @@ class Datastore:
         # re initialise the datastore
         self.__init__()
 
-    def update_json(self):
-        with open('src/json_dump/data_store.txt', 'w') as FILE:
-            json.dump(self.__store, FILE)
+    def update_pickle(self):
+        with open('src/pickle_dump/data_store.txt', 'wb') as FILE:
+            pickle.dump(self.__store, FILE)
 
     # Get Methods ##############################################################
 
@@ -155,6 +159,7 @@ class Datastore:
     # login
 
     def get_logins_from_email_dict(self):
+        print(self.__store)
         return self.__store['login']
     
     def get_login_from_email(self, email):
@@ -239,6 +244,7 @@ class Datastore:
     # stats
 
     def get_user_stats_from_u_id_dict(self):
+        print(self.__store)
         return self.__store['user_stats']
     
     def get_user_stats_from_u_id(self, u_id):
@@ -388,11 +394,11 @@ class Datastore:
             'password': password,
             'auth_id': auth_id
         }
-        self.update_json()
+        self.update_pickle()
 
     def insert_token(self, token, auth_user_id):
         self.get_u_ids_from_token_dict()[token] = auth_user_id
-        self.update_json()
+        self.update_pickle()
 
     def insert_user(self, u_id, email, name_first, name_last, handle_str):
         self.get_users_from_u_id_dict()[u_id] = {
@@ -410,11 +416,11 @@ class Datastore:
             'utilization_rate': 0
         }
         self.get_notifications_from_u_id_dict()[u_id] = []
-        self.update_json()
+        self.update_pickle()
 
     def insert_user_perm(self, u_id, global_id):
         self.get_user_perms_from_u_id_dict()[u_id] = global_id
-        self.update_json()
+        self.update_pickle()
     
     def insert_channel(self, channel_id, channel_name, is_public, messages, owner_members, all_members):
         self.get_channels_from_channel_id_dict()[channel_id] = {
@@ -425,10 +431,11 @@ class Datastore:
         }
 
         self.get_messages_from_channel_or_dm_id_dict()[channel_id] = messages
-        self.update_json()
+        self.update_pickle()
 
     def insert_channel_owner(self, channel_id, u_id):
         self.get_channel_from_channel_id(channel_id).get('owner_members').append(data_store.get_user_from_u_id(u_id))
+        self.update_pickle()
 
     def insert_standup(self, channel_id, time_finish):
         standups = self.get_standups_from_channel_id_dict()
@@ -436,6 +443,7 @@ class Datastore:
             'messages': '',
             'time_finish': time_finish
         }
+        self.update_pickle()
 
     def insert_dm(self, creator, dm_id, u_ids, name):
         self.get_dms_from_dm_id_dict()[dm_id] = {
@@ -443,12 +451,12 @@ class Datastore:
             'creator' : creator
         }
         self.get_messages_from_channel_or_dm_id_dict()[dm_id] = []
-        self.update_json()
+        self.update_pickle()
 
     def insert_message(self, id, message):
         self.get_messages_from_channel_or_dm_id(id).insert(0, message)
         self.get_channels_or_dms_id_from_message_id_dict()[message.get('message_id')] = id
-        self.update_json()
+        self.update_pickle()
 
     def insert_notification(self, u_id, notification_message, channel_or_dm_id):
         notifications = self.get_notifications_from_u_id(u_id)
@@ -466,25 +474,26 @@ class Datastore:
                                 'dm_id': dm_id,
                                 'notification_message': notification_message
                                 })
+        self.update_pickle()
 
     # Remove ##############################################
 
     def invalidate_token(self, token):
         tokens = self.get_u_ids_from_token_dict()
         del tokens[token]
-        self.update_json()
+        self.update_pickle()
 
     def remove_message(self, message_id):
         channel_or_dm_id = self.get_channel_or_dm_id_from_message_id(message_id)
         self.get_messages_from_channel_or_dm_id(channel_or_dm_id).remove(self.get_message_from_message_id(message_id))
         del self.get_channels_or_dms_id_from_message_id_dict()[message_id]
-        self.update_json()
+        self.update_pickle()
 
     def remove_dm(self, dm_id):
         dm = self.get_dm_from_dm_id(dm_id)
         dm['members'] = []
 
-        self.update_json()
+        self.update_pickle()
     
     def remove_standup(self, channel_id):
         standups = self.get_standups_from_channel_id_dict()
@@ -498,7 +507,7 @@ class Datastore:
             if person['u_id'] == u_id:
                 members.remove(person)
         
-        self.update_json()
+        self.update_pickle()
 
     def admin_user_remove(self, u_id):
         user = self.get_user_from_u_id(u_id)
@@ -550,7 +559,7 @@ class Datastore:
         user['name_last'] = 'user'
         user['handle_str'] = ''
 
-        self.update_json()
+        self.update_pickle()
 
     # Update ##################################################################
     
@@ -559,27 +568,27 @@ class Datastore:
         user['name_first'] = name_first
         user['name_last'] = name_last
 
-        self.update_json()
+        self.update_pickle()
     
     def update_user_stats_channels_joined(self, u_id, change):
         user_stats_channels = self.get_user_stat_from_u_id(u_id)['channels_joined']
         user_stats_channels['num_channels_joined'] += change
         user_stats_channels['timestamp'] = datetime.utcnow().timestamp()
-        self.update_user_stats_involment_rate(u_id)
+        self.update_user_stats_involvement_rate(u_id)
     
     def update_user_stats_dms_joined(self, u_id, change):
         user_stats_dms = self.get_user_stat_from_u_id(u_id)['dms_joined']
         user_stats_dms['num_dms_joined'] += change
         user_stats_dms['timestamp'] = datetime.utcnow().timestamp()
-        self.update_user_stats_involment_rate(u_id)
+        self.update_user_stats_involvement_rate(u_id)
 
     def update_user_stats_dms_joined(self, u_id, change):
         user_stats_messages = self.get_user_perms_from_u_id(u_id)['messages_sent']
         user_stats_messages['messages_sent'] += change
         user_stats_messages['timestamp'] = datetime.utcnow().timestamp()
-        self.update_user_stats_involment_rate(u_id)
+        self.update_user_stats_involvement_rate(u_id)
 
-    def update_user_stats_involment_rate(self, u_id):
+    def update_user_stats_involvement_rate(self, u_id):
         user_stats = self.get_user_perms_from_u_id(u_id)
         workplace_stats = self.get_workplace_stats()
 
@@ -590,6 +599,7 @@ class Datastore:
             workplace_stats['messages_exist']['num_messages_exist'])
         
         user_stats['involvement_rate'] = user_sum / workplace_sum
+        self.update_pickle()
     
     def update_workspace_stats_channels_exist(self, change):
         workplace_stats_channels = self.get_workplace_stats()['channels_exist']
@@ -610,6 +620,7 @@ class Datastore:
         self.update_workplace_stats_utilization_rate()
 
     def update_workplace_stats_utilization_rate(self):
+        self.update_pickle()
         pass
 
     def update_email(self, auth_user_id, email):
@@ -620,22 +631,23 @@ class Datastore:
         login_info[email] = login_info.pop(old_email)
         user['email'] = email
 
-        self.update_json()
+        self.update_pickle()
     
     def update_handle(self, auth_user_id, handle):
         user = self.get_users_from_u_id_dict().get(auth_user_id)
         user['handle_str'] = handle
 
-        self.update_json()
+        self.update_pickle()
 
     def update_value(self, dict_key, key, value):
         self.__store[dict_key][key] = value
-        self.update_json()
+        self.update_pickle()
 
     # Other ####################################################################
         
     def increment_message_count(self):
         self.__store['message_count'] += 1
+        self.update_pickle()
 
     def set(self, store):
         if not isinstance(store, dict):
