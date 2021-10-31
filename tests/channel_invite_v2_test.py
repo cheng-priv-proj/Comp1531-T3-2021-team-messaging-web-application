@@ -55,14 +55,16 @@ def test_member_invite_v2(clear_server, get_invitee, get_user_1):
             'email': 'owner@test.com',
             'name_first': 'owner',
             'name_last': 'one',
-            'handle_str': 'ownerone'
+            'handle_str': 'ownerone',
+            'profile_img_url': 'link_to_default'
         },
         {
             'u_id': get_invitee['auth_user_id'],
             'email': 'example@email.com',
             'name_first': 'John',
             'name_last': 'smith',
-            'handle_str': 'johnsmith'
+            'handle_str': 'johnsmith',
+            'profile_img_url': 'link_to_default'
         }
     ]
 
@@ -95,21 +97,24 @@ def test_invite_multiple_v2(clear_server, get_invitee, get_user_1):
             'email': 'owner@test.com',
             'name_first': 'owner',
             'name_last': 'one',
-            'handle_str': 'ownerone'
+            'handle_str': 'ownerone',
+            'profile_img_url': 'link_to_default'
         },
         {
             'u_id': get_invitee['auth_user_id'],
             'email': 'example@email.com',
             'name_first': 'John',
             'name_last': 'smith',
-            'handle_str': 'johnsmith'
+            'handle_str': 'johnsmith',
+            'profile_img_url': 'link_to_default'
         },
         {
             'u_id': user_3_dict['auth_user_id'],
             'email': 'eexample@email.com',
             'name_first': 'Johno',
             'name_last': 'smith',
-            'handle_str': 'johnosmith'
+            'handle_str': 'johnosmith',
+            'profile_img_url': 'link_to_default'
         }
     ]
 
@@ -133,14 +138,16 @@ def test_private_invite(clear_server, get_invitee, get_user_1):
             'email': 'owner@test.com',
             'name_first': 'owner',
             'name_last': 'one',
-            'handle_str': 'ownerone'
+            'handle_str': 'ownerone',
+            'profile_img_url': 'link_to_default'
         },
         {
             'u_id': get_invitee['auth_user_id'],
             'email': 'example@email.com',
             'name_first': 'John',
             'name_last': 'smith',
-            'handle_str': 'johnsmith'
+            'handle_str': 'johnsmith',
+            'profile_img_url': 'link_to_default'
         }
     ]
 
