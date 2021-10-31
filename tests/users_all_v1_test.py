@@ -12,6 +12,13 @@ def extract_token():
         return auth_user_id_dict['token']
     return extract_token_id_function
 
+# Extracts the token from a given dictionary.
+@pytest.fixture
+def extract_user():
+    def extract_u_id_function(auth_user_id_dict):
+        return auth_user_id_dict['auth_user_id']
+    return extract_u_id_function
+
 # Call users all
 @pytest.fixture
 def users_all():
@@ -26,20 +33,24 @@ def clear():
     requests.delete(url + 'clear/v1')
 
 # Registers an user and returns their registration info, auth_id and token and handle_str
+# Assumes handle_str does not require additional processing past concatenation
 @pytest.fixture
 def register_user_return_info():
-    def register_user_return_info_function(email, name_first, name_last):
+    def register_user_function(email, name_first, name_last):
         registration_info = {
             'email': email, 
             'password': 'password', 
             'name_first': name_first,
-            'name_last': name_last 
-        }
-        owner_id_dict = requests.post(url + 'auth/register/v2', json = registration_info).json()
-        
-        owner_id_dict['handle_str'] = registration_info.get('name_first') + registration_info.get('name_last')
-        return {**owner_id_dict, **registration_info}
-    return register_user_return_info_function
+            'name_last': name_last }
+        register = requests.post(url + 'auth/register/v2', json = registration_info)
+        register_dict = register.json()
+        if register.status_code != 403 and register.status_code != 400:
+            owner_id_profile = requests.get(url + 'user/profile/v1', params = {'token': register_dict['token'], 'u_id': register_dict['auth_user_id']})
+            register_dict['profile_img_url'] = owner_id_profile.json()['user']['profile_img_url']
+
+        register_dict['handle_str'] = registration_info.get('name_first') + registration_info.get('name_last')    
+        return {**register_dict, **registration_info}
+    return register_user_function
 
 # Removes token and password key value pairs
 @pytest.fixture

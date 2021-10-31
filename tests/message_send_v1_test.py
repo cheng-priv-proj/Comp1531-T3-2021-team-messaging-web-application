@@ -73,14 +73,16 @@ def test_send_one_valid_message(clear, register, extract_token, extract_user, ex
         'token': owner_token,
         'channel_id': channel_id, 
         'start': 0 }).json()
-    
+    print(messages)
     assert messages == {
         'messages': [
             {
                 'message_id': message_id.get('message_id'),
                 'u_id': extract_user(register),
                 'message': 'testmessage',
-                'time_created':  pytest.approx(now, rel=2)
+                'time_created':  pytest.approx(now, rel=2),
+                'reacts': [],
+                'is_pinned': False
             }
         ],
         'start': 0,
@@ -115,26 +117,32 @@ def test_send_multiple_valid_messages(clear, register, extract_token, extract_us
         'token': owner_token,
         'channel_id': channel_id, 
         'start': 0 }).json()
-
+    print(messages)
     assert messages == {
         'messages': [
             {
                 'message_id': message_id2,
                 'u_id': owner_id,
                 'message': 'testmessage2',
-                'time_created': pytest.approx(now, rel=2)
+                'time_created': pytest.approx(now, rel=2),
+                'reacts': [],
+                'is_pinned': False
             },
             {
                 'message_id': message_id1,
                 'u_id': owner_id,
                 'message': 'testmessage1',
-                'time_created': pytest.approx(now, rel=2)
+                'time_created': pytest.approx(now, rel=2),
+                'reacts': [],
+                'is_pinned': False
             },
             {
                 'message_id': message_id0,
                 'u_id': owner_id,
                 'message': 'testmessage0',
-                'time_created':  pytest.approx(now, rel=2)
+                'time_created':  pytest.approx(now, rel=2),
+                'reacts': [],
+                'is_pinned': False
             }
             ],
         'start': 0,
@@ -157,7 +165,8 @@ def test_send_invalid_message_to_short(clear, register, extract_token, extract_c
     assert requests.post(url + 'message/send/v1', json = {
         'token': owner_token,
         'channel_id': channel_id,
-        'message': ''
+        'message': '',
+        'reacts': []
     }).status_code == 400
 
 def test_send_invalid_message_to_long(clear, register, extract_token, extract_channel):
@@ -174,7 +183,8 @@ def test_send_invalid_message_to_long(clear, register, extract_token, extract_ch
     assert requests.post(url + 'message/send/v1', json = {
         'token': owner_token,
         'channel_id': channel_id,
-        'message': 'a' * 1001
+        'message': 'a' * 1001,
+        'reacts': []
     }).status_code == 400
 
 def test_send_valid_message_unauthorized_user(clear, register, extract_token, extract_channel):

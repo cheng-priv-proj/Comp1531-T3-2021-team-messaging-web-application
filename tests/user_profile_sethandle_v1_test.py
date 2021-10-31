@@ -66,6 +66,7 @@ def test_user_profile_sethandle_basic_functionality(clear, register_user, user_p
         'handle_str': 'owneronen',
         'name_first': 'owner',
         'name_last': 'one',
+        'profile_img_url': user_profile(extract_token(owner_info), extract_user(owner_info)).json().get('user').get('profile_img_url'),
         'email': 'owner@gmail.com'
     }
 
