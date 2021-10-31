@@ -73,7 +73,7 @@ def test_send_one_valid_message(clear, register, extract_token, extract_user, ex
         'token': owner_token,
         'channel_id': channel_id, 
         'start': 0 }).json()
-    
+    print(messages)
     assert messages == {
         'messages': [
             {
@@ -81,7 +81,8 @@ def test_send_one_valid_message(clear, register, extract_token, extract_user, ex
                 'u_id': extract_user(register),
                 'message': 'testmessage',
                 'time_created':  pytest.approx(now, rel=2),
-                'reacts': []
+                'reacts': [],
+                'is_pinned': False
             }
         ],
         'start': 0,
@@ -116,7 +117,7 @@ def test_send_multiple_valid_messages(clear, register, extract_token, extract_us
         'token': owner_token,
         'channel_id': channel_id, 
         'start': 0 }).json()
-
+    print(messages)
     assert messages == {
         'messages': [
             {
@@ -124,21 +125,24 @@ def test_send_multiple_valid_messages(clear, register, extract_token, extract_us
                 'u_id': owner_id,
                 'message': 'testmessage2',
                 'time_created': pytest.approx(now, rel=2),
-                'reacts': []
+                'reacts': [],
+                'is_pinned': False
             },
             {
                 'message_id': message_id1,
                 'u_id': owner_id,
                 'message': 'testmessage1',
                 'time_created': pytest.approx(now, rel=2),
-                'reacts': []
+                'reacts': [],
+                'is_pinned': False
             },
             {
                 'message_id': message_id0,
                 'u_id': owner_id,
                 'message': 'testmessage0',
                 'time_created':  pytest.approx(now, rel=2),
-                'reacts': []
+                'reacts': [],
+                'is_pinned': False
             }
             ],
         'start': 0,
