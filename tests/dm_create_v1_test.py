@@ -152,7 +152,8 @@ def test_dm_id_correct(clear, user1, extract_dm, extract_token, extract_id):
                 'email': 'user1@test.com',
                 'name_first': 'a',
                 'name_last': 'one',
-                'handle_str': 'aone'
+                'handle_str': 'aone',
+                'profile_img_url': 'link_to_default'
             }
         ]
     }
@@ -188,7 +189,8 @@ def test_only_creator_dm(clear, user1, extract_dm, extract_token, extract_id):
                 'email': 'user1@test.com',
                 'name_first': 'a',
                 'name_last': 'one',
-                'handle_str': 'aone'
+                'handle_str': 'aone',
+                'profile_img_url': 'link_to_default'
             }
         ]
     }
@@ -226,14 +228,16 @@ def test_multiple_handles(clear, user1, user2, extract_dm, extract_id, extract_t
                 'email': 'user2@test.com',
                 'name_first': 'b',
                 'name_last': 'two',
-                'handle_str': 'btwo'
+                'handle_str': 'btwo',
+                'profile_img_url': 'link_to_default'
             },
             {
                 'u_id': user1_id,
                 'email': 'user1@test.com',
                 'name_first': 'a',
                 'name_last': 'one',
-                'handle_str': 'aone'
+                'handle_str': 'aone',
+                'profile_img_url': 'link_to_default'
             },
         ]
     }
