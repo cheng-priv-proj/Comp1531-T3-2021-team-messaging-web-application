@@ -130,7 +130,8 @@ def test_returns_all_info(clear, first_register):
                 'email': 'globalowner@test.com',
                 'name_first': 'global',
                 'name_last': 'user',
-                'handle_str': 'globaluser'
+                'handle_str': 'globaluser',
+                'profile_img_url': 'link_to_default'
             }
         ],
         'all_members': [
@@ -139,7 +140,8 @@ def test_returns_all_info(clear, first_register):
                 'email': 'globalowner@test.com',
                 'name_first': 'global',
                 'name_last': 'user',
-                'handle_str': 'globaluser'
+                'handle_str': 'globaluser',
+                'profile_img_url': 'link_to_default'
             }
         ]
     }
