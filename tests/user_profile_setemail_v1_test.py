@@ -75,6 +75,7 @@ def test_user_setemail_test_valid(clear, register_user, extract_user, extract_to
         'email': 'valid@email.com',
         'name_first': 'owner',
         'name_last': 'one',
+        'profile_img_url': user_profile(extract_token(owner_info), extract_user(owner_info)).json().get('user').get('profile_img_url'),
         'handle_str': 'ownerone'
     }
 

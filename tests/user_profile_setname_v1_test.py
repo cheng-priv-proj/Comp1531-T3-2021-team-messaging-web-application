@@ -74,6 +74,7 @@ def test_user_profile_setname_basic_functionality(clear, register_user, user_pro
         'handle_str': 'ownerone',
         'name_first': 'ownera',
         'name_last': 'asdd',
+        'profile_img_url': user_profile(extract_token(owner_info), extract_user(owner_info)).json().get('user').get('profile_img_url'),
         'email': 'owner@gmail.com',
     }
 
