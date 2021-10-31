@@ -198,7 +198,7 @@ class Datastore:
         return self.__store['standups']
 
     def get_standup_from_channel_id(self, channel_id):
-        return self.get_standups_from_channel_id_dict.get(channel_id)
+        return self.get_standups_from_channel_id_dict().get(channel_id)
 
     # messages
 
@@ -587,21 +587,15 @@ class Datastore:
         self.update_pickle()
     
     def update_user_stats_channels_joined(self, u_id, change):
-        user_stats_channels = self.get_user_stat_from_u_id(u_id)['channels_joined']
+        user_stats_channels = self.get_user_stats_from_u_id(u_id)['channels_joined']
         user_stats_channels['num_channels_joined'] += change
         user_stats_channels['timestamp'] = datetime.utcnow().timestamp()
         self.update_user_stats_involvement_rate(u_id)
     
     def update_user_stats_dms_joined(self, u_id, change):
-        user_stats_dms = self.get_user_stat_from_u_id(u_id)['dms_joined']
+        user_stats_dms = self.get_user_stats_from_u_id(u_id)['dms_joined']
         user_stats_dms['num_dms_joined'] += change
         user_stats_dms['timestamp'] = datetime.utcnow().timestamp()
-        self.update_user_stats_involvement_rate(u_id)
-
-    def update_user_stats_dms_joined(self, u_id, change):
-        user_stats_messages = self.get_user_perms_from_u_id(u_id)['messages_sent']
-        user_stats_messages['messages_sent'] += change
-        user_stats_messages['timestamp'] = datetime.utcnow().timestamp()
         self.update_user_stats_involvement_rate(u_id)
 
     def update_user_stats_involvement_rate(self, u_id):
