@@ -83,7 +83,8 @@ def test_standard(register):
         'email': '',
         'name_first': 'Removed',
         'name_last': 'user',
-        'handle_str': ''
+        'handle_str': '',
+        'profile_img_url': 'link_to_default'
     }
 
     # check if channel message has been overwritten
@@ -98,7 +99,9 @@ def test_standard(register):
             'u_id': register[1].get('auth_user_id'),
             'message': 'Removed user',
             'time_created': pytest.approx(channel_now, rel = 5),
-            'message_id': channel_message.get('message_id')
+            'message_id': channel_message.get('message_id'),
+            'reacts': [],
+            'is_pinned': False
         }]
     }
 
@@ -114,7 +117,9 @@ def test_standard(register):
             'u_id': register[1].get('auth_user_id'),
             'message': 'Removed user',
             'time_created': pytest.approx(dm_now, rel = 5),
-            'message_id': dm_message.get('message_id')
+            'message_id': dm_message.get('message_id'),
+            'reacts': [],
+            'is_pinned': False
         }]
     }
 
@@ -127,7 +132,9 @@ def test_standard(register):
             'email': 'owner@email.com',
             'name_first': 'owner',
             'name_last': 'one',
-            'handle_str': 'ownerone'
+            'handle_str': 'ownerone',
+            'profile_img_url': 'link_to_default'
+
         }]
     }
 
@@ -147,7 +154,8 @@ def test_standard(register):
         'email': 'user@email.com',
         'name_first': 'user',
         'name_last': 'one',
-        'handle_str': 'userone'
+        'handle_str': 'userone',
+        'profile_img_url': 'link_to_default'
     }
 
 def test_invalid_u_id(register):
