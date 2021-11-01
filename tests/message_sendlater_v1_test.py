@@ -180,7 +180,7 @@ def test_time_in_past(register_users, channel_factory):
         'time_sent': datetime.utcnow().timestamp() - 2
     }).status_code == 400
 
-def test_channel_valid_user_not_in_channel():
+def test_channel_valid_user_not_in_channel(register_users, channel_factory):
     channel_id = channel_factory(register_users[0]['token'])
 
     assert requests.post(url + 'message/sendlater/v1', json={
@@ -190,7 +190,7 @@ def test_channel_valid_user_not_in_channel():
         'time_sent': datetime.utcnow().timestamp() + 2
     }).status_code == 403
 
-def test_token_invalid():
+def test_token_invalid(clear, channel_factory):
     channel_id = channel_factory(register_users[0]['token'])
 
     assert requests.post(url + 'message/sendlater/v1', json={

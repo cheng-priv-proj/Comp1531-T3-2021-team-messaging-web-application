@@ -178,7 +178,7 @@ def test_time_in_past(register_users, dm_factory):
         'time_sent': datetime.utcnow().timestamp() - 2
     }).status_code == 400
 
-def test_dm_valid_user_not_in_channel():
+def test_dm_valid_user_not_in_channel(register_users):
     dm_id = dm_factory(register_users[0]['token'], [])
 
     assert requests.post(url + 'message/sendlaterdm/v1', json={
@@ -188,7 +188,7 @@ def test_dm_valid_user_not_in_channel():
         'time_sent': datetime.utcnow().timestamp() + 2
     }).status_code == 403
 
-def test_token_invalid():
+def test_token_invalid(register_users, channel_factory):
     dm_id = dm_factory(register_users[0]['token'], [])
 
     assert requests.post(url + 'message/sendlaterdm/v1', json={
