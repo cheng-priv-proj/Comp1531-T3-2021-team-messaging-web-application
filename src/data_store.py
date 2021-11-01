@@ -99,9 +99,9 @@ initial_object = {
     'perms' : {},
     'user_stats': {},
     'workplace_stats': { 
-                        'channels_exist': [{0, 0}], 
-                        'dms_exist': [{0, 0}], 
-                        'messages_exist': [{0, 0}], 
+                        'channels_exist': [{'num_channels_changed': 0, 'time_stamp': 0}], 
+                        'dms_exist': [{'num_dms_changed': 0, 'time_stamp': 0}], 
+                        'messages_exist': [{'num_messages_sent': 0, 'time_stamp': 0}], 
                         'utilization_rate': 0 
                         },
     'message_count': 0
@@ -122,19 +122,19 @@ class Datastore:
                 'token' : {},
                 'channels' : {},
                 'dms': {},
-                'standsups': {},
+                'standups': {},
                 'message_ids' : {},
                 'messages' : {},
                 'users': {},
                 'notifications': {},
                 'perms' : {},
+                'user_stats': {},
                 'workplace_stats': { 
-                                    'channels_exist': [{0, 0}], 
-                                    'dms_exist': [{0, 0}], 
-                                    'messages_exist': [{0, 0}], 
+                                    'channels_exist': [{'num_channels_changed': 0, 'time_stamp': 0}], 
+                                    'dms_exist': [{'num_dms_changed': 0, 'time_stamp': 0}], 
+                                    'messages_exist': [{'num_messages_sent': 0, 'time_stamp': 0}], 
                                     'utilization_rate': 0 
                                     },
-                'user_stats': {},
                 'message_count': 0
             }, 
             FILE
@@ -404,9 +404,9 @@ class Datastore:
             'profile_img_url': 'link_to_default'
         }
         self.get_user_stats_from_u_id_dict()[u_id] = {
-            'channels_exist': [{0, 0}], 
-            'dms_exist': [{0, 0}], 
-            'messages_exist': [{0, 0}], 
+            'channels_exist': [{'num_channels_joined': 0, 'time_stamp': 0}], 
+            'dms_exist': [{'num_dms_joined': 0, 'time_stamp': 0}], 
+            'messages_exist': [{'num_messages_sent': 0, 'time_stamp': 0}], 
             'utilization_rate': 0
         }
         self.get_notifications_from_u_id_dict()[u_id] = []
