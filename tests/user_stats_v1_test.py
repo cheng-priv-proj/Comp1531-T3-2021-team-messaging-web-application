@@ -33,7 +33,6 @@ def channel_factory():
         }
         channel_id_dict = requests.post(url + 'channels/create/v2', json = channel_details).json()
         channel_id = channel_id_dict.get('channel_id')
-        
         return channel_id
     return create_channel
 
@@ -53,6 +52,7 @@ def send_message_channel_factory():
             'token': token,
             'channel_id': channel_id,
             'message': message}).json()
+    return send_channel_message
         
 @pytest.fixture
 def send_message_dm_factory():
@@ -61,11 +61,12 @@ def send_message_dm_factory():
             'token': token,
             'dm_id': dm_id,
             'message': message}).json()
+    return send_dm
 
 
 def test_user_stats_v1_invalid_token(clear_server):
 
-    response = requests.post(url + 'user/stats/v1', json = {
+    response = requests.get(url + 'user/stats/v1', json = {
         'token': -1
     })
 
@@ -75,9 +76,9 @@ def test_user_stats_v1_nothing_joined(clear_server, get_valid_token):
     token = get_valid_token['token']
     now = datetime.utcnow().timestamp()
 
-    response = requests.post(url + 'user/stats/v1', json = {
+    response = requests.get(url + 'user/stats/v1', params = {
         'token': token
-    })
+    }).json()
 
     assert response == {
         'channels_joined': [{
@@ -103,9 +104,11 @@ def test_user_stats_v1_joined_channels(clear_server, get_valid_token, channel_fa
 
     now = datetime.utcnow().timestamp()
 
-    response = requests.post(url + 'user/stats/v1', json = {
+    response = requests.get(url + 'user/stats/v1', params = {
         'token': token
-    })
+    }).json()
+
+    print(response)
 
     assert response == {
         'channels_joined': [{
@@ -135,9 +138,11 @@ def test_user_stats_v1_joined_dms(clear_server, get_valid_token, dm_factory, sen
 
     now = datetime.utcnow().timestamp()
 
-    response = requests.post(url + 'user/stats/v1', json = {
+    response = requests.get(url + 'user/stats/v1', params = {
         'token': token
-    })
+    }).json()
+
+    print(response)
 
     assert response == {
         'channels_joined': [{
@@ -156,7 +161,7 @@ def test_user_stats_v1_joined_dms(clear_server, get_valid_token, dm_factory, sen
     }
 
 
-def test_user_stats_v1_joined_channels_and_dms(clear_server, get_valid_token, channel_factory, dm_factory):
+def test_user_stats_v1_joined_channels_and_dms(clear_server, get_valid_token, channel_factory, send_message_dm_factory, send_message_channel_factory, dm_factory):
     user = get_valid_token
     token = user['token']
     auth_id = user['auth_user_id']
@@ -172,10 +177,10 @@ def test_user_stats_v1_joined_channels_and_dms(clear_server, get_valid_token, ch
 
     now = datetime.utcnow().timestamp()
 
-    response = requests.post(url + 'user/stats/v1', json = {
+    response = requests.get(url + 'user/stats/v1', params = {
         'token': token
-    })
-
+    }).json()
+    print(response)
     assert response == {
         'channels_joined': [{
             'num_channels_joined': 2,

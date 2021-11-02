@@ -765,7 +765,6 @@ def user_stats_endpt():
     '''
     request_token = request.args.get('token')
     auth_user_id = token_to_auth_id(request_token)
-
     return user_stats_v1(auth_user_id)
 
 @APP.route('/users/stats/v1', methods=['GET'])

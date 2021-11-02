@@ -193,8 +193,7 @@ def user_stats_v1(auth_user_id):
     '''
 
     check_type(auth_user_id, int)
-
-    return data_store.get_user_stats(auth_user_id)
+    return data_store.get_user_stats_from_u_id(auth_user_id)
 
 def users_stats_v1(auth_user_id):
     '''
