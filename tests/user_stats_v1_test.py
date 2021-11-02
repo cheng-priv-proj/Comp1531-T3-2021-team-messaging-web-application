@@ -101,6 +101,8 @@ def test_user_stats_v1_joined_channels(clear_server, get_valid_token, channel_fa
     channel2 = channel_factory(token, 'channel2')
     send_message_channel_factory(token, channel1, 'hello')
 
+    now = datetime.utcnow().timestamp()
+
     response = requests.post(url + 'user/stats/v1', json = {
         'token': token
     })
@@ -130,6 +132,8 @@ def test_user_stats_v1_joined_dms(clear_server, get_valid_token, dm_factory, sen
     dm2 = dm_factory(token, [auth_id])
     send_message_dm_factory(token, dm1, 'hello')
     send_message_dm_factory(token, dm2, 'abcd')
+
+    now = datetime.utcnow().timestamp()
 
     response = requests.post(url + 'user/stats/v1', json = {
         'token': token
@@ -166,6 +170,7 @@ def test_user_stats_v1_joined_channels_and_dms(clear_server, get_valid_token, ch
     send_message_dm_factory(token, dm1, 'hello')
     send_message_dm_factory(token, dm2, 'abcd')
 
+    now = datetime.utcnow().timestamp()
 
     response = requests.post(url + 'user/stats/v1', json = {
         'token': token
