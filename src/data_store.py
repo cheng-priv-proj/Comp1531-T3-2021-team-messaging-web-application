@@ -576,35 +576,20 @@ class Datastore:
     
     def update_user_stats_channels_joined(self, u_id):
         user_stats_channels = self.get_user_stats_from_u_id(u_id)['channels_joined']
-<<<<<<< HEAD
-        user_stats_channels['num_channels_joined'] += 1
-        user_stats_channels['time_stamp'] = datetime.utcnow().timestamp()
-=======
         user_stats_channels[0]['num_channels_joined'] += 1
         user_stats_channels[0]['time_stamp'] = datetime.utcnow().timestamp()
->>>>>>> 3b74d9c (database changes)
         self.update_user_stats_involvement_rate(u_id)
     
     def update_user_stats_dms_joined(self, u_id):
         user_stats_dms = self.get_user_stats_from_u_id(u_id)['dms_joined']
-<<<<<<< HEAD
-        user_stats_dms['num_dms_joined'] += 1
-        user_stats_dms['time_stamp'] = datetime.utcnow().timestamp()
-=======
         user_stats_dms[0]['num_dms_joined'] += 1
         user_stats_dms[0]['time_stamp'] = datetime.utcnow().timestamp()
->>>>>>> 3b74d9c (database changes)
         self.update_user_stats_involvement_rate(u_id)
 
     def update_user_stats_messages_sent(self, u_id):
         user_stats_messages = self.get_user_stats_from_u_id(u_id)['messages_sent']
-<<<<<<< HEAD
-        user_stats_messages['num_messages_sent'] += 1
-        user_stats_messages['time_stamp'] = datetime.utcnow().timestamp()
-=======
         user_stats_messages[0]['num_messages_sent'] += 1
         user_stats_messages[0]['time_stamp'] = datetime.utcnow().timestamp()
->>>>>>> 3b74d9c (database changes)
         self.update_user_stats_involvement_rate(u_id)
 
     def update_user_stats_involvement_rate(self, u_id):
@@ -623,35 +608,20 @@ class Datastore:
     
     def update_workspace_stats_channels_exist(self, change):
         workplace_stats_channels = self.get_workplace_stats()['channels_exist']
-<<<<<<< HEAD
-        workplace_stats_channels['num_channels_exist'] += change
-        workplace_stats_channels['time_stamp'] = datetime.utcnow().timestamp
-=======
         workplace_stats_channels[0]['num_channels_exist'] += change
         workplace_stats_channels[0]['time_stamp'] = datetime.utcnow().timestamp
->>>>>>> 3b74d9c (database changes)
         self.update_workplace_stats_utilization_rate()
 
     def update_workplace_stats_dms_exist(self, change):
         workplace_stats_dms = self.get_workplace_stats()['dms_exist']
-<<<<<<< HEAD
-        workplace_stats_dms['num_dms_exist'] += change
-        workplace_stats_dms['time_stamp'] = datetime.utcnow().timestamp
-=======
         workplace_stats_dms[0]['num_dms_exist'] += change
         workplace_stats_dms[0]['time_stamp'] = datetime.utcnow().timestamp
->>>>>>> 3b74d9c (database changes)
         self.update_workplace_stats_utilization_rate()
 
     def update_workplace_stats_messages_exist(self, change):
         workplace_stats_messages = self.get_workplace_stats()['messages_exist']
-<<<<<<< HEAD
-        workplace_stats_messages['num_messages_exist'] += change
-        workplace_stats_messages['time_stamp'] = datetime.utcnow().timestamp
-=======
         workplace_stats_messages[0]['num_messages_exist'] += change
         workplace_stats_messages[0]['time_stamp'] = datetime.utcnow().timestamp
->>>>>>> 3b74d9c (database changes)
         self.update_workplace_stats_utilization_rate()
 
     def update_workplace_stats_utilization_rate(self):

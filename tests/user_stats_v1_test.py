@@ -99,7 +99,7 @@ def test_user_stats_v1_nothing_joined(clear_server, get_valid_token):
 def test_user_stats_v1_joined_channels(clear_server, get_valid_token, channel_factory, send_message_channel_factory):
     token = get_valid_token['token']
     channel1 = channel_factory(token, 'channel1')
-    channel2 = channel_factory(token, 'channel2')
+    channel_factory(token, 'channel2')
     send_message_channel_factory(token, channel1, 'hello')
 
     now = datetime.utcnow().timestamp()
@@ -167,7 +167,7 @@ def test_user_stats_v1_joined_channels_and_dms(clear_server, get_valid_token, ch
     auth_id = user['auth_user_id']
 
     channel1 = channel_factory(token, 'channel1')
-    channel2 = channel_factory(token, 'channel2')
+    channel_factory(token, 'channel2')
     send_message_channel_factory(token, channel1, 'hello')
 
     dm1 = dm_factory(token, [auth_id])
