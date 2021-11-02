@@ -1064,6 +1064,41 @@ def search_endpt():
 
     return search_v1(auth_user_id, query_str)
 
+    return notifications_get_v1()
+
+################## SEARCH ######################################################
+
+@APP.route('/search/v1', methods=['GET'])
+def search_endpt():
+    '''
+    put smth here
+    '''
+
+    return search_v1()
+
+################## STANDUP #####################################################
+
+@APP.route('/standup/start/v1', methods=['POST'])
+def standup_start_endpt():
+    '''
+    put smth here
+    '''
+
+    return standup_start_v1()
+
+@APP.route('/standup/active/v1', methods=['GET'])
+def standup_active_endpt():
+    '''
+    put smth here
+    '''
+
+    return standup_active_v1()
+
+@APP.route('/standup/send/v1', methods=['POST'])
+def standup_send_endpt():
+    '''
+    put smth here
+    '''
 
 
 ################## STANDUP #####################################################
