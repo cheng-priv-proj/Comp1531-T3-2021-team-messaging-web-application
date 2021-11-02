@@ -6,6 +6,7 @@ from src import config
 
 from src.other import clear_v1
 from src.config import url
+from datetime import datetime
 
 @pytest.fixture
 def clear_server():
@@ -72,11 +73,10 @@ def test_user_stats_v1_invalid_token(clear_server):
 
     assert response.status_code == 403
 
-# need to fix asserts
-
 def test_user_stats_v1_nothing_joined(clear_server, get_valid_token):
     token = get_valid_token['token']
-    
+    now = datetime.utcnow().timestamp()
+
     response = requests.post(url + 'user/stats/v1', json = {
         'token': token
     })
@@ -84,17 +84,17 @@ def test_user_stats_v1_nothing_joined(clear_server, get_valid_token):
     assert response == {
         'channels_joined': [{
             'num_channels_joined': 0
-            'time_stamp':
+            'time_stamp': pytest.approx(pytest.approx(now, rel=2))
         }]
         'dms_joined': [{
             'num_dms_joined': 0
-            'time_stamp':
+            'time_stamp': pytest.approx(pytest.approx(now, rel=2))
         }]
         'messages_sent': [{
             'num_messages_sent': 0
-            'time_stamp':
+            'time_stamp': pytest.approx(pytest.approx(now, rel=2))
         }]
-        'involvement_rate':
+        'involvement_rate': 0
     }
 
 def test_user_stats_v1_joined_channels(clear_server, get_valid_token, channel_factory, send_message_channel_factory):
@@ -110,17 +110,17 @@ def test_user_stats_v1_joined_channels(clear_server, get_valid_token, channel_fa
     assert response == {
         'channels_joined': [{
             'num_channels_joined': 2
-            'time_stamp':
+            'time_stamp': pytest.approx(pytest.approx(now, rel=2))
         }]
         'dms_joined': [{
             'num_dms_joined': 0
-            'time_stamp':
+            'time_stamp': pytest.approx(pytest.approx(now, rel=2))
         }]
         'messages_sent': [{
             'num_messages_sent': 1
-            'time_stamp':
+            'time_stamp': pytest.approx(pytest.approx(now, rel=2))
         }]
-        'involvement_rate':
+        'involvement_rate': 1
     }
 
 
@@ -140,17 +140,17 @@ def test_user_stats_v1_joined_dms(clear_server, get_valid_token, dm_factory, sen
     assert response == {
         'channels_joined': [{
             'num_channels_joined': 0
-            'time_stamp':
+            'time_stamp': pytest.approx(pytest.approx(now, rel=2))
         }]
         'dms_joined': [{
             'num_dms_joined': 2
-            'time_stamp':
+            'time_stamp': pytest.approx(pytest.approx(now, rel=2))
         }]
         'messages_sent': [{
             'num_messages_sent': 2
-            'time_stamp':
+            'time_stamp': pytest.approx(pytest.approx(now, rel=2))
         }]
-        'involvement_rate':
+        'involvement_rate': 1
     }
 
 
@@ -176,17 +176,17 @@ def test_user_stats_v1_joined_channels_and_dms(clear_server, get_valid_token, ch
     assert response == {
         'channels_joined': [{
             'num_channels_joined': 2
-            'time_stamp':
+            'time_stamp': pytest.approx(pytest.approx(now, rel=2))
         }]
         'dms_joined': [{
             'num_dms_joined': 2
-            'time_stamp':
+            'time_stamp': pytest.approx(pytest.approx(now, rel=2))
         }]
         'messages_sent': [{
             'num_messages_sent': 3
-            'time_stamp':
+            'time_stamp': pytest.approx(pytest.approx(now, rel=2))
         }]
-        'involvement_rate':
+        'involvement_rate': 1
     }
 
 
