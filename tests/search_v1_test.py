@@ -69,7 +69,7 @@ def send_message_dm_factory():
 
 def test_search_v1_invalid_token(clear_server):
 
-    response = requests.post(url + 'search/v1', json = {
+    response = requests.get(url + 'search/v1', params = {
         'token': -1,
         'query_str': 'hello'
     })
@@ -79,7 +79,7 @@ def test_search_v1_invalid_token(clear_server):
 def test_search_v1_query_str_too_short(clear_server, get_valid_token):
     token = get_valid_token['token']
 
-    response = requests.post(url + 'search/v1', json = {
+    response = requests.get(url + 'search/v1', params = {
         'token': token,
         'query_str': ''
     })
@@ -89,7 +89,7 @@ def test_search_v1_query_str_too_short(clear_server, get_valid_token):
 def test_search_v1_query_str_too_long(clear_server, get_valid_token):
     token = get_valid_token['token']
 
-    response = requests.post(url + 'search/v1', json = {
+    response = requests.get(url + 'search/v1', params = {
         'token': token,
         'query_str': 'hello' * 500
     })
@@ -100,24 +100,28 @@ def test_search_v1_1_channel(clear_server, get_valid_token, channel_factory, sen
     user = get_valid_token
     token = user['token']
     auth_id = user['auth_user_id']
+    print(auth_id)
     channel = channel_factory(token, 'channel1')
-    message_id = send_message_dm_factory(token, channel, 'hello')
+    print(channel)
+    message_id_dict = send_message_channel_factory(token, channel, 'hello')
+    message_id = message_id_dict['message_id']
+    print(message_id)
 
     now = datetime.utcnow().timestamp()
 
-    response = requests.post(url + 'search/v1', json = {
+    response = requests.get(url + 'search/v1', params = {
         'token': token,
-        'query_str': 'hello' * 500
+        'query_str': 'hello'
     }).json()
 
-    assert response == [{
+    assert response == {'messages' : [{
         'message_id': message_id, 
         'u_id': auth_id,
         'message': 'hello',
         'time_created': pytest.approx(pytest.approx(now, rel=2)),
         'reacts': [],
         'is_pinned': False
-    }]
+    }]}
 
 def test_search_v1_2_channels(clear_server, get_valid_token, channel_factory, send_message_channel_factory):
     user = get_valid_token
@@ -127,16 +131,18 @@ def test_search_v1_2_channels(clear_server, get_valid_token, channel_factory, se
     channel2 = channel_factory(token, 'channel2')
 
     message_id1 = send_message_channel_factory(token, channel1, 'hello')
+    message_id1 = message_id1["message_id"]
     message_id2 = send_message_channel_factory(token, channel2, 'hello')
+    message_id2 = message_id2["message_id"]
 
     now = datetime.utcnow().timestamp()
 
-    response = requests.post(url + 'search/v1', json = {
+    response = requests.get(url + 'search/v1', params = {
         'token': token,
         'query_str': 'hello'
     }).json()
 
-    assert response == [{
+    assert response == {'messages' : [{
         'message_id': message_id1,
         'u_id': auth_id,
         'message': 'hello',
@@ -151,8 +157,7 @@ def test_search_v1_2_channels(clear_server, get_valid_token, channel_factory, se
         'time_created': pytest.approx(pytest.approx(now, rel=2)),
         'reacts': [],
         'is_pinned': False
-    }
-    ]
+    }]}
 
 
 def test_search_v1_1_channel_1_dm(clear_server, get_valid_token, channel_factory, dm_factory, send_message_channel_factory, send_message_dm_factory):
@@ -163,16 +168,20 @@ def test_search_v1_1_channel_1_dm(clear_server, get_valid_token, channel_factory
     dm = dm_factory(token, [auth_id])
 
     message_id1 = send_message_channel_factory(token, channel, 'hello')
+    message_id1 = message_id1["message_id"]
     message_id2 = send_message_dm_factory(token, dm, 'hello')
+    message_id2 = message_id2["message_id"]
+    print(message_id1)
+    print(message_id2)
 
     now = datetime.utcnow().timestamp()
 
-    response = requests.post(url + 'search/v1', json = {
+    response = requests.get(url + 'search/v1', params = {
         'token': token,
         'query_str': 'hello'
     }).json()
 
-    assert response == [{
+    assert response == {'messages' : [{
         'message_id': message_id1,
         'u_id': auth_id,
         'message': 'hello',
@@ -187,7 +196,7 @@ def test_search_v1_1_channel_1_dm(clear_server, get_valid_token, channel_factory
         'time_created': pytest.approx(pytest.approx(now, rel=2)),
         'reacts': [],
         'is_pinned': False
-    }]
+    }]}
 
 
 def test_search_v1_2_dms(clear_server, get_valid_token, dm_factory, send_message_dm_factory):
@@ -200,15 +209,20 @@ def test_search_v1_2_dms(clear_server, get_valid_token, dm_factory, send_message
 
     message_id1 = send_message_dm_factory(token, dm1, 'hello')
     message_id2 = send_message_dm_factory(token, dm2, 'hello')
+    message_id1 = message_id1["message_id"]
+    message_id2 = message_id2["message_id"]
+
+
 
     now = datetime.utcnow().timestamp()
 
-    response = requests.post(url + 'search/v1', json = {
+    response = requests.get(url + 'search/v1', params = {
         'token': token,
         'query_str': 'hello'
     }).json()
 
-    assert response == [{
+
+    assert response == {'messages' : [{
         'message_id': message_id1,
         'u_id': auth_id,
         'message': 'hello',
@@ -223,14 +237,15 @@ def test_search_v1_2_dms(clear_server, get_valid_token, dm_factory, send_message
         'time_created': pytest.approx(pytest.approx(now, rel=2)),
         'reacts': [],
         'is_pinned': False
-    }]
+    }]}
 
 def test_search_v1_query_str_not_found(clear_server, get_valid_token):
-    token = get_valid_token
+    user = get_valid_token
+    token = user['token']
 
-    response = requests.post(url + 'search/v1', json = {
+    response = requests.get(url + 'search/v1', params = {
         'token': token,
         'query_str': 'hello'
     }).json()
 
-    assert response == []
+    assert response == {'messages': []}
