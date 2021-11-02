@@ -259,6 +259,12 @@ class Datastore:
     def get_notifications_from_u_id(self, u_id):
         return self.get_notifications_from_u_id_dict().get(u_id)
 
+    # handle_str
+
+    def get_u_id_from_handle_str(self, handle_str):
+        users = self.get_users_from_u_id_dict
+        return [users[user]['u_id'] for user in users if users[user]['handle_str'] == handle_str][0]
+
     # Check Methods ############################################################
 
     def is_token_invalid(self, token):
