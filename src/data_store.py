@@ -612,7 +612,7 @@ class Datastore:
         if workplace_sum == 0:
             user_stats['involvement_rate'] = 0
         else:
-            user_stats['involvement_rate'] = user_sum / sworkplace_sum
+            user_stats['involvement_rate'] = user_sum / workplace_sum
 
         self.update_pickle()
     
