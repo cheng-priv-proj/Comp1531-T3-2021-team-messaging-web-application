@@ -598,13 +598,8 @@ class Datastore:
 
     def update_user_stats_messages_sent(self, u_id):
         user_stats_messages = self.get_user_stats_from_u_id(u_id)['messages_sent']
-<<<<<<< HEAD
         user_stats_messages[0]['num_messages_sent'] += 1
         user_stats_messages[0]['time_stamp'] = datetime.utcnow().timestamp()
-=======
-        user_stats_messages['num_messages_sent'] += 1
-        user_stats_messages['time_stamp'] = datetime.utcnow().timestamp()
->>>>>>> 1c19ab0 (forgot u_id argument)
         self.update_user_stats_involvement_rate(u_id)
 
     def update_user_stats_involvement_rate(self, u_id):
@@ -617,7 +612,7 @@ class Datastore:
         if workplace_sum == 0:
             user_stats['involvement_rate'] = 0
         else:
-            user_stats['involvement_rate'] = user_sum / workplace_sum
+            user_stats['involvement_rate'] = user_sum / sworkplace_sum
 
         self.update_pickle()
     
