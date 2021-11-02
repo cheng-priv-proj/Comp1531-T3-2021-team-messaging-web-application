@@ -265,7 +265,6 @@ class Datastore:
         users = self.get_users_from_u_id_dict()
         return [users[user]['u_id'] for user in users if users[user]['handle_str'] == handle_str][0]
 
-<<<<<<< HEAD
     # channel or dm name
 
     def get_name_from_channel_or_dm_id(self, channel_or_dm_id):
@@ -276,8 +275,6 @@ class Datastore:
             
         return name
 
-=======
->>>>>>> 3b74d9c (database changes)
     # Check Methods ############################################################
 
     def is_token_invalid(self, token):
