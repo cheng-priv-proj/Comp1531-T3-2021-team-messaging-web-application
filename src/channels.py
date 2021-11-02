@@ -93,4 +93,6 @@ def channels_create_v1(auth_user_id, name, is_public):
     
     data_store.insert_channel(new_id, name, is_public, [], [owner], [owner])
 
+    data_store.update_user_stats_channels_joined(auth_user_id)
+
     return { 'channel_id': new_id }
