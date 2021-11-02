@@ -149,7 +149,7 @@ def passwordreset_request_endpt():
     insert something here
     '''
 
-    return auth_passwordreset_request_v1()
+    return auth_passwordreset_request_v1('')
 
 # Auth password reset
 @APP.route('/auth/passwordreset/reset/v1', methods= ['POST'])
@@ -158,7 +158,7 @@ def passwordreset_reset_endpt():
     insert something here
     '''
 
-    return auth_passwordreset_reset_v1()
+    return auth_passwordreset_reset_v1(0,'')
 
 ###################### Channels ######################
 # Channel create
@@ -747,7 +747,7 @@ def user_profile_uploadphoto_endpt():
     put smth here
     '''
 
-    return user_profile_uploadphoto_v1()
+    return user_profile_uploadphoto_v1(0,'',0,0,0,0)
 
 @APP.route('/user/stats/v1', methods=['GET'])
 def user_stats_endpt():
@@ -755,7 +755,7 @@ def user_stats_endpt():
     put smth here
     '''
 
-    return user_stats_v1()
+    return user_stats_v1(0)
 
 @APP.route('/users/stats/v1', methods=['GET'])
 def users_stats_endpt():
@@ -763,7 +763,7 @@ def users_stats_endpt():
     put smth here
     '''
 
-    return users_stats_v1()
+    return users_stats_v1(0)
 
 ################## Message #####################################################
 
@@ -926,7 +926,7 @@ def message_share_endpt():
     put smth here
     '''
 
-    return message_share_v1()
+    return message_share_v1(0,0,'',0,0)
 
 @APP.route('/message/react/v1', methods=['POST'])
 def message_react_endpt():
@@ -934,7 +934,7 @@ def message_react_endpt():
     put smth here
     '''
 
-    return message_react_v1()
+    return message_react_v1(0,0,0)
 
 @APP.route('/message/unreact/v1', methods=['POST'])
 def message_unreact_endpt():
@@ -942,7 +942,7 @@ def message_unreact_endpt():
     put smth here
     '''
 
-    return message_unreact_v1()
+    return message_unreact_v1(0,0,0)
 
 @APP.route('/message/pin/v1', methods=['POST'])
 def message_pin_endpt():
@@ -950,7 +950,7 @@ def message_pin_endpt():
     put smth here
     '''
 
-    return message_pin_v1()
+    return message_pin_v1(0,0)
 
 @APP.route('/message/unpin/v1', methods=['POST'])
 def message_unpin_endpt():
@@ -958,7 +958,7 @@ def message_unpin_endpt():
     put smth here
     '''
 
-    return message_unpin_v1()
+    return message_unpin_v1(0,0)
 
 @APP.route('/message/sendlater/v1', methods=['POST'])
 def message_sendlatere_endpt():
@@ -966,7 +966,7 @@ def message_sendlatere_endpt():
     put smth here
     '''
 
-    return message_sendlater_v1()
+    return message_sendlater_v1(0,0,'',0.0)
 
 @APP.route('/message/sendlaterdm/v1', methods=['POST'])
 def message_sendlaterdm_endpt():
@@ -974,7 +974,7 @@ def message_sendlaterdm_endpt():
     put smth here
     '''
 
-    return message_sendlaterdm_v1()
+    return message_sendlaterdm_v1(0,0,'',0.0)
 
 
 ############################ ADMIN #############################################
@@ -1047,7 +1047,7 @@ def notifications_get_endpt():
     put smth here
     '''
 
-    return notifications_get_v1()
+    return notifications_get_v1(0)
 
 ################## SEARCH ######################################################
 
@@ -1057,7 +1057,7 @@ def search_endpt():
     put smth here
     '''
 
-    return search_v1()
+    return search_v1(0,'')
 
 ################## STANDUP #####################################################
 
@@ -1067,7 +1067,7 @@ def standup_start_endpt():
     put smth here
     '''
 
-    return standup_start_v1()
+    return standup_start_v1(0,0,0)
 
 @APP.route('/standup/active/v1', methods=['GET'])
 def standup_active_endpt():
@@ -1075,7 +1075,7 @@ def standup_active_endpt():
     put smth here
     '''
 
-    return standup_active_v1()
+    return standup_active_v1(0,0)
 
 @APP.route('/standup/send/v1', methods=['POST'])
 def standup_send_endpt():
@@ -1083,7 +1083,7 @@ def standup_send_endpt():
     put smth here
     '''
 
-    return standup_send_v1()
+    return standup_send_v1(0,0,'')
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, quit_gracefully) # For coverage
