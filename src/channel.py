@@ -293,7 +293,7 @@ def channel_removeowner_v1(auth_user_id, channel_id, u_id):
     if not data_store.is_channel_owner(channel_id, u_id): 
         raise InputError ('u_id refers to a user who is not an owner of the channel')
     
-    if data_store.is_channel_only_owner(channel_id) and auth_user_id == u_id:
+    if data_store.is_channel_only_owner(channel_id):
         raise InputError ('u_id refers to a user who is the only owner')
     
     data_store.remove_channel_owner(channel_id, u_id)
