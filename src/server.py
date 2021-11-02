@@ -1057,7 +1057,7 @@ def notifications_get_endpt():
     '''
     token = request.args.get('token')
     auth_id = token_to_auth_id(token)
-
+    print(111111)
     return notifications_get_v1(auth_id)
 
 ################## SEARCH ######################################################

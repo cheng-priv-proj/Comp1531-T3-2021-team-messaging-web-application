@@ -21,4 +21,4 @@ def notifications_get_v1(auth_user_id):
 
     check_type(auth_user_id, int)
 
-    return { 'notifications': data_store.get_notifications_from_u_id(auth_user_id).get('notifications')[:20] }
+    return { 'notifications': data_store.get_notifications_from_u_id(auth_user_id)[:20] }
