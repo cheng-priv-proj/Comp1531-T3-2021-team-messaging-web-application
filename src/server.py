@@ -6,12 +6,15 @@ from flask import Flask, request
 from flask_cors import CORS
 from src import config
 
-from src.user import user_profile_v1, users_all_v1, user_setname_v1, user_setemail_v1, user_sethandle_v1
+from src.user import user_profile_v1, users_all_v1, user_setname_v1, user_setemail_v1, user_sethandle_v1, user_profile_uploadphoto_v1, user_stats_v1, users_stats_v1
 from src.channels import channels_listall_v1, channels_list_v1, channels_create_v1
-from src.auth import auth_login_v1, auth_register_v1, auth_logout_v1
+from src.auth import auth_login_v1, auth_register_v1, auth_logout_v1, auth_passwordreset_request_v1, auth_passwordreset_reset_v1
 from src.dm import dm_create_v1, dm_details_v1, dm_leave_v1, dm_list_v1, dm_remove_v1, dm_details_v1, dm_create_v1, dm_messages_v1
 from src.channel import channel_invite_v1, channel_messages_v1, channel_details_v1, channel_leave_v1, channel_addowner_v1, channel_removeowner_v1, channel_join_v1
-from src.message import message_send_v1, message_senddm_v1, message_remove_v1, message_edit_v1
+from src.message import message_send_v1, message_senddm_v1, message_remove_v1, message_edit_v1, message_share_v1, message_pin_v1, message_unpin_v1, message_react_v1, message_unreact_v1, message_sendlater_v1, message_sendlaterdm_v1
+from src.notifications import notifications_get_v1
+from src.search import search_v1
+from src.standup import standup_start_v1, standup_active_v1, standup_send_v1
 
 from src.data_store import data_store
 from src.error import InputError
@@ -44,8 +47,6 @@ CORS(APP)
 
 APP.config['TRAP_HTTP_EXCEPTIONS'] = True
 APP.register_error_handler(Exception, defaultHandler)
-
-#### NO NEED TO MODIFY ABOVE THIS POINT, EXCEPT IMPORTS
 
 ###################### Auth ######################
 @APP.route('/auth/register/v2', methods = ['POST'])
@@ -141,6 +142,23 @@ def logout_endpt():
     token_to_auth_id(token)
     return auth_logout_v1(token)
 
+# Auth password reset request
+@APP.route('/auth/passwordreset/request/v1', methods= ['POST'])
+def passwordreset_request_endpt():
+    '''
+    insert something here
+    '''
+
+    return auth_passwordreset_request_v1('')
+
+# Auth password reset
+@APP.route('/auth/passwordreset/reset/v1', methods= ['POST'])
+def passwordreset_reset_endpt():
+    '''
+    insert something here
+    '''
+
+    return auth_passwordreset_reset_v1(0,'')
 
 ###################### Channels ######################
 # Channel create
@@ -516,7 +534,7 @@ def channel_removeowner_endpt():
 
     return channel_removeowner_v1(auth_id, channel_id, u_id)
 
-################## User ###################################
+################## User ########################################################
 @APP.route("/user/profile/v1", methods=['GET'])
 def user_profile_ep():
     '''
@@ -723,6 +741,32 @@ def user_profile_sethandle_ep():
     user_sethandle_v1(auth_user_id, handle)
     return {}
 
+@APP.route('/user/profile/uploadphoto/v1', methods=['POST'])
+def user_profile_uploadphoto_endpt():
+    '''
+    put smth here
+    '''
+
+    return user_profile_uploadphoto_v1(0,'',0,0,0,0)
+
+@APP.route('/user/stats/v1', methods=['GET'])
+def user_stats_endpt():
+    '''
+    put smth here
+    '''
+
+    return user_stats_v1(0)
+
+@APP.route('/users/stats/v1', methods=['GET'])
+def users_stats_endpt():
+    '''
+    put smth here
+    '''
+
+    return users_stats_v1(0)
+
+################## Message #####################################################
+
 @APP.route("/message/send/v1", methods=['POST'])
 def message_send_endpt():
     '''
@@ -876,6 +920,64 @@ def message_remove_endpt():
     auth_user_id = token_to_auth_id(token)
     return message_remove_v1(auth_user_id, message_id)
 
+@APP.route('/message/share/v1', methods=['POST'])
+def message_share_endpt():
+    '''
+    put smth here
+    '''
+
+    return message_share_v1(0,0,'',0,0)
+
+@APP.route('/message/react/v1', methods=['POST'])
+def message_react_endpt():
+    '''
+    put smth here
+    '''
+
+    return message_react_v1(0,0,0)
+
+@APP.route('/message/unreact/v1', methods=['POST'])
+def message_unreact_endpt():
+    '''
+    put smth here
+    '''
+
+    return message_unreact_v1(0,0,0)
+
+@APP.route('/message/pin/v1', methods=['POST'])
+def message_pin_endpt():
+    '''
+    put smth here
+    '''
+
+    return message_pin_v1(0,0)
+
+@APP.route('/message/unpin/v1', methods=['POST'])
+def message_unpin_endpt():
+    '''
+    put smth here
+    '''
+
+    return message_unpin_v1(0,0)
+
+@APP.route('/message/sendlater/v1', methods=['POST'])
+def message_sendlatere_endpt():
+    '''
+    put smth here
+    '''
+
+    return message_sendlater_v1(0,0,'',0.0)
+
+@APP.route('/message/sendlaterdm/v1', methods=['POST'])
+def message_sendlaterdm_endpt():
+    '''
+    put smth here
+    '''
+
+    return message_sendlaterdm_v1(0,0,'',0.0)
+
+
+############################ ADMIN #############################################
 
 @APP.route("/admin/userpermission/change/v1", methods=['POST'])
 def admin_userpermission_change_v1_endpt():
@@ -937,11 +1039,60 @@ def admin_user_remove_v1_endpt():
 
     return {}
 
+################## NOTIFICATIONS ###############################################
+
+@APP.route('/notifications/get/v1', methods=['GET'])
+def notifications_get_endpt():
+    '''
+    put smth here
+    '''
+
+    return notifications_get_v1(0)
+
+################## SEARCH ######################################################
+
+@APP.route('/search/v1', methods=['GET'])
+def search_endpt():
+    '''
+    put smth here
+    '''
+
+    token = request.args.get('token')
+    auth_user_id = token_to_auth_id(token)
+
+    query_str = request.args.get('query_str')
+
+    return search_v1(auth_user_id, query_str)
 
 
-#### NO NEED TO MODIFY BELOW THIS POINT
+
+################## STANDUP #####################################################
+
+@APP.route('/standup/start/v1', methods=['POST'])
+def standup_start_endpt():
+    '''
+    put smth here
+    '''
+
+    return standup_start_v1(0,0,0)
+
+@APP.route('/standup/active/v1', methods=['GET'])
+def standup_active_endpt():
+    '''
+    put smth here
+    '''
+
+    return standup_active_v1(0,0)
+
+@APP.route('/standup/send/v1', methods=['POST'])
+def standup_send_endpt():
+    '''
+    put smth here
+    '''
+
+    return standup_send_v1(0,0,'')
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, quit_gracefully) # For coverage
-    APP.run(port=config.port) # Do not edit this port
+    APP.run(port=config.port, debug=True) # Do not edit this port
     
