@@ -592,6 +592,12 @@ class Datastore:
         user_stats_messages[0]['time_stamp'] = datetime.utcnow().timestamp()
         self.update_user_stats_involvement_rate(u_id)
 
+    def update_user_stats_messages_sent(self, u_id):
+        user_stats_messages = self.get_user_stats_from_u_id(u_id)['messages_sent']
+        user_stats_message['num_messages_sent'] += 1
+        user_stats_channels['time_stamp'] = datetime.utcnow().timestamp()
+        self.update_user_stats_involvement_rate()
+
     def update_user_stats_involvement_rate(self, u_id):
         user_stats = self.get_user_stats_from_u_id(u_id)
         workplace_stats = self.get_workplace_stats()
