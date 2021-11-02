@@ -71,7 +71,9 @@ def test_standard(register_users, dm_factory):
                 'message_id': message_id,
                 'u_id': register_users[0]['token'],
                 'message': 'hi there',
-                'time_created': pytest.approx(now + 2, rel=1)
+                'time_created': pytest.approx(now + 2, rel=1),
+                'reacts': {},
+                'is_pinned': False
             }
         ],
         'start': 0,
@@ -130,19 +132,25 @@ def test_multiple(register_users, dm_factory):
                 'message_id': message_id_3,
                 'u_id': register_users[0]['token'],
                 'message': 'hi there',
-                'time_created': pytest.approx(now + 5, rel=1)
+                'time_created': pytest.approx(now + 5, rel=1),
+                'reacts': {},
+                'is_pinned': False
             },
             {
                 'message_id': message_id_1,
                 'u_id': register_users[0]['token'],
                 'message': 'hi there',
-                'time_created': pytest.approx(now + 2, rel=1)
+                'time_created': pytest.approx(now + 2, rel=1),
+                'reacts': {},
+                'is_pinned': False
             },
             {
                 'message_id': message_id_2,
                 'u_id': register_users[0]['token'],
                 'message': 'hi there',
-                'time_created': pytest.approx(now + 1, rel=1)
+                'time_created': pytest.approx(now + 1, rel=1),
+                'reacts': {},
+                'is_pinned': False
             }
         ],
         'start': 0,
