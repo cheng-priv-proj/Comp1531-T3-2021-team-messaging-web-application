@@ -63,16 +63,6 @@ def send_message_dm_factory():
             'message': message
         }).json()
 
-'''
-create user
-create channel
-join channel/dm --> 1 channel, 2 channels, 1 dm 1 channel, 2 dms.
-send messages
-query 
-
-takes in token and query string, returns messages (list of dicts)
-'''
-
 def test_search_v1_invalid_token(clear_server, get_valid_token):
     token = get_valid_token['token']
 
