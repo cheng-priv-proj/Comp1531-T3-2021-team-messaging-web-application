@@ -752,10 +752,21 @@ def user_profile_uploadphoto_endpt():
 @APP.route('/user/stats/v1', methods=['GET'])
 def user_stats_endpt():
     '''
-    put smth here
-    '''
+    Returns the stats for the authorised user
 
-    return user_stats_v1(0)
+    Arguments:
+        token           (str)   - valid token
+    
+    Exceptions:
+        AccessError - occurs when token is invalid
+
+    Return value:
+        Return user_stats
+    '''
+    request_token = request.args.get('token')
+    auth_user_id = token_to_auth_id(request_token)
+
+    return user_stats_v1(auth_user_id)
 
 @APP.route('/users/stats/v1', methods=['GET'])
 def users_stats_endpt():

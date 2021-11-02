@@ -54,6 +54,8 @@ def message_send_v1(auth_user_id, channel_id, message):
 
     data_store.insert_message(channel_id, message_dict)
 
+    data_store.update_user_stats_messages_sent(auth_user_id)
+
     return { 'message_id': message_id}
 
 
@@ -104,6 +106,8 @@ def message_senddm_v1(auth_user_id, dm_id, message):
     }
 
     data_store.insert_message(dm_id, message_dict)
+
+    data_store.update_user_stats_messages_sent(auth_user_id)
 
     return { 'message_id' : message_id }
 
@@ -218,6 +222,8 @@ def message_share_v1(auth_user_id, og_message_id, message, channel_id, dm_id):
     Return value:
         Returns { shared_message_id } on success
     '''
+
+    data_store.update_user_stats_messages_sent(auth_user_id)
 
     return { 'shared_message_id': 0}
 

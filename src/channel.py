@@ -49,6 +49,8 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
 
     channel.get('all_members').append(data_store.get_user_from_u_id(u_id))
 
+    data_store.update_user_stats_channels_joined(auth_user_id)
+
     return {}
 
 def channel_details_v1(auth_user_id, channel_id):
@@ -174,6 +176,8 @@ def channel_join_v1(auth_user_id, channel_id):
 
     user = data_store.get_user_from_u_id(auth_user_id)
     channel.get('all_members').append(user)
+
+    data_store.update_user_stats_channels_joined(auth_user_id)
 
     return {}
 
