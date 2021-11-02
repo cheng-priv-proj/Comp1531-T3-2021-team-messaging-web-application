@@ -265,6 +265,16 @@ class Datastore:
         users = self.get_users_from_u_id_dict()
         return [users[user]['u_id'] for user in users if users[user]['handle_str'] == handle_str][0]
 
+    # channel or dm name
+
+    def get_name_from_channel_or_dm_id(self, channel_or_dm_id):
+        if channel_or_dm_id < 0:
+            name = self.get_dm_from_dm_id(channel_or_dm_id).get('details').get('name')
+        else:
+            name = self.get_channel_from_channel_id(channel_or_dm_id).get('name')
+            
+        return name
+
     # Check Methods ############################################################
 
     def is_token_invalid(self, token):
