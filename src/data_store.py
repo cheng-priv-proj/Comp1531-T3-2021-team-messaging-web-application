@@ -265,7 +265,7 @@ class Datastore:
 
     def get_name_from_channel_or_dm_id(self, channel_or_dm_id):
         if channel_or_dm_id < 0:
-            name = self.get_dm_from_dm_id(channel_or_dm_id).get('details').get('name')
+            name = self.get_dm_from_dm_id(channel_or_dm_id).get('name')
         else:
             name = self.get_channel_from_channel_id(channel_or_dm_id).get('name')
             
