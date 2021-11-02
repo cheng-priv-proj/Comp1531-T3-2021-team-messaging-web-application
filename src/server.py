@@ -1048,7 +1048,6 @@ def notifications_get_endpt():
     '''
 
     return notifications_get_v1(0)
-<<<<<<< HEAD
 
 ################## SEARCH ######################################################
 
@@ -1065,19 +1064,30 @@ def search_endpt():
 
     return search_v1(auth_user_id, query_str)
 
-    return notifications_get_v1()
-=======
->>>>>>> a090c72 (pylint fix)
+################## STANDUP #####################################################
 
-################## SEARCH ######################################################
-
-@APP.route('/search/v1', methods=['GET'])
-def search_endpt():
+@APP.route('/standup/start/v1', methods=['POST'])
+def standup_start_endpt():
     '''
     put smth here
     '''
 
-    return search_v1(0,'')
+    return standup_start_v1(0,0,0)
+
+@APP.route('/standup/active/v1', methods=['GET'])
+def standup_active_endpt():
+    '''
+    put smth here
+    '''
+
+    return standup_active_v1(0,0)
+
+@APP.route('/standup/send/v1', methods=['POST'])
+def standup_send_endpt():
+    '''
+    put smth here
+    '''
+
 
 ################## STANDUP #####################################################
 
@@ -1103,34 +1113,6 @@ def standup_send_endpt():
     put smth here
     '''
 
-<<<<<<< HEAD
-
-################## STANDUP #####################################################
-
-@APP.route('/standup/start/v1', methods=['POST'])
-def standup_start_endpt():
-    '''
-    put smth here
-    '''
-
-    return standup_start_v1(0,0,0)
-
-@APP.route('/standup/active/v1', methods=['GET'])
-def standup_active_endpt():
-    '''
-    put smth here
-    '''
-
-    return standup_active_v1(0,0)
-
-@APP.route('/standup/send/v1', methods=['POST'])
-def standup_send_endpt():
-    '''
-    put smth here
-    '''
-
-=======
->>>>>>> a090c72 (pylint fix)
     return standup_send_v1(0,0,'')
 
 if __name__ == "__main__":
