@@ -159,7 +159,6 @@ class Datastore:
     # login
 
     def get_logins_from_email_dict(self):
-        print(self.__store)
         return self.__store['login']
     
     def get_login_from_email(self, email):
@@ -244,7 +243,6 @@ class Datastore:
     # stats
 
     def get_user_stats_from_u_id_dict(self):
-        print(self.__store)
         return self.__store['user_stats']
     
     def get_user_stats_from_u_id(self, u_id):
