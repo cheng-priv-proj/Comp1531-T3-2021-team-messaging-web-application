@@ -93,7 +93,7 @@ def test_standup_send_multiple_messages(clear_server, register_user, register_ch
     user_token = extract_token(user_info)
 
     channel_id = register_channel(owner_token, 'channel1', True).json()
-    requests.post(config.url + 'channel/invite/v2', json={'token': owner_token, 'channel_id': channel_id, 'u_id': user_info['auth_user_id']}).json()
+    requests.post(url + 'channel/invite/v2', json={'token': owner_token, 'channel_id': channel_id, 'u_id': user_info['auth_user_id']}).json()
 
     now = datetime.utcnow.timestamp()
     standup_info = create_standup(owner_token, channel_id, 5).json()
