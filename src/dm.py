@@ -2,13 +2,7 @@ from src.data_store import data_store
 
 from src.error import InputError
 from src.error import AccessError
-from src.other import check_type
-
-from src.data_store import data_store
-
-from src.error import InputError
-from src.error import AccessError
-from src.other import check_type
+from src.other import check_type, insert_invite_channel_or_dm_notifications
 
 def dm_create_v1(auth_id, u_ids):
     '''
@@ -48,6 +42,9 @@ def dm_create_v1(auth_id, u_ids):
     dm_id = (len(data_store.get_dms_from_dm_id_dict()) + 1) * -1
 
     data_store.insert_dm(auth_id, dm_id, user_list, dm_name)
+
+    for u_id in u_ids:
+        insert_invite_channel_or_dm_notifications(dm_id, auth_id, u_id)
 
     return { 'dm_id': dm_id }
 
