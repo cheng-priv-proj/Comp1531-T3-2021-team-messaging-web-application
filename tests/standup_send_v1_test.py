@@ -71,11 +71,20 @@ def test_standup_send_basic_functionality(clear_server, register_user, register_
     owner_token = extract_token(owner_info)
 
     channel_id = register_channel(owner_token, 'channel1', True).json()
+    now = datetime.utcnow.timestamp()
     standup_info = create_standup(owner_token, channel_id, 5).json()
     send_standup_message(owner_token, channel_id, 'message1')
-    
+
     messages = get_channel_messages(owner_token, channel_id, 0).json()
-    assert messages['messages'][0] ==
+    assert messages['messages'][0] == {
+        'message_id': messages['message'][0]['message_id'],
+        'message': 'ownerone: message1',
+        'u_id': owner_info['auth_user_id'],
+        'time_created': now,
+        'reacts': [],
+        'is_pinned': False
+    }
+
 
 def test_standup_send_multiple_messages(clear_server, register_user, register_channel, extract_token, create_standup, send_standup_message, get_channel_messages):
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
@@ -86,6 +95,7 @@ def test_standup_send_multiple_messages(clear_server, register_user, register_ch
     channel_id = register_channel(owner_token, 'channel1', True).json()
     requests.post(config.url + 'channel/invite/v2', json={'token': owner_token, 'channel_id': channel_id, 'u_id': user_info['auth_user_id']}).json()
 
+    now = datetime.utcnow.timestamp()
     standup_info = create_standup(owner_token, channel_id, 5).json()
     send_standup_message(owner_token, channel_id, 'message1')
     send_standup_message(user_token, channel_id, 'message2')
@@ -93,30 +103,53 @@ def test_standup_send_multiple_messages(clear_server, register_user, register_ch
     send_standup_message(user_token, channel_id, 'message4')
     
     messages = get_channel_messages(owner_token, channel_id, 0).json()
-    assert messages['messages'][0] == 
+    assert messages['messages'][0] == {
+        'message_id': messages['message'][0]['message_id'],
+        'message': 'ownerone: message1\nuserone: message2\nownerone: message3\nuserone: message4',
+        'u_id': owner_info['auth_user_id'],
+        'time_created': now,
+        'reacts': [],
+        'is_pinned': False
+    }
 
 def test_standup_send_empty_message(clear_server, register_user, register_channel, extract_token, create_standup, send_standup_message, get_channel_messages):
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     owner_token = extract_token(owner_info)
 
     channel_id = register_channel(owner_token, 'channel1', True).json()
+    now = datetime.utcnow.timestamp()
     standup_info = create_standup(owner_token, channel_id, 5).json()
     send_standup_message(owner_token, channel_id, '')
     
     messages = get_channel_messages(owner_token, channel_id, 0).json()
-    assert messages['messages'][0] == 
+    assert messages['messages'][0] == {
+        'message_id': messages['message'][0]['message_id'],
+        'message': 'ownerone: ',
+        'u_id': owner_info['auth_user_id'],
+        'time_created': now,
+        'reacts': [],
+        'is_pinned': False
+    }
     
 def test_standup_send_normal_message_before_standup_over(clear_server, register_user, register_channel, extract_token, create_standup, send_standup_message, get_channel_messages):
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     owner_token = extract_token(owner_info)
 
     channel_id = register_channel(owner_token, 'channel1', True).json()
+    now = datetime.utcnow.timestamp()
     standup_info = create_standup(owner_token, channel_id, 5).json()
     send_standup_message(owner_token, channel_id, '')
     requests.post(url + 'message/send/v1', json = {'token': owner_token, 'channel_id': channel_id, 'message': 'message1'})
 
     messages = get_channel_messages(owner_token, channel_id, 0).json()
-    assert messages['messages'][0] == 
+    assert messages['messages'][0] == {
+        'message_id': messages['message'][0]['message_id'],
+        'message': 'ownerone: message1',
+        'u_id': owner_info['auth_user_id'],
+        'time_created': now,
+        'reacts': [],
+        'is_pinned': False
+    }
 
 def test_standup_send_tags_in_messsage(clear_server, register_user, register_channel, extract_token, create_standup, send_standup_message, get_channel_messages):
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
