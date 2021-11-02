@@ -198,6 +198,13 @@ class Datastore:
         
         return False
 
+    def is_invalid_handle_str(self, handle_str):
+        users = self.get_users_from_u_id_dict()
+        if handle_str not any (users['handle_str'] == handle_str for user in users):
+            return True
+
+        return False
+
     def is_invalid_channel_id(self, channel_id):
         channels = self.get_channels_from_channel_id_dict()
         if channel_id not in channels:
