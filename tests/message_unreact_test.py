@@ -90,7 +90,7 @@ def auth_id_v2():
 
 def test_unreact_own(clear, register, extract_token, extract_user, extract_channel, extract_message):
     '''
-    Standard test with one message. (The person unreacts to their own message)
+    Standard test with one message. (The person unreacts to their own react on their own message)
 
     Expects: 
         Correct output from channel/messages.
@@ -105,12 +105,12 @@ def test_unreact_own(clear, register, extract_token, extract_user, extract_chann
 
     requests.post(url + 'message/react/v1', json = {
         'token': owner_token,
-        'message_id': message_id,
+        'message_id': extract_message(message_id),
         'react_id': 1 }).json()
 
     requests.post(url + 'message/unreact/v1', json = {
         'token': owner_token,
-        'message_id': message_id,
+        'message_id': extract_message(message_id),
         'react_id': 1 }).json()
     
     messages = requests.get(url + 'channel/messages/v2', params = {
@@ -124,6 +124,43 @@ def test_unreact_own(clear, register, extract_token, extract_user, extract_chann
     assert reacts == [{
         'react_id' : 1,
         'u_ids' : [],
+        'is_this_user_reacted' : False
+    }]
+
+def test_react_not_own(clear, register, extract_token, extract_user, extract_channel, extract_message, auth_id_v2):
+    '''
+    A person reacts and unreacts to someone else message
+
+    Expects: 
+        Correct output from channel/messages.
+    '''
+
+    channel_id = extract_channel(register)
+    owner_token = extract_token(register)
+
+    requests.post(url + 'channel/join/v2', json = {'token': auth_id_v2['token'],'channel_id': channel_id})
+
+    message_id = requests.post(url + 'message/send/v1', json = {
+        'token': owner_token,
+        'channel_id': channel_id,
+        'message': 'testmessage' }).json()
+
+    requests.post(url + 'message/react/v1', json = {
+        'token': auth_id_v2['token'],
+        'message_id': extract_message(message_id),
+        'react_id': 1 }).json()
+    
+    messages = requests.get(url + 'channel/messages/v2', params = {
+        'token': owner_token,
+        'channel_id': channel_id, 
+        'start': 0 }).json()
+
+    messages = messages['messages']
+    reacts = messages['reacts']
+
+    assert reacts == [{
+        'react_id' : 1,
+        'u_ids' : [auth_id_v2['token']],
         'is_this_user_reacted' : False
     }]
 
@@ -171,7 +208,7 @@ def test_invalid_react_id(clear, register, extract_token, extract_user, extract_
 
     assert requests.post(url + 'message/unreact/v1', json = {
         'token': auth_id_v2['token'],
-        'message_id': message_id,
+        'message_id': extract_message(message_id),
         'react_id': 420}).status_code == 400
 
 def test_unreact_not_own(clear, register, extract_token, extract_user, extract_channel, extract_message, auth_id_v2):
@@ -194,6 +231,6 @@ def test_unreact_not_own(clear, register, extract_token, extract_user, extract_c
 
     assert requests.post(url + 'message/unreact/v1', json = {
         'token': auth_id_v2['token'],
-        'message_id': message_id,
+        'message_id': extract_message(message_id),
         'react_id': 1 }) == 400
     

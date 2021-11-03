@@ -109,7 +109,7 @@ def test_react_own(clear, register, extract_token, extract_user, extract_channel
 
     requests.post(url + 'message/react/v1', json = {
         'token': owner_token,
-        'message_id': message_id,
+        'message_id': extract_message(message_id),
         'react_id': 1 }).json()
     
     messages = requests.get(url + 'channel/messages/v2', params = {
@@ -119,7 +119,6 @@ def test_react_own(clear, register, extract_token, extract_user, extract_channel
 
     messages = messages['messages']
     reacts = messages['reacts']
-
 
     assert reacts == [{
         'react_id' : 1,
@@ -147,7 +146,7 @@ def test_react_not_own(clear, register, extract_token, extract_user, extract_cha
 
     requests.post(url + 'message/react/v1', json = {
         'token': auth_id_v2['token'],
-        'message_id': message_id,
+        'message_id': extract_message(message_id),
         'react_id': 1 }).json()
     
     messages = requests.get(url + 'channel/messages/v2', params = {
@@ -208,7 +207,7 @@ def test_invalid_react_id(clear, register, extract_token, extract_user, extract_
 
     assert requests.post(url + 'message/react/v1', json = {
         'token': auth_id_v2['token'],
-        'message_id': message_id,
+        'message_id': extract_message(message_id),
         'react_id': 420}).status_code == 400
 
 
@@ -232,16 +231,16 @@ def test_already_reacted_id(clear, register, extract_token, extract_user, extrac
 
     requests.post(url + 'message/react/v1', json = {
         'token': auth_id_v2['token'],
-        'message_id': message_id,
+        'message_id': extract_message(message_id),
         'react_id': 1})
 
     assert requests.post(url + 'message/react/v1', json = {
         'token': auth_id_v2['token'],
-        'message_id': message_id,
+        'message_id': extract_message(message_id),
         'react_id': 1}).status_code == 400
 
 
-def test_react_own_dm(clear, get_user_1, auth_id_v2):
+def test_react_own_dm(clear, get_user_1, auth_id_v2, extract_message):
     '''
     Standard test with one message. (The person reacts to their own message)
 
@@ -249,22 +248,25 @@ def test_react_own_dm(clear, get_user_1, auth_id_v2):
         Correct output from channel/messages.
     '''
 
-    channel_id = extract_channel(register)
-    owner_token = extract_token(register)
+    dm_id = requests.post(url + 'dm/create/v1', json = {
+        'token': get_user_1['token'],
+        'u_ids': [auth_id_v2['auth_user_id']]}).json()
 
-    message_id = requests.post(url + 'message/send/v1', json = {
-        'token': owner_token,
-        'channel_id': channel_id,
-        'message': 'testmessage' }).json()
+    dm_id = dm_id['dm_id']
+
+    message_id = requests.post(url + 'message/senddm/v1', json = {
+        'token': get_user_1['token'],
+        'dm_id': dm_id,
+        'message': 'HELLO THERE GENERAL KENOBI' }).json()
 
     requests.post(url + 'message/react/v1', json = {
-        'token': owner_token,
-        'message_id': message_id,
+        'token': get_user_1['token'],
+        'message_id': extract_message(message_id),
         'react_id': 1 }).json()
     
-    messages = requests.get(url + 'channel/messages/v2', params = {
-        'token': owner_token,
-        'channel_id': channel_id, 
+    messages = requests.get(url + 'dm/messages/v1', params = {
+        'token': get_user_1['token'],
+        'dm_id': dm_id, 
         'start': 0 }).json()
 
     messages = messages['messages']
@@ -272,12 +274,12 @@ def test_react_own_dm(clear, get_user_1, auth_id_v2):
 
     assert reacts == [{
         'react_id' : 1,
-        'u_ids' : [extract_user(register)],
+        'u_ids' : [get_user_1['auth_user_id']],
         'is_this_user_reacted' : True
     }]
 
 
-def test_react_not_own_dm(clear, get_user_1, auth_id_v2):
+def test_react_not_own_dm(clear, get_user_1, auth_id_v2, extract_message):
     '''
     Standard test with one message. (The person reacts does not react to their own message)
 
@@ -298,7 +300,7 @@ def test_react_not_own_dm(clear, get_user_1, auth_id_v2):
 
     requests.post(url + 'message/react/v1', json = {
         'token': auth_id_v2['token'],
-        'message_id': message_id,
+        'message_id': extract_message(message_id),
         'react_id': 1 }).json()
     
     messages = requests.get(url + 'dm/messages/v1', params = {
