@@ -7,8 +7,8 @@ from src import config
 
 from src.other import clear_v1
 from src.config import url
-# Create an owner and some users
 
+# Create an owner and some users
 @pytest.fixture
 def clear_server():
     requests.delete(config.url + "clear/v1")
@@ -56,6 +56,13 @@ def dm_factory():
     return create_dm
 
 def test_standard(clear_server, register, dm_factory):
+    '''
+    Testing correct output from standard valid case.
+
+    Expects: 
+        Correct output from dm_list.
+    '''
+    
     dm_id = dm_factory(register[0]['token'], [register[1]['auth_user_id'], register[2]['auth_user_id'], register[3]['auth_user_id']])
     
     requests.post(url + 'dm/leave/v1', json = {
@@ -63,13 +70,13 @@ def test_standard(clear_server, register, dm_factory):
         'dm_id': dm_id
     })
 
-    assert requests.get(url + 'dm/list/v1', json = {
+    assert requests.get(url + 'dm/list/v1', params = {
         'token': register[1]['token']
     }).json() == {
         'dms': []
     }
 
-    assert requests.get(url + 'dm/list/v1', json = {
+    assert requests.get(url + 'dm/list/v1', params = {
         'token': register[0]['token']
     }).json() == {
         'dms': [
@@ -81,6 +88,13 @@ def test_standard(clear_server, register, dm_factory):
     }
 
 def test_creator_leaves(clear_server, register, dm_factory):
+    '''
+    Testing correct output when the creator leaves.
+
+    Expects: 
+        Correct output from dm_list.
+    '''
+    
     dm_id = dm_factory(register[0]['token'], [register[1]['auth_user_id'], register[2]['auth_user_id'], register[3]['auth_user_id']])
     
     requests.post(url + 'dm/leave/v1', json = {
@@ -88,13 +102,13 @@ def test_creator_leaves(clear_server, register, dm_factory):
         'dm_id': dm_id
     })
 
-    assert requests.get(url + 'dm/list/v1', json = {
+    assert requests.get(url + 'dm/list/v1', params = {
         'token': register[0]['token']
     }).json() == {
         'dms':[]
     }
 
-    assert requests.get(url + 'dm/list/v1', json = {
+    assert requests.get(url + 'dm/list/v1', params = {
         'token': register[1]['token']
     }).json() == {
         'dms': [
@@ -106,12 +120,25 @@ def test_creator_leaves(clear_server, register, dm_factory):
     }
 
 def test_invalid_dm_id(clear_server, register):
+    '''
+    Test expecting input error when given an invalid dm_id.
+
+    Expects: 
+        InputError (400 error)
+    '''
+
     assert requests.post(url + 'dm/leave/v1', json = {
         'token': register[1]['token'],
         'dm_id': 1
         }).status_code == 400
 
 def test_invalid_auth_user_id(clear_server, register, dm_factory):
+    '''
+    Tests expecting access error when auth_id is invalid.
+
+    Expects: 
+        AccessError (403 error)
+    '''
 
     dm_id = dm_factory(register[0]['token'], [register[1]['auth_user_id']])
 

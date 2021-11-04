@@ -5,11 +5,10 @@ from src.other import clear_v1
 
 import requests
 
-# Clears storage
+# Clears json
 @pytest.fixture
 def clear():
     requests.delete(url + "clear/v1") 
-
 
 # Generates the first user
 @pytest.fixture
@@ -31,7 +30,7 @@ def first_register():
     channel_id_dict = requests.post(url + 'channels/create/v2', json = channel_details).json()
     channel_id = channel_id_dict.get('channel_id')
     
-    return {'token': token, 'channel_id': channel_id}
+    return {'token': token, 'channel_id': channel_id, 'auth_user_id': token_dict.get('auth_user_id')}
 
 # Creates a user using the given details and returns the channel_id
 @pytest.fixture 
@@ -64,55 +63,85 @@ def register_channel():
         return channel_id
     return register_channel_function
 
-# Test expecting AccessError when given a valid Auth_id that is not in the channel.
 def test_user_with_no_access_to_channel(clear, first_register, register_user):
+    '''
+    Test expecting AccessError when given a valid Auth_id that is not in the channel.
+
+
+    Expects: 
+        AccessError (403 error)
+    '''
+    
     invalid_token = register_user('user2@test.com')
     channel_id = first_register.get('channel_id')
 
-    invalid_request = requests.get(url + 'channel/details/v2', json = {'token': invalid_token, 'channel_id': channel_id})
+    invalid_request = requests.get(url + 'channel/details/v2', params = {'token': invalid_token, 'channel_id': channel_id})
     assert (invalid_request.status_code) == 403
 
 
 
 def test_invalid_channel_id(clear, first_register):
+    '''
+    Tests that ensures that channel id is valid.  
+
+    Expects: 
+        InputError (400 error)
+    '''
+    
     token = first_register.get('token')
     invalid_channel_id = 10000
 
-    invalid_request = requests.get(url + 'channel/details/v2', json = {'token': token, 'channel_id': invalid_channel_id})
+    invalid_request = requests.get(url + 'channel/details/v2', params = {'token': token, 'channel_id': invalid_channel_id})
     assert (invalid_request.status_code) == 400
 
 def test_invalid_auth_id(clear, first_register):
+    '''
+    Test that ensures validity of auth_id.
+
+    Expects: 
+        InputError (400 error)
+    '''
+    
     invalid_token = 10000
     channel_id = first_register.get('channel_id')
 
-    invalid_request = requests.get(url + 'channel/details/v2', json = {'token': invalid_token, "channel_id": channel_id})
+    invalid_request = requests.get(url + 'channel/details/v2', params = {'token': invalid_token, "channel_id": channel_id})
     assert (invalid_request.status_code) == 403
 
 def test_returns_all_info(clear, first_register):
+    '''
+    Tests that all info is returned correctly.
+
+    Expects: 
+        Correct output from channel/details.
+    '''
+    
     token = first_register.get('token')
     channel_id = first_register.get('channel_id')
 
-    channel_details = requests.get(url + 'channel/details/v2', json = {'token': token, "channel_id": channel_id}).json()
+    channel_details = requests.get(url + 'channel/details/v2', params = {'token': token, "channel_id": channel_id}).json()
 
     assert channel_details == {
         'name': 'channel',
         'is_public': True,
         'owner_members': [
             {
-                'u_id': int(token),
+                'u_id': first_register.get('auth_user_id'),
                 'email': 'globalowner@test.com',
                 'name_first': 'global',
                 'name_last': 'user',
-                'handle_str': 'globaluser'
+                'handle_str': 'globaluser',
+                'profile_img_url': 'link_to_default'
             }
         ],
         'all_members': [
             {
-                'u_id': int(token),
+                'u_id': first_register.get('auth_user_id'),
                 'email': 'globalowner@test.com',
                 'name_first': 'global',
                 'name_last': 'user',
-                'handle_str': 'globaluser'
+                'handle_str': 'globaluser',
+                'profile_img_url': 'link_to_default'
             }
         ]
     }
