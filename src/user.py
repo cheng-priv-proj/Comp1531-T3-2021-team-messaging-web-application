@@ -146,3 +146,79 @@ def user_sethandle_v1(auth_id, handle_str):
     data_store.update_handle(auth_id, handle_str)
 
     return {}
+
+def user_profile_uploadphoto_v1(auth_user_id, img_url, x_start, y_start, x_end, y_end ):
+    '''
+    Given a URL of an image on the internet, crops the image within bounds
+    (x_start, y_start) and (x_end, y_end). Position (0,0) is the top left.
+
+    Arguments:
+        auth_user_id    (int)   - authorised user id
+        img_url         (str)   - url of the image
+        x_start         (int)   - lower x bound
+        y_start         (int)   - lower y bound
+        x_end           (int)   - upper x bound
+        y_end           (int)   - upper y bound
+
+    Exceptions:
+        TypeError   - occurs when auth_user_id, x_start, x_end, y_end
+                      are not ints
+        TypeError   - occurs when img_url is not a str
+        InputError  - occurs when handle is invalid
+        InputError  - occurs when img_url returns an HTTP status other than 200
+        InputError  - occurs when any of x_start, y_start, x_end, y_end are not
+                      within the dimensions of the image at the URL
+        InputError  - occurs when x_end is less than x_start or y_end is less
+                      than y_start
+        InputError  - occurs when image uploaded is not a JPG
+
+    Return value:
+        Returns {} on success
+    '''
+
+    return {}
+
+def user_stats_v1(auth_user_id):
+    '''
+    Fetches the required statistics about this user's use of UNSW Streams.
+
+    Arguments:
+        auth_user_id    (int)   - authorised user id
+
+    Exceptions:
+        TypeError   - occurs when auth_user_id is not an int
+
+    Return value:
+        Returns { user_stats } on success
+    '''
+
+    return {
+        'user_stats': {
+            'channels_joined': [{ 'num_channels_joined': 0, 'time_stamp': 0.0 }],
+            'dms_joined': [{'num_dms_joined': 0, 'time_stamp': 0.0}], 
+            'messages_sent': [{'num_messages_sent': 0, 'time_stamp': 0.0}], 
+            'involvement_rate': 0.0,
+        }
+    }
+
+def users_stats_v1(auth_user_id):
+    '''
+    Fetches the required statistics about the use of UNSW Streams.
+
+    Arguments:
+        auth_user_id    (int)   - authorised user id
+    Exceptions:
+        TypeError   - occurs when auth_user_id is not an int
+
+    Return value:
+        Returns { workspace_stats } on success
+    '''
+
+    return {
+        'workspace_stats': {
+            'channels_exist': [{'num_channels_exist': 0, 'time_stamp': 0.0}], 
+            'dms_exist': [{'num_dms_exist': 0, 'time_stamp': 0.0}],
+            'messages_exist': [{'num_messages_exist': 0, 'time_stamp': 0.0}],
+            'utilization_rate': 0.0
+        }
+    }

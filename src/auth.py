@@ -127,3 +127,42 @@ def auth_logout_v1(token):
     data_store.invalidate_token(token)
 
     return {}
+
+def auth_passwordreset_request_v1(email):
+    '''
+    Given an email address, if the user is a registered user, sends them an
+    email containing a specific secret code, that when entered in
+    auth/passwordreset/reset, shows that the user trying to reset the password
+    is the one who got sent this email. No error should be raised when passed an
+    invalid email, as that would pose a security/privacy concern. When a user
+    requests a password reset, they should be logged out of all current sessions.
+    
+    Arguments:
+        email           (str) - email str
+
+    Exceptions:
+        N/A
+
+    Returns {} on success
+    '''
+
+    return {}
+
+def auth_passwordreset_reset_v1(reset_code, new_password):
+    '''
+    Given a reset code for a user, set that user's new password to the
+    password provided.
+    
+    Arguments:
+        reset_code      (str) - secret reset string
+        new_password    (str) - new password string
+
+    Exceptions:
+        TypeError   - occurs when reset_code, new_password are not strs
+        InputError  - reset_code is not a valid reset code
+        InputError  - password entered is less than 6 characters long
+
+    Return {} on success
+    '''
+
+    return {}

@@ -52,7 +52,7 @@ def register_channel():
         return channel_id
     return register_channel_function
 
-def test_create_standup_basic_functionality(clear, register_channel, register_user, create_standup, extract_token):
+def test_create_standup_basic_functionality(clear_server, register_channel, register_user, create_standup, extract_token):
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     owner_token = extract_token(owner_info)
 
@@ -62,7 +62,7 @@ def test_create_standup_basic_functionality(clear, register_channel, register_us
     now = datetime.now().timestamp()        
     assert standup_info['time_finish'] == pytest.approx(now + 5, rel=2)
 
-def test_create_standup_no_second_standup(clear, register_channel, register_user, create_standup, extract_token):
+def test_create_standup_no_second_standup(clear_server, register_channel, register_user, create_standup, extract_token):
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     owner_token = extract_token(owner_info)
 
@@ -72,7 +72,7 @@ def test_create_standup_no_second_standup(clear, register_channel, register_user
 
     assert error == 400
 
-def test_create_standup_invalid_channel_id(clear, register_user, create_standup, extract_token):
+def test_create_standup_invalid_channel_id(clear_server, register_user, create_standup, extract_token):
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     owner_token = extract_token(owner_info)
 
@@ -80,7 +80,7 @@ def test_create_standup_invalid_channel_id(clear, register_user, create_standup,
 
     assert error == 400
 
-def test_create_standup_negative_length(clear, register_channel, register_user, create_standup, extract_token):
+def test_create_standup_negative_length(clear_server, register_channel, register_user, create_standup, extract_token):
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     owner_token = extract_token(owner_info)
 
@@ -89,7 +89,7 @@ def test_create_standup_negative_length(clear, register_channel, register_user, 
     
     assert error == 400
 
-def test_create_standup_unauthorized_member(clear, register_channel, register_user, create_standup, extract_token):
+def test_create_standup_unauthorized_member(clear_server, register_channel, register_user, create_standup, extract_token):
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     owner_token = extract_token(owner_info)
 
@@ -99,7 +99,7 @@ def test_create_standup_unauthorized_member(clear, register_channel, register_us
 
     assert error == 403
 
-def test_create_priority_error(clear, register_channel, register_user, create_standup, extract_token):
+def test_create_priority_error(clear_server, register_channel, register_user, create_standup, extract_token):
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     owner_token = extract_token(owner_info)
 
@@ -110,7 +110,7 @@ def test_create_priority_error(clear, register_channel, register_user, create_st
 
     assert error == 400
 
-def test_create_priotiy_error(clear, register_channel, register_user, create_standup, extract_token):
+def test_create_priotiy_error(clear_server, register_channel, register_user, create_standup, extract_token):
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     owner_token = extract_token(owner_info)
 
