@@ -45,7 +45,7 @@ def dm_create_v1(auth_id, u_ids):
 
     # Creating the channel name and dm_id (ALL DM_ID ARE NEGATIVE AND START AT -1)
     dm_name = ', '.join(handle_str_list)
-    dm_id = (len(data_store.get_dms_from_dm_id_dict()) + 1) * -1
+    dm_id = (len(data_store.get_dms_from_dm_id_dict()) + 2) * -1
 
     data_store.insert_dm(auth_id, dm_id, user_list, dm_name)
 

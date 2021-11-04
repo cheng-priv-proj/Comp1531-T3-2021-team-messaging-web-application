@@ -926,7 +926,15 @@ def message_share_endpt():
     put smth here
     '''
 
-    return message_share_v1(0,0,'',0,0)
+    request_data = request.get_json(force = True)
+    message_id = request_data['og_message_id']
+    message = request_data['message']
+    channel_id = request_data['channel_id']
+    dm_id = request_data['dm_id']
+    token = request_data['token']
+    auth_user_id = token_to_auth_id(token)
+
+    return message_share_v1(auth_user_id, message_id, message, channel_id, dm_id)
 
 @APP.route('/message/react/v1', methods=['POST'])
 def message_react_endpt():
