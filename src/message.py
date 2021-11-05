@@ -5,6 +5,10 @@ from src.other import check_type
 
 from datetime import datetime
 
+import threading
+from datetime import datetime, time
+from time import sleep
+
 def message_send_v1(auth_user_id, channel_id, message):
     '''
     Send a message from the authorised user to the channel specified by channel_id
@@ -312,6 +316,33 @@ def message_unpin_v1(auth_user_id, message_id):
 
     return {}
 
+################# Standup Thread ###############################################
+
+class DelayedMessage (threading.Thread):
+    def __init__(self, u_id, channel_or_dm_id, timesent, message):
+        threading.Thread.__init__(self)
+        self.u_id = u_id
+        self.channel_or_dm_id = channel_or_dm_id
+        self.wait = timesent - datetime.utcnow().timestamp() 
+        self.message = message
+
+    def run(self):
+        print('delayed message thread started for channel_id ', self.channel_or_dm_id)
+
+        sleep(self.wait)
+        if self.channel_or_dm_id < 0:
+            message_id = message_send_v1(self.u_id, self.channel_or_dm_id, self.message)
+        else:
+            message_id = message_senddm_v1(self.u_id, self.channel_or_dm_id, self.message)
+
+        print('delayed message thread exiting for channel_id ', self.channel_or_dm_id)
+
+        return message_id
+
+
+################################################################################
+
+
 def message_sendlater_v1(auth_user_id, channel_id, message, time_sent):
     '''
     Send a message from the authorised user to the channel specified by
@@ -335,8 +366,26 @@ def message_sendlater_v1(auth_user_id, channel_id, message, time_sent):
 
     Returns { message_id } on success
     '''
+    check_type(auth_user_id, int)
+    check_type(channel_id, int)
+    check_type(message, str)
+    check_type(time_sent, float)
 
-    return { 'message_id': 0}
+    if data_store.is_invalid_channel_id(channel_id):
+        raise InputError('channel_id does not refer to a valid channel')
+
+    if data_store.is_user_member_of_channel(channel_id, auth_user_id):
+        raise AccessError ('channel_id is valid and the authorised user is not a member of the channel they are trying to post to')
+
+    if len(message) > 1000:
+        raise InputError('length of message is over 1000 characters')
+
+    if time_sent - datetime.utcnow().timestamp() < 0:
+        raise InputError('time_sent is a time in the past')
+
+    delayed_message = DelayedMessage(auth_user_id, channel_id, timesent, message)
+    
+    return delayed_message.start()
 
 def message_sendlaterdm_v1(auth_user_id, dm_id, message, time_sent):
     '''
@@ -361,5 +410,23 @@ def message_sendlaterdm_v1(auth_user_id, dm_id, message, time_sent):
 
     Returns { message_id } on success
     '''
+    check_type(auth_user_id, int)
+    check_type(dm_id, int)
+    check_type(message, str)
+    check_type(time_sent, float)
 
-    return { 'message_id': 0}
+    if data_store.is_invalid_channel_id(dm_id):
+        raise InputError('dm_id does not refer to a valid dm')
+
+    if data_store.is_user_member_of_dm(dm_id, auth_user_id):
+        raise AccessError ('dm_id is valid and the authorised user is not a member of the dm they are trying to post to')
+
+    if len(message) > 1000:
+        raise InputError('length of message is over 1000 characters')
+
+    if time_sent - datetime.utcnow().timestamp() < 0:
+        raise InputError('time_sent is a time in the past')
+
+    delayed_message = DelayedMessage(auth_user_id, dm_id, timesent, message)
+    
+    return delayed_message.start()
