@@ -45,9 +45,11 @@ def test_standard(register_users, channel_factory):
         'channel_id': channel_id,
         'message': 'hi there',
         'time_sent': now + 2
-    }).json().get('message_id')
+    }).json()
+    print(message_id)
+    message_id = message_id.get('message_id')
 
-    messages_dict = requests.get(url + 'dm/messages/v1', json = {
+    messages_dict = requests.get(url + 'channel/messages/v2', params = {
         'token': register_users[0]['token'],
         'channel_id': channel_id,
         'start': 0
@@ -61,12 +63,12 @@ def test_standard(register_users, channel_factory):
 
     sleep(3)
 
-    messages_dict = requests.get(url + 'dm/messages/v1', json = {
+    messages_dict = requests.get(url + 'channel/messages/v2', params = {
         'token': register_users[0]['token'],
         'channel_id': channel_id,
         'start': 0
     }).json()
-
+    print(messages_dict)
     assert messages_dict == {
         'messages': [
             {
@@ -108,7 +110,7 @@ def test_multiple(register_users, channel_factory):
         'time_sent': now + 5
     }).json().get('message_id')
 
-    messages_dict = requests.get(url + 'dm/messages/v1', json = {
+    messages_dict = requests.get(url + 'channel/messages/v1', params = {
         'token': register_users[0]['token'],
         'channel_id': channel_id,
         'start': 0
@@ -198,7 +200,7 @@ def test_channel_valid_user_not_in_channel(register_users, channel_factory):
         'time_sent': datetime.utcnow().timestamp() + 2
     }).status_code == 403
 
-def test_token_invalid(clear, channel_factory):
+def test_token_invalid(clear, register_users, channel_factory):
     channel_id = channel_factory(register_users[0]['token'])
 
     assert requests.post(url + 'message/sendlater/v1', json={

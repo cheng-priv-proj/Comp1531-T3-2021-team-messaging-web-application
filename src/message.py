@@ -354,19 +354,20 @@ class DelayedMessage (threading.Thread):
         self.channel_or_dm_id = channel_or_dm_id
         self.wait = timesent - datetime.utcnow().timestamp() 
         self.message = message
+        self.message_id = {}
 
     def run(self):
         print('delayed message thread started for channel_id ', self.channel_or_dm_id)
 
         sleep(self.wait)
         if self.channel_or_dm_id < 0:
-            message_id = message_send_v1(self.u_id, self.channel_or_dm_id, self.message)
+            self.message_id = message_senddm_v1(self.u_id, self.channel_or_dm_id, self.message)  
+                 
         else:
-            message_id = message_senddm_v1(self.u_id, self.channel_or_dm_id, self.message)
-
+            self.message_id = message_send_v1(self.u_id, self.channel_or_dm_id, self.message)
+        data_store.decrease_message_count()
+        
         print('delayed message thread exiting for channel_id ', self.channel_or_dm_id)
-
-        return message_id
 
 
 ################################################################################
@@ -403,7 +404,7 @@ def message_sendlater_v1(auth_user_id, channel_id, message, time_sent):
     if data_store.is_invalid_channel_id(channel_id):
         raise InputError('channel_id does not refer to a valid channel')
 
-    if data_store.is_user_member_of_channel(channel_id, auth_user_id):
+    if not data_store.is_user_member_of_channel(channel_id, auth_user_id):
         raise AccessError ('channel_id is valid and the authorised user is not a member of the channel they are trying to post to')
 
     if len(message) > 1000:
@@ -412,9 +413,10 @@ def message_sendlater_v1(auth_user_id, channel_id, message, time_sent):
     if time_sent - datetime.utcnow().timestamp() < 0:
         raise InputError('time_sent is a time in the past')
 
-    delayed_message = DelayedMessage(auth_user_id, channel_id, timesent, message)
+    delayed_message = DelayedMessage(auth_user_id, channel_id, time_sent, message)
+    delayed_message.start()
     
-    return delayed_message.start()
+    return {'message_id': data_store.get_messages_count()}
 
 def message_sendlaterdm_v1(auth_user_id, dm_id, message, time_sent):
     '''
@@ -447,7 +449,7 @@ def message_sendlaterdm_v1(auth_user_id, dm_id, message, time_sent):
     if data_store.is_invalid_channel_id(dm_id):
         raise InputError('dm_id does not refer to a valid dm')
 
-    if data_store.is_user_member_of_dm(dm_id, auth_user_id):
+    if not data_store.is_user_member_of_dm(dm_id, auth_user_id):
         raise AccessError ('dm_id is valid and the authorised user is not a member of the dm they are trying to post to')
 
     if len(message) > 1000:
@@ -456,6 +458,7 @@ def message_sendlaterdm_v1(auth_user_id, dm_id, message, time_sent):
     if time_sent - datetime.utcnow().timestamp() < 0:
         raise InputError('time_sent is a time in the past')
 
-    delayed_message = DelayedMessage(auth_user_id, dm_id, timesent, message)
-    
-    return delayed_message.start()
+    delayed_message = DelayedMessage(auth_user_id, dm_id, time_sent, message)
+    delayed_message.start()
+
+    return delayed_message.message_id
