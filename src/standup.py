@@ -27,10 +27,12 @@ class Standup (threading.Thread):
     
 def send_message_buffer(u_id, channel_id, length):
     sleep(length)
-
-    standup = data_store.get_standup_from_channel_id(channel_id)
     
+    standup = data_store.get_standup_from_channel_id(channel_id)
+
     message_send_v1(u_id, channel_id, standup.get('messages'))
+
+    data_store.remove_standup(channel_id)
 
 ################################################################################
 

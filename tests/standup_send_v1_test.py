@@ -171,7 +171,6 @@ def test_standup_send_normal_message_before_standup_over(clear_server, register_
         'is_pinned': False
     }
 
-@pytest.mark.skip('unsure on spec details')
 def test_standup_send_tags_in_messsage(clear_server, register_user, register_channel, extract_token, create_standup, send_standup_message, get_channel_messages):
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     owner_token = extract_token(owner_info)

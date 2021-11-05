@@ -575,6 +575,9 @@ class Datastore:
 
         self.update_pickle()
 
+    def remove_standup(self, channel_id):
+        del self.get_standups_from_channel_id_dict()[channel_id]
+
     # Update ##################################################################
     
     def update_name(self, auth_user_id, name_first, name_last):
