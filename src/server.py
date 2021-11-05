@@ -1104,10 +1104,21 @@ def admin_user_remove_v1_endpt():
 @APP.route('/notifications/get/v1', methods=['GET'])
 def notifications_get_endpt():
     '''
-    put smth here
-    '''
+    Return the user's most recent 20 notifications, ordered from most recent to least recent.
 
-    return notifications_get_v1(0)
+    Arguments:
+        token           (str) - unique user token
+
+    Exceptions
+        AccessError - Occurs when token is invalid
+
+    Return Value:
+        Returns {'notifications': [notification]}
+    '''
+    token = request.args.get('token')
+    auth_id = token_to_auth_id(token)
+    print(111111)
+    return notifications_get_v1(auth_id)
 
 ################## SEARCH ######################################################
 

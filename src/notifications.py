@@ -19,4 +19,6 @@ def notifications_get_v1(auth_user_id):
         Returns { notifications } on success
     '''
 
-    return { 'notifications': [] }
+    check_type(auth_user_id, int)
+
+    return { 'notifications': data_store.get_notifications_from_u_id(auth_user_id)[:20] }

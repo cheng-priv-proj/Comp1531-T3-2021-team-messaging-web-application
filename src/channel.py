@@ -2,6 +2,7 @@ from src.data_store import data_store
 from src.error import InputError
 from src.error import AccessError
 from src.other import check_type
+from src.other import insert_invite_channel_or_dm_notifications
 
 def channel_invite_v1(auth_user_id, channel_id, u_id):
     '''
@@ -48,6 +49,8 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     channel = data_store.get_channel_from_channel_id(channel_id)
 
     channel.get('all_members').append(data_store.get_user_from_u_id(u_id))
+
+    insert_invite_channel_or_dm_notifications(channel_id, auth_user_id, u_id)
 
     return {}
 
