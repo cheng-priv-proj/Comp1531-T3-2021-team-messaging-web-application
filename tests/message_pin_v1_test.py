@@ -157,7 +157,7 @@ def test_invalid_message_id(clear, extract_token, extract_message, register_user
 
     channel_id = register_channel(owner_token, 'original_channel', True)
 
-    message_id = extract_message(requests.post(url + 'message/send/v1', json = {
+    extract_message(requests.post(url + 'message/send/v1', json = {
         'token': owner_token,
         'channel_id': channel_id,
         'message': 'testmessage' 

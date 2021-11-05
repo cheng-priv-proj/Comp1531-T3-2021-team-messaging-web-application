@@ -963,7 +963,8 @@ def message_pin_endpt():
     return {}
 
 @APP.route('/message/unpin/v1', methods=['POST'])
-def request_data = request.get_json()
+def message_unpin_endpt():
+    request_data = request.get_json()
     token = request_data['token']
     auth_user_id = token_to_auth_id(token)
     message_id = request_data.get('message_id')
