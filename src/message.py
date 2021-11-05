@@ -310,7 +310,7 @@ def message_pin_v1(auth_user_id, message_id):
         message_id      (int)   - unique message id
     
     Exceptions:
-        TypeError   - occurs when auth_user_id, message_id, react_id are not ints
+        TypeError   - occurs when auth_user_id, message_id are not ints
         InputError  - occurs when message_id is not a valid message within a
                       channel or DM that the authorised user has joined
         InputError  - occurs when the message is already pinned
@@ -320,6 +320,27 @@ def message_pin_v1(auth_user_id, message_id):
     Return value:
         Returns {} on success
     '''
+
+    check_type(auth_user_id, int)
+    check_type(message_id, int)
+
+    is_invalid_message = data_store.is_invalid_message(message_id)
+    channel_or_dm_id = get_channel_or_dm_id_from_message_id(message_id)
+    is_member = data_store.is_user_member_of_channel_or_dm(channel_or_dm_id, auth_user_id)
+
+    if is_invalid_message == True and is_member == True:
+        raise InputError('Message_id does not refer to a valid message')
+
+    if is_invalid_message == False and is_member == False:
+        raise AccessError('User does not have the correct permissions')
+
+    message = datastore.get_message_from_message_id(message_id)
+    
+
+    if message['is_pinned'] == True:
+        raise InputError('Message is already pinned')
+    else:
+        message['is_pinned'] = True 
 
     return {}
 
@@ -332,7 +353,7 @@ def message_unpin_v1(auth_user_id, message_id):
         message_id      (int)   - unique message id
     
     Exceptions:
-        TypeError   - occurs when auth_user_id, message_id, react_id are not ints
+        TypeError   - occurs when auth_user_id, message_id are not ints
         InputError  - occurs when message_id is not a valid message within a
                       channel or DM that the authorised user has joined
         InputError  - occurs when the message is not already pinned
@@ -342,8 +363,29 @@ def message_unpin_v1(auth_user_id, message_id):
     Return value:
         Returns {} on success
     '''
+    check_type(auth_user_id, int)
+    check_type(message_id, int)
+
+    is_invalid_message = data_store.is_invalid_message(message_id)
+    channel_or_dm_id = get_channel_or_dm_id_from_message_id(message_id)
+    is_member = data_store.is_user_member_of_channel_or_dm(channel_or_dm_id, auth_user_id)
+
+    if is_invalid_message == True and is_member == True:
+        raise InputError('Message_id does not refer to a valid message')
+
+    if is_invalid_message == False and is_member == False:
+        raise AccessError('User does not have the correct permissions')
+
+    message = datastore.get_message_from_message_id(message_id)
+    
+    
+    if message['is_pinned'] == False:
+        raise InputError('Message is already unpinned')
+    else:
+        message['is_pinned'] = False 
 
     return {}
+
 
 ################# Standup Thread ###############################################
 
