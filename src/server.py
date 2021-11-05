@@ -954,19 +954,23 @@ def message_unreact_endpt():
 
 @APP.route('/message/pin/v1', methods=['POST'])
 def message_pin_endpt():
-    '''
-    put smth here
-    '''
+    request_data = request.get_json()
+    token = request_data['token']
+    auth_user_id = token_to_auth_id(token)
+    message_id = request_data.get('message_id')
 
-    return message_pin_v1(0,0)
+    message_pin_v1(auth_user_id, message_id)
+    return {}
 
 @APP.route('/message/unpin/v1', methods=['POST'])
-def message_unpin_endpt():
-    '''
-    put smth here
-    '''
+def request_data = request.get_json()
+    token = request_data['token']
+    auth_user_id = token_to_auth_id(token)
+    message_id = request_data.get('message_id')
 
-    return message_unpin_v1(0,0)
+    message_unpin_v1(auth_user_id, message_id)
+    return {}
+
 
 @APP.route('/message/sendlater/v1', methods=['POST'])
 def message_sendlatere_endpt():
