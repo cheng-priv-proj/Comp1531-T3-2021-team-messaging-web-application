@@ -2,8 +2,6 @@ import pytest
 import requests
 from src import config
 
-# Generate invalid tokens some other time
-
 # Fixture to reset data store
 @pytest.fixture
 def clear():
@@ -61,9 +59,14 @@ def user3():
     }).json()
     return response
 
-# Might add test with valid_u_id some other time too tho
-# Test access error priority
 def test_invalid_token(clear):
+    '''
+    Test that access error has priority
+
+    Expects: 
+        AccessError (403 error)
+    '''
+
     invalid_token = '-10000'
     invalid_u_id = -10000
 
@@ -76,8 +79,14 @@ def test_invalid_token(clear):
 
     assert resp.status_code == 403
 
-# Test Invalid u_id
 def test_invalid_u_id(clear, user1, extract_token):
+    '''
+    Test Invalid u_id
+
+    Expects: 
+        InputError (400 error)
+    '''
+
     token1 = extract_token(user1)
 
     invalid_u_id = -1000
@@ -89,8 +98,14 @@ def test_invalid_u_id(clear, user1, extract_token):
 
     assert resp.status_code == 400
 
-# Test multiple Invalid u_id
 def test_multiple_invalid_u_ids(clear, user1, user2, extract_token, extract_id):
+    '''
+    Test multiple Invalid u_id
+
+    Expects: 
+        InputError (400 error)
+    '''
+
     token1 = extract_token(user1)
 
     invalid_u_id1 = -1000
@@ -106,6 +121,13 @@ def test_multiple_invalid_u_ids(clear, user1, user2, extract_token, extract_id):
     assert resp.status_code == 400
 
 def test_dm_id_correct(clear, user1, extract_dm, extract_token, extract_id):
+    '''
+    Tests that the dm_id generated is correct.
+
+    Expects: 
+        Correct output from dm_details.
+    '''
+
     auth1 = extract_id(user1)
     token1 = extract_token(user1)
 
@@ -116,7 +138,7 @@ def test_dm_id_correct(clear, user1, extract_dm, extract_token, extract_id):
         'u_ids': u_ids
     }).json())
 
-    dm_details = requests.get(config.url + 'dm/details/v1', json = {
+    dm_details = requests.get(config.url + 'dm/details/v1', params = {
         'token': token1,
         'dm_id': dm_id
     }).json()
@@ -130,13 +152,19 @@ def test_dm_id_correct(clear, user1, extract_dm, extract_token, extract_id):
                 'email': 'user1@test.com',
                 'name_first': 'a',
                 'name_last': 'one',
-                'handle_str': 'aone'
+                'handle_str': 'aone',
+                'profile_img_url': 'link_to_default'
             }
         ]
     }
 
-# Test only one person
 def test_only_creator_dm(clear, user1, extract_dm, extract_token, extract_id):
+    '''
+    Test case where there is only one person.
+
+    Expects: 
+        Correct output from dm_details.
+    '''
     auth1 = extract_id(user1)
     token1 = extract_token(user1)
 
@@ -147,7 +175,7 @@ def test_only_creator_dm(clear, user1, extract_dm, extract_token, extract_id):
         'u_ids': u_ids
     }).json())
 
-    dm_details = requests.get(config.url + 'dm/details/v1', json = {
+    dm_details = requests.get(config.url + 'dm/details/v1', params = {
         'token': token1,
         'dm_id': dm_id
     }).json()
@@ -161,13 +189,20 @@ def test_only_creator_dm(clear, user1, extract_dm, extract_token, extract_id):
                 'email': 'user1@test.com',
                 'name_first': 'a',
                 'name_last': 'one',
-                'handle_str': 'aone'
+                'handle_str': 'aone',
+                'profile_img_url': 'link_to_default'
             }
         ]
     }
 
-# Test multiple handles
 def test_multiple_handles(clear, user1, user2, extract_dm, extract_id, extract_token):
+    '''
+    Test case where there are multiple handles.
+
+    Expects: 
+        Correct output from dm_details.
+    '''
+
     user1_id = extract_id(user1)
     token1 = extract_token(user1)
     user2_id = extract_id(user2)
@@ -179,7 +214,7 @@ def test_multiple_handles(clear, user1, user2, extract_dm, extract_id, extract_t
         'u_ids': u_ids
     }).json())
 
-    dm_details = requests.get(config.url + 'dm/details/v1', json = {
+    dm_details = requests.get(config.url + 'dm/details/v1', params = {
         'token': token1,
         'dm_id': dm_id
     }).json()
@@ -193,20 +228,28 @@ def test_multiple_handles(clear, user1, user2, extract_dm, extract_id, extract_t
                 'email': 'user2@test.com',
                 'name_first': 'b',
                 'name_last': 'two',
-                'handle_str': 'btwo'
+                'handle_str': 'btwo',
+                'profile_img_url': 'link_to_default'
             },
             {
                 'u_id': user1_id,
                 'email': 'user1@test.com',
                 'name_first': 'a',
                 'name_last': 'one',
-                'handle_str': 'aone'
+                'handle_str': 'aone',
+                'profile_img_url': 'link_to_default'
             },
         ]
     }
 
-# Test alphabetically sorted
 def test_name_alphabetically_sorted(clear, user1, user2, user3, extract_dm, extract_id, extract_token):
+    '''
+    Test alphabetically sorted
+
+    Expects: 
+        Correct output from dm/details.
+    '''
+
     extract_id(user1)
     token1 = extract_token(user1)
     user2_id = extract_id(user2)
@@ -219,7 +262,7 @@ def test_name_alphabetically_sorted(clear, user1, user2, user3, extract_dm, extr
         'u_ids': u_ids
     }).json())
 
-    dm_details = requests.get(config.url + 'dm/details/v1', json = {
+    dm_details = requests.get(config.url + 'dm/details/v1', params = {
         'token': token1,
         'dm_id': dm_id
     }).json()

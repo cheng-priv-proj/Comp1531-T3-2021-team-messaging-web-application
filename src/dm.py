@@ -24,7 +24,6 @@ def dm_create_v1(auth_id, u_ids):
     Exceptions:
         TypeError   - Occurs when auth_id is not an int
         TypeError   - Occurs when u_ids is not a list
-        AccessError - Occurs when auth_id is invalid
         InputError  - Occurs when an u_id in u_ids is invalid
 
     Return Value:
@@ -33,9 +32,6 @@ def dm_create_v1(auth_id, u_ids):
     '''
     check_type(auth_id, int)
     check_type(u_ids, list)
-
-    if data_store.is_invalid_user_id(auth_id):
-        raise AccessError ('Invalid auth_user_id')
 
     user_info = data_store.get_users_from_u_id_dict()
 
@@ -49,13 +45,11 @@ def dm_create_v1(auth_id, u_ids):
 
     # Creating the channel name and dm_id (ALL DM_ID ARE NEGATIVE AND START AT -1)
     dm_name = ', '.join(handle_str_list)
-    dm_id = (len(data_store.get_dms_from_dm_id_dict()) + 1) * -1
+    dm_id = (len(data_store.get_dms_from_dm_id_dict()) + 2) * -1
 
     data_store.insert_dm(auth_id, dm_id, user_list, dm_name)
 
-    return {
-        'dm_id': dm_id
-    }
+    return { 'dm_id': dm_id }
 
 def dm_details_v1(auth_id, dm_id):
     '''
@@ -68,7 +62,6 @@ def dm_details_v1(auth_id, dm_id):
     Exceptions:
         TypeError   - Occurs when auth_id is not an int
         TypeError   - Occurs when dm_id is not an int
-        AccessError - Occurs when auth_id is invalid
         InputError  - Occurs when dm_id does refer to a valid DM
         AccessError - Occurs when dm_id is valid but auth_id is not a member of the DM
 
@@ -78,9 +71,6 @@ def dm_details_v1(auth_id, dm_id):
     '''
     check_type(auth_id, int)
     check_type(dm_id, int)
-
-    if data_store.is_invalid_user_id(auth_id):
-        raise AccessError ('Invalid auth_user_id')
 
     if data_store.is_invalid_dm_id(dm_id):
         raise InputError ('dm_id does not refer to valid DM')
@@ -94,28 +84,31 @@ def dm_details_v1(auth_id, dm_id):
 
 def dm_list_v1(auth_id):
     '''
-    Returns a list of DMs that the user is a member of
+        Returns the list of DMs that the user is a member of.
+
+        Arguments:
+            auth_id     (int)   - authorized user id
+
+        Exceptions:
+            AccessError         - Occurs when token is invalid
+
+        Return Value:
+            Returns nothing on success
     '''
+
     check_type(auth_id, int)
 
-    if data_store.is_invalid_user_id(auth_id):
-        raise AccessError ('Invalid auth_user_id')
+    dm_dict = data_store.get_dms_from_dm_id_dict().items()
 
-    dm_list = { 'dms': [] }
+    dms = [ {
+                'dm_id': dm_id,
+                'name': dm['details']['name']
+            }
+            for dm_id, dm in dm_dict
+            if data_store.is_user_member_of_dm(dm_id, auth_id)
+          ]
 
-    dms = data_store.get_dms_from_dm_id_dict()
-
-    for dm_id in dms:
-        for member in dms[dm_id]['details']['members']:
-            if member['u_id'] == auth_id:
-                dm_list['dms'].append(
-                    {
-                        'dm_id': dm_id,
-                        'name': dms[dm_id]['details']['name']
-                    }
-                )
-
-    return dm_list
+    return { 'dms': dms }
 
 def dm_messages_v1(auth_id, dm_id, start):
     '''
@@ -123,35 +116,49 @@ def dm_messages_v1(auth_id, dm_id, start):
     given DM that the authorised user has access to. Additionally returns
     'start', and 'end' = 'start' + 50
 
+    Arguments:
+        auth_id         (int)   - authorized user id
+        dm_id           (int)   - unique dm id
+        start           (int)   - message index (most recent message has index 0)
+
+    Exceptions:
+        TypeError   - occurs when auth_user_id, dm_id, start are not ints
+        InputError  - dm_id does not refer to a valid DM
+        InputError  - occurs when start is negative
+        InputError  - occurs when start is greater than the total number of messages
+                    in the channel
+        AccessError - dm_id is valid and the authorised user is not a member of the DM
+
+    Return value:
+        Returns { messages, start, end } on success
+        Returns { messages, start, -1 } if the function has returned the least
+        recent message
+
+
     '''
     check_type(auth_id, int)
     check_type(dm_id, int)
     check_type(start, int)
 
-    if start < 0:
-        raise InputError('start is a negative integer')
 
     # check if auth and dm ids are valid and user is in dm
-    if data_store.is_invalid_user_id(auth_id):
-        raise AccessError ('Invalid auth_user_id')
-
     if data_store.is_invalid_dm_id(dm_id):
         raise InputError ('dm_id does not refer to valid DM')
 
     if not data_store.is_user_member_of_dm(dm_id, auth_id):
         raise AccessError ('dm_id is valid and the authorised user is not a member of the DM')
 
+    if start < 0:
+        raise InputError('start is a negative integer')
+
     messages = data_store.get_messages_from_channel_or_dm_id(dm_id)
-    no_of_messages = len(messages)
+    num_messages = len(messages)
 
-    end = start + 50
-
-    if start > no_of_messages:
+    if start > num_messages:
         raise InputError('start is greater than the total number of messages in the channel')
 
     # accounts for when given empty channel and start = 0
-    elif start + 50 >= no_of_messages:
-        end = -1
+    end = start + 50 if start + 50 < num_messages else -1
     
     return {
         'messages' : messages[start: start + 50],
@@ -166,27 +173,21 @@ def dm_leave_v1(auth_id, dm_id):
     The creator is allowed to leave and the DM will still exist if this happens. 
     This does not update the name of the DM.
 
-    POST
+    Arguments:
+        auth_id     (int)   - authorized user id
+        dm_id       (int)   - unique dm id
 
-    Parameters:
-        { token, dm_id }
-    Return Type:
-        {}
+    Exceptions:
+        TypeError   - occurs when auth_user_id, dm_id are not ints
+        InputError  - dm_id does not refer to a valid DM
+        AccessError - dm_id is valid and the authorised user is not a member of the DM
 
-    InputError when:
-      
-        dm_id does not refer to a valid DM
-      
-    AccessError when:
-      
-        dm_id is valid and the authorised user is not a member of the DM
+    Return values:
+        Returns {} on success
 
     '''
     check_type(auth_id, int)
     check_type(dm_id, int)
-
-    if data_store.is_invalid_user_id(auth_id):
-        raise AccessError ('Invalid auth_user_id')
 
     if data_store.is_invalid_dm_id(dm_id):
         raise InputError ('dm_id does not refer to valid DM')
@@ -194,15 +195,11 @@ def dm_leave_v1(auth_id, dm_id):
     if not data_store.is_user_member_of_dm(dm_id, auth_id):
         raise AccessError ('dm_id is valid and the authorised user is not a member of the DM')
 
-    # ^^ yo inked from aleks code. if this is boken check his code.
-
-    details_dict = data_store.get_dm_from_dm_id(dm_id)
-    members = details_dict['members']
+    dm = data_store.get_dm_from_dm_id(dm_id)
     
-    for person in members:
-        if person['u_id'] == auth_id:
-            members.remove(person)
-            return {}
+    dm['members'] = [user for user in dm.get('members') if user.get('u_id') != auth_id]
+
+    return {}
 
 def dm_remove_v1(auth_id, dm_id):
     '''
@@ -215,18 +212,14 @@ def dm_remove_v1(auth_id, dm_id):
     Exceptions:
         TypeError   - Occurs when auth_id is not an int
         TypeError   - Occurs when dm_id is not an int
-        AccessError - Occurs when auth_id is invalid
         InputError  - Occurs when dm_id does refer to a valid DM
         AccessError - Occurs when dm_id is valid but auth_id is not a creator of the DM
 
     Return Value:
-        Retursn nothing on success
+        Returs {} on success
     '''
     check_type(auth_id, int)
     check_type(dm_id, int)
-    
-    if data_store.is_invalid_user_id(auth_id):
-        raise AccessError ('Invalid auth_user_id')
 
     if data_store.is_invalid_dm_id(dm_id):
         raise InputError ('dm_id does not refer to valid DM')

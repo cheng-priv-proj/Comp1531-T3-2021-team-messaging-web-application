@@ -51,9 +51,16 @@ def dm_factory():
     return create_dm
 
 def test_standard(register, dm_factory):
+    '''
+    Tests standard valid case.
+
+    Expects: 
+        Correct output from dm_list.
+    '''
+
     dm_id = dm_factory(register[0]['token'], [register[1]['auth_user_id'], register[2]['auth_user_id'], register[3]['auth_user_id']])
 
-    dm_list = requests.get(url + 'dm/list/v1', json = {
+    dm_list = requests.get(url + 'dm/list/v1', params = {
         'token': register[0]['token']
         }).json()
 
@@ -67,9 +74,16 @@ def test_standard(register, dm_factory):
     }
 
 def test_creator_only(register, dm_factory):
+    '''
+    Tests standard valid case when there is only the owner in the dm.
+
+    Expects: 
+        Correct output from dm_list.
+    '''
+
     dm_id = dm_factory(register[0]['token'], [])
     
-    dm_list = requests.get(url + 'dm/list/v1', json = {
+    dm_list = requests.get(url + 'dm/list/v1', params = {
         'token': register[0]['token']
         }).json()
 
@@ -83,8 +97,14 @@ def test_creator_only(register, dm_factory):
     }
 
 def test_user_has_no_dms(register, dm_factory):
+    '''
+    Tests case where the user has no dms.
 
-    dm_list = requests.get(url + 'dm/list/v1', json = {
+    Expects: 
+        Correct output from dm_list.
+    '''
+
+    dm_list = requests.get(url + 'dm/list/v1', params = {
         'token': register[0]['token']
         }).json()
 
@@ -94,7 +114,7 @@ def test_user_has_no_dms(register, dm_factory):
 
     dm_factory(register[0]['token'], [register[1]['auth_user_id']])
 
-    dm_list = requests.get(url + 'dm/list/v1', json = {
+    dm_list = requests.get(url + 'dm/list/v1', params = {
         'token': register[2]['token']
         }).json()
 
@@ -103,7 +123,14 @@ def test_user_has_no_dms(register, dm_factory):
     }
 
 def test_invalid_token():
-    requests.get(url + 'dm/list/v1', json = {
+    '''
+    Test expecting access error when token is invalid. 
+
+    Expects: 
+        AccessError (403 error)
+    '''
+
+    requests.get(url + 'dm/list/v1', params = {
         'token': 'no token has been registered yet'
         }).status_code == 403
 

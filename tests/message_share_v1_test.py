@@ -92,7 +92,7 @@ def test_dm_share(clear, extract_token, extract_user, extract_message, register_
         'dm_id': dm_id,
         'message': 'testmessage' 
     }).json())
-
+    
     shared_message_id_dict = requests.post(url + 'message/share/v1', json = { 
         'token': owner_token, 
         'og_message_id': message_id, 
@@ -101,8 +101,8 @@ def test_dm_share(clear, extract_token, extract_user, extract_message, register_
         'dm_id': dm_id_sent_to 
     }).json()
     shared_message_id = shared_message_id_dict.get('shared_message_id')
-    
-    messages = requests.get(url + 'dm/messages/v1', json = {
+    print(owner_token)
+    messages = requests.get(url + 'dm/messages/v1', params= {
         'token': owner_token,
         'dm_id': dm_id_sent_to, 
         'start': 0 
@@ -148,7 +148,7 @@ def test_channel_share(clear, extract_token, extract_user, extract_message, regi
     }).json()
     shared_message_id = shared_message_id_dict.get('shared_message_id')
 
-    messages = requests.get(url + 'channel/messages/v2', json = {
+    messages = requests.get(url + 'channel/messages/v2', params= {
         'token': owner_token,
         'channel_id': channel_id_sent_to, 
         'start': 0 
@@ -194,7 +194,7 @@ def test_extra_message(clear, extract_token, extract_user, extract_message, regi
     }).json()
     shared_message_id = shared_message_id_dict.get('shared_message_id')
 
-    messages = requests.get(url + 'channel/messages/v2', json = {
+    messages = requests.get(url + 'channel/messages/v2', params= {
         'token': owner_token,
         'channel_id': channel_id_sent_to, 
         'start': 0 
@@ -235,7 +235,7 @@ def test_both_channel_id_and_dm_id_invalid(clear, extract_token, extract_message
         'message': '', 
         'channel_id': invalid_channel_id, 
         'dm_id': -1
-    }).status_code() == 400
+    }).status_code == 400
 
 def test_neither_negative_one(clear, extract_token, extract_user, extract_message, register_user, register_channel, register_dm):
     owner_details = register_user('owner@email.com')
@@ -256,7 +256,7 @@ def test_neither_negative_one(clear, extract_token, extract_user, extract_messag
         'message': '', 
         'channel_id': channel_id, 
         'dm_id': dm_id
-    }).status_code() == 400
+    }).status_code == 400
 
 def test_invalid_og_message_id(clear, extract_token, extract_message, register_user, register_channel):
     owner_details = register_user('owner@email.com')
@@ -278,7 +278,7 @@ def test_invalid_og_message_id(clear, extract_token, extract_message, register_u
         'message': '', 
         'channel_id': channel_id, 
         'dm_id': -1
-    }).status_code() == 400
+    }).status_code == 400
 
 def test_length_of_messages_less_than_thousand(clear, extract_token, extract_message, register_user, register_channel):
     owner_details = register_user('owner@email.com')
@@ -299,7 +299,7 @@ def test_length_of_messages_less_than_thousand(clear, extract_token, extract_mes
         'message': 'extramessage' * 1000, 
         'channel_id': channel_id_sent_to, 
         'dm_id': -1
-    }).status_code() == 403
+    }).status_code == 400
     
 
 def test_valid_id_but_not_in_channel(clear, extract_token, extract_message, register_user, register_channel):
@@ -314,7 +314,7 @@ def test_valid_id_but_not_in_channel(clear, extract_token, extract_message, regi
         'message': 'testmessage' 
     }).json())
 
-    random_token = register_user('randomuser@email.com')
+    random_token = extract_token(register_user('randomuser@email.com'))
 
     assert requests.post(url + 'message/share/v1', json = { 
         'token': random_token, 
@@ -322,5 +322,5 @@ def test_valid_id_but_not_in_channel(clear, extract_token, extract_message, regi
         'message': '', 
         'channel_id': channel_id, 
         'dm_id': -1
-    }).status_code() == 403
+    }).status_code == 403
 
