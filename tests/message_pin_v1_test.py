@@ -89,7 +89,7 @@ def test_pin_dm(clear, extract_token, extract_user, extract_message, register_us
         'message_id': message_id
     })
     
-    messages = requests.get(url + 'dm/messages/v1', json = {
+    messages = requests.get(url + 'dm/messages/v1', params = {
         'token': owner_token,
         'dm_id': dm_id, 
         'start': 0 
@@ -130,7 +130,7 @@ def test_pin_channel(clear, extract_token, extract_user, extract_message, regist
         'message_id': message_id
     })
 
-    messages = requests.get(url + 'channel/messages/v2', json = {
+    messages = requests.get(url + 'channel/messages/v2', params = {
         'token': owner_token,
         'channel_id': channel_id, 
         'start': 0 
