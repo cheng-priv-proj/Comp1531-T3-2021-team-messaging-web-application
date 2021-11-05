@@ -34,37 +34,14 @@ def auth_id_v2():
         })
     return response.json()
 
-'''
-message/remove/v1
-Given a message_id for a message, this message is removed from the channel/DM
-
-
-DELETE
-
-
-Parameters:
-    { token, message_id}
-
-Return Type:
-    {}
-
-InputError when any of:
-      
-        message_id does not refer to a valid message within a channel/DM that the authorised user has joined
-      
-AccessError when message_id refers to a valid message in a joined channel/DM and none of the following are true:
-      
-        the message was sent by the authorised user making this request
-        the authorised user has owner permissions in the channel/DM
-'''
-
-# TO GET MORE COVERAGE, MAYBE DO THE SMAE TESTS WITH THE CHANNELS BUT CHANGE IS_PUBLIC TO PRIVATE and vice versa
-# same tests but send more than 50 messages.
-# test with non owner member
-# need to add test multple messages
-
-#tests owner case
 def test_normal_case_channel(clear_server, get_user_1):
+    '''
+    Standard test with owner case
+
+    Expects: 
+        Correct output from channel/messages.
+    '''
+
     channel_dict = requests.post(config.url + 'channels/create/v2', json= {
         'token': get_user_1['token'], 
         'name': 'test channel', 
@@ -84,7 +61,7 @@ def test_normal_case_channel(clear_server, get_user_1):
         'message_id': message_id
     })
     
-    message_dict = requests.get(config.url + 'channel/messages/v2', json = {
+    message_dict = requests.get(config.url + 'channel/messages/v2', params = {
         'token': get_user_1['token'],
         'channel_id': extracted_channel_id, 
         'start': 0 }).json()
@@ -96,6 +73,13 @@ def test_normal_case_channel(clear_server, get_user_1):
     }
 
 def test_normal_case_non_owner(clear_server, get_user_1, auth_id_v2):
+    '''
+    Standard test with non owner case
+
+    Expects: 
+        Correct output from channel/messages.
+    '''
+
     channel_dict = requests.post(config.url + 'channels/create/v2', json= {
         'token': get_user_1['token'], 
         'name': 'test channel', 
@@ -121,7 +105,7 @@ def test_normal_case_non_owner(clear_server, get_user_1, auth_id_v2):
         'message_id': message_id
     })
     
-    message_dict = requests.get(config.url + 'channel/messages/v2', json = {
+    message_dict = requests.get(config.url + 'channel/messages/v2', params = {
         'token': auth_id_v2['token'],
         'channel_id': extracted_channel_id, 
         'start': 0 }).json()
@@ -132,8 +116,14 @@ def test_normal_case_non_owner(clear_server, get_user_1, auth_id_v2):
         'end': -1
     }
 
-# testing owner can edit other peoples messages
 def test_owner_perms(clear_server, get_user_1, auth_id_v2):
+    '''
+    Testing owner can edit other peoples messages
+
+    Expects: 
+        Correct output from channel/messages.
+    '''
+
     channel_dict = requests.post(config.url + 'channels/create/v2', json= {
         'token': get_user_1['token'], 
         'name': 'test channel', 
@@ -159,7 +149,7 @@ def test_owner_perms(clear_server, get_user_1, auth_id_v2):
         'message_id': message_id
     })
     
-    message_dict = requests.get(config.url + 'channel/messages/v2', json = {
+    message_dict = requests.get(config.url + 'channel/messages/v2', params = {
         'token': get_user_1['token'],
         'channel_id': extracted_channel_id, 
         'start': 0 }).json()
@@ -170,8 +160,15 @@ def test_owner_perms(clear_server, get_user_1, auth_id_v2):
         'end': -1
     }
 
-# message_id does not refer to a valid message within a channel/DM that the authorised user has joined
+
 def test_invalid_message_id(clear_server, get_user_1):
+    '''
+    Case where message_id does not refer to a valid message within a channel/DM that the authorised user has joined
+
+    Expects: 
+        InputError (400 error)
+    '''
+
     channel_dict = requests.post(config.url + 'channels/create/v2', json= {
         'token': get_user_1['token'], 
         'name': 'test channel', 
@@ -193,15 +190,43 @@ def test_invalid_message_id(clear_server, get_user_1):
     }).status_code == 400
 
 
+def test_user_is_not_member(clear_server, get_user_1, auth_id_v2):
+    '''
+    Case where user is not in the  channel/DM that the authorised user has joined.
 
-'''
-# AccessError when message_id refers to a valid message in a joined channel/DM and none of the following are true:
+    Expects: 
+        InputError (400 error)
+    '''
+
+    channel_dict = requests.post(config.url + 'channels/create/v2', json= {
+        'token': get_user_1['token'], 
+        'name': 'test channel', 
+        'is_public': True
+    }).json()
+
+    extracted_channel_id = channel_dict['channel_id']
+
+    message_dict = requests.post(config.url + 'message/send/v1', json = {
+        'token': get_user_1['token'],
+        'channel_id': extracted_channel_id,
+        'message': 'Hello there' }).json()
+
+    assert requests.delete(config.url + 'message/remove/v1', json = {
+        'token' : auth_id_v2['token'],
+        'message_id': message_dict['message_id']
+    }).status_code == 400
+
+def test_edit_acess_error(clear_server, get_user_1, auth_id_v2):
+    '''
+    AccessError when message_id refers to a valid message in a joined channel/DM and none of the following are true:
       
         the message was sent by the authorised user making this request
         the authorised user has owner permissions in the channel/DM
-'''
-# non owner removing someone elses message
-def test_edit_acess_error(clear_server, get_user_1, auth_id_v2):
+
+    Expects: 
+        AccessError (403 error)
+    '''
+
     channel_dict = requests.post(config.url + 'channels/create/v2', json= {
         'token': get_user_1['token'], 
         'name': 'test channel', 
@@ -226,9 +251,14 @@ def test_edit_acess_error(clear_server, get_user_1, auth_id_v2):
         'message_id': message_id,
     }).status_code == 403
 
-
-# does not test global owner
 def test_normal_case_dms(clear_server, get_user_1, auth_id_v2):
+    '''
+    Standard test with owner case
+
+    Expects: 
+        Correct output from dm/messages.
+    '''
+
     dm_id_dict = requests.post(config.url + 'dm/create/v1', json= {
         'token': get_user_1['token'], 
         'u_ids': [auth_id_v2["auth_user_id"]]
@@ -246,7 +276,7 @@ def test_normal_case_dms(clear_server, get_user_1, auth_id_v2):
         'message_id': message_id
     })
 
-    message_dict = requests.get(config.url + 'dm/messages/v1', json = {
+    message_dict = requests.get(config.url + 'dm/messages/v1', params = {
         'token': get_user_1['token'],
         'dm_id': dm_id, 
         'start': 0 }).json()
@@ -258,6 +288,13 @@ def test_normal_case_dms(clear_server, get_user_1, auth_id_v2):
     }
 
 def test_normal_case_non_owner_dms(clear_server, get_user_1, auth_id_v2):
+    '''
+    Standard test with non owner case
+
+    Expects: 
+        Correct output from dm/messages.
+    '''
+
     dm_id_dict = requests.post(config.url + 'dm/create/v1', json= {
         'token': get_user_1['token'], 
         'u_ids': [auth_id_v2["auth_user_id"]]
@@ -276,7 +313,7 @@ def test_normal_case_non_owner_dms(clear_server, get_user_1, auth_id_v2):
         'message_id': message_id
     })
 
-    message_dict = requests.get(config.url + 'dm/messages/v1', json = {
+    message_dict = requests.get(config.url + 'dm/messages/v1', params = {
         'token': auth_id_v2['token'],
         'dm_id': dm_id, 
         'start': 0 }).json()
@@ -287,8 +324,14 @@ def test_normal_case_non_owner_dms(clear_server, get_user_1, auth_id_v2):
         'end': -1
     }
 
-# testing owner can edit other peoples messages
 def test_owner_perms_dms(clear_server, get_user_1, auth_id_v2):
+    '''
+    Testing owner can edit other peoples messages
+
+    Expects: 
+        Correct output from dm/messages.
+    '''
+
     dm_id_dict = requests.post(config.url + 'dm/create/v1', json= {
         'token': get_user_1['token'], 
         'u_ids': [auth_id_v2["auth_user_id"]]
@@ -308,7 +351,7 @@ def test_owner_perms_dms(clear_server, get_user_1, auth_id_v2):
         'message_id': message_id
     })
 
-    message_dict = requests.get(config.url + 'dm/messages/v1', json = {
+    message_dict = requests.get(config.url + 'dm/messages/v1', params = {
         'token': get_user_1['token'],
         'dm_id': dm_id, 
         'start': 0 }).json()
@@ -319,9 +362,14 @@ def test_owner_perms_dms(clear_server, get_user_1, auth_id_v2):
         'end': -1
     }
 
-
-# message_id does not refer to a valid message within a channel/DM that the authorised user has joined
 def test_invalid_message_id_dms(clear_server, get_user_1, auth_id_v2):
+    '''
+    Case where message_id does not refer to a valid message within a channel/DM that the authorised user has joined
+
+    Expects: 
+        InputError (400 error)
+    '''
+
     dm_id_dict = requests.post(config.url + 'dm/create/v1', json= {
         'token': get_user_1['token'], 
         'u_ids': [auth_id_v2["auth_user_id"]]
@@ -341,14 +389,17 @@ def test_invalid_message_id_dms(clear_server, get_user_1, auth_id_v2):
         'message_id': message_id
     }).status_code == 400
 
-'''
-# AccessError when message_id refers to a valid message in a joined channel/DM and none of the following are true:
+def test_edit_acess_error_dms(clear_server, get_user_1, auth_id_v2):
+    '''
+    AccessError when message_id refers to a valid message in a joined channel/DM and none of the following are true:
       
         the message was sent by the authorised user making this request
         the authorised user has owner permissions in the channel/DM
-'''
-# non owner tries to dlelete other members messages
-def test_edit_acess_error_dms(clear_server, get_user_1, auth_id_v2):
+
+    Expects: 
+        AccessError (403 error)
+    '''
+    
     dm_id_dict = requests.post(config.url + 'dm/create/v1', json= {
         'token': get_user_1['token'], 
         'u_ids': [auth_id_v2["auth_user_id"]]

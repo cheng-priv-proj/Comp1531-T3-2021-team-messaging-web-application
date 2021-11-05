@@ -1,6 +1,10 @@
 from src.data_store import data_store
 import re
-from src.error import AccessError
+from src.error import AccessError, InputError
+from src.config import SECRET
+import jwt
+import hashlib
+
 def clear_v1():
     '''
     Resets the internal data of the application to its initial state, clearing the
@@ -36,7 +40,6 @@ def handle_str_generation(firstname, lastname):
 
     base_handle_str = base_handle_str_generation(firstname, lastname)
     handle_str = handle_prevent_duplicates(base_handle_str)
-    print(handle_str)
     return handle_str
 
 # Returns a nonduplicate handle_str
@@ -92,6 +95,9 @@ def base_handle_str_generation(firstname, lastname):
     if len(base_handle) > 20:
         base_handle = base_handle[0:20]
 
+    if base_handle == '':
+        base_handle = 'defaultname'
+
     return base_handle
 
 # helper function to handle TypeError exceptions
@@ -129,9 +135,17 @@ def token_to_auth_id(token):
 
     if data_store.is_token_invalid(token):
         raise AccessError ('Token is invalid')
-    
-    return data_store.get_u_id_from_token(token)
+    # data_store.get_u_id_from_token(token)
+    token_dict = jwt.decode(token, SECRET, algorithms=['HS256'])
 
+    return token_dict['auth_user_id']
+
+def hash_str(string):
+    return hashlib.sha256(string.encode()).hexdigest()
+
+def check_email_valid(email):
+    if not re.fullmatch(r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$', email):
+        raise InputError ('incorrect email format')
 
 stream_owner = 1
 stream_member = 2

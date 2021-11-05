@@ -54,6 +54,13 @@ def register():
     return {**owner_id_dict, **channel_id_dict}
 
 def test_send_one_valid_message(clear, register, extract_token, extract_user, extract_channel, extract_message):
+    '''
+    Standard test with one message.
+
+    Expects: 
+        Correct output from channel/messages.
+    '''
+
     channel_id = extract_channel(register)
     owner_token = extract_token(register)
     now = datetime.utcnow().timestamp()
@@ -62,18 +69,20 @@ def test_send_one_valid_message(clear, register, extract_token, extract_user, ex
         'token': owner_token,
         'channel_id': channel_id,
         'message': 'testmessage' }).json()
-    messages = requests.get(url + 'channel/messages/v2', json = {
+    messages = requests.get(url + 'channel/messages/v2', params = {
         'token': owner_token,
         'channel_id': channel_id, 
         'start': 0 }).json()
-    
+    print(messages)
     assert messages == {
         'messages': [
             {
                 'message_id': message_id.get('message_id'),
                 'u_id': extract_user(register),
                 'message': 'testmessage',
-                'time_created':  pytest.approx(now, rel=2)
+                'time_created':  pytest.approx(now, rel=2),
+                'reacts': [],
+                'is_pinned': False
             }
         ],
         'start': 0,
@@ -81,6 +90,13 @@ def test_send_one_valid_message(clear, register, extract_token, extract_user, ex
     }
 
 def test_send_multiple_valid_messages(clear, register, extract_token, extract_user, extract_channel, extract_message):
+    '''
+    Standard test with multiple messages.
+
+    Expects: 
+        Correct output from channel/messages.
+    '''
+
     channel_id = extract_channel(register)
     owner_token = extract_token(register)
     owner_id = extract_user(register)
@@ -97,30 +113,36 @@ def test_send_multiple_valid_messages(clear, register, extract_token, extract_us
         'token': owner_token,
         'channel_id': channel_id,
         'message': 'testmessage2' }).json())
-    messages = requests.get(url + 'channel/messages/v2', json = {
+    messages = requests.get(url + 'channel/messages/v2', params = {
         'token': owner_token,
         'channel_id': channel_id, 
         'start': 0 }).json()
-
+    print(messages)
     assert messages == {
         'messages': [
             {
                 'message_id': message_id2,
                 'u_id': owner_id,
                 'message': 'testmessage2',
-                'time_created': pytest.approx(now, rel=2)
+                'time_created': pytest.approx(now, rel=2),
+                'reacts': [],
+                'is_pinned': False
             },
             {
                 'message_id': message_id1,
                 'u_id': owner_id,
                 'message': 'testmessage1',
-                'time_created': pytest.approx(now, rel=2)
+                'time_created': pytest.approx(now, rel=2),
+                'reacts': [],
+                'is_pinned': False
             },
             {
                 'message_id': message_id0,
                 'u_id': owner_id,
                 'message': 'testmessage0',
-                'time_created':  pytest.approx(now, rel=2)
+                'time_created':  pytest.approx(now, rel=2),
+                'reacts': [],
+                'is_pinned': False
             }
             ],
         'start': 0,
@@ -129,28 +151,50 @@ def test_send_multiple_valid_messages(clear, register, extract_token, extract_us
 
     assert extract_message(messages['messages'][0]) != extract_message(messages['messages'][1]) != extract_message(messages['messages'][2])
 
-
 def test_send_invalid_message_to_short(clear, register, extract_token, extract_channel):
+    '''
+    Test case where message sent is too short.
+
+    Expects: 
+        InputError (400 error)
+    '''
+
     channel_id = extract_channel(register)
     owner_token = extract_token(register)
 
     assert requests.post(url + 'message/send/v1', json = {
         'token': owner_token,
         'channel_id': channel_id,
-        'message': ''
+        'message': '',
+        'reacts': []
     }).status_code == 400
 
 def test_send_invalid_message_to_long(clear, register, extract_token, extract_channel):
+    '''
+    Test case where message sent is too long.
+
+    Expects: 
+        InputError (400 error)
+    '''
+
     channel_id = extract_channel(register)
     owner_token = extract_token(register)
     
     assert requests.post(url + 'message/send/v1', json = {
         'token': owner_token,
         'channel_id': channel_id,
-        'message': 'a' * 1001
+        'message': 'a' * 1001,
+        'reacts': []
     }).status_code == 400
 
 def test_send_valid_message_unauthorized_user(clear, register, extract_token, extract_channel):
+    '''
+    Test case where user is not authorized to send a message.
+
+    Expects: 
+        AccessError (403 error)
+    '''
+
     channel_id = extract_channel(register)
     user_token = extract_token(requests.post(url + 'auth/register/v2', json = {
     'email': 'user@test.com', 
@@ -165,6 +209,13 @@ def test_send_valid_message_unauthorized_user(clear, register, extract_token, ex
     }).status_code == 403
 
 def test_send_message_invalid_channel_id(clear, register, extract_token, extract_user, extract_message):
+    '''
+    Test case where channel_id is invalid.
+
+    Expects: 
+        InputError (400 error)
+    '''
+
     owner_token = extract_token(register)
     assert requests.post(url + 'message/send/v1', json = {
         'token': owner_token,
@@ -173,6 +224,13 @@ def test_send_message_invalid_channel_id(clear, register, extract_token, extract
     }).status_code == 400
 
 def test_send_valid_message_invalid_token(clear, register, extract_token):
+    '''
+    Test case where token is not valid.
+
+    Expects: 
+        AccessError (403 error)
+    '''
+
     channel_id = extract_token(register)
     assert requests.post(url + 'message/send/v1', json = {
         'token': '123123414',
@@ -181,6 +239,13 @@ def test_send_valid_message_invalid_token(clear, register, extract_token):
     }).status_code == 403
 
 def test_send_invalid_message_invalid_token(clear, register):
+    '''
+    Test case where access error is expected to take precedence.
+
+    Expects: 
+        AccessError (403 error)
+    '''
+
     assert requests.post(url + 'message/send/v1', json = {
         'token': '123123414',
         'channel_id': 23423,
