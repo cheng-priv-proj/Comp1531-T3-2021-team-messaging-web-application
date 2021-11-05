@@ -664,6 +664,10 @@ class Datastore:
         self.__store['message_count'] += 1
         self.update_pickle()
 
+    def decrease_message_count(self):
+        self.__store['message_count'] -= 1
+        self.update_pickle()
+
     def set(self, store):
         if not isinstance(store, dict):
             raise TypeError('store must be of type dictionary')
