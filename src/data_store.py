@@ -584,6 +584,10 @@ class Datastore:
 
         self.update_pickle()
     
+    def update_message_count(self, number):
+        self.__store['message_count'] = number
+        self.update_pickle()
+
     def update_user_stats_channels_joined(self, u_id):
         user_stats_channels = self.get_user_stats_from_u_id(u_id)['channels_joined']
         user_stats_channels[0]['num_channels_joined'] += 1

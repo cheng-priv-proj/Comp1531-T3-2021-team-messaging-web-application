@@ -9,6 +9,8 @@ import threading
 from datetime import datetime, time
 from time import sleep
 
+mutex = threading.RLock()
+
 def message_send_v1(auth_user_id, channel_id, message):
     '''
     Send a message from the authorised user to the channel specified by channel_id
@@ -44,8 +46,10 @@ def message_send_v1(auth_user_id, channel_id, message):
         raise InputError('message has invalid length')
 
     # message ids will start from 0
+    mutex.acquire()
     message_id = data_store.get_messages_count()
     data_store.increment_message_count()
+    mutex.release()
 
     message_dict = {
         'message_id': message_id,
@@ -97,8 +101,10 @@ def message_senddm_v1(auth_user_id, dm_id, message):
         raise InputError('message has invalid length')
 
     # message ids will start from 0
+    mutex.acquire()
     message_id = data_store.get_messages_count()
     data_store.increment_message_count()
+    mutex.release()
 
     message_dict = {
         'message_id': message_id,
@@ -360,20 +366,35 @@ class DelayedMessage (threading.Thread):
         self.channel_or_dm_id = channel_or_dm_id
         self.wait = timesent - datetime.utcnow().timestamp() 
         self.message = message
-        self.message_id = {}
+        
+        mutex.acquire()
+        self.message_id = data_store.get_messages_count()
+        data_store.increment_message_count()
+        mutex.release()
 
     def run(self):
-        print('delayed message thread started for channel_id ', self.channel_or_dm_id)
-
+        print('delayed message thread started for channel_id ', self.channel_or_dm_id, self.wait)
+ 
         sleep(self.wait)
-        if self.channel_or_dm_id < 0:
-            self.message_id = message_senddm_v1(self.u_id, self.channel_or_dm_id, self.message)  
-                 
-        else:
-            self.message_id = message_send_v1(self.u_id, self.channel_or_dm_id, self.message)
-        data_store.decrease_message_count()
+        # locking this shit so that we don't encounter concurrency issues
+        mutex.acquire()
+
+        future_message_count = data_store.get_messages_count()
+
+        data_store.update_message_count(self.message_id)
+        # Resets message count so message_send uses the message count we set it to before
         
-        print('delayed message thread exiting for channel_id ', self.channel_or_dm_id)
+        if self.channel_or_dm_id < 0:
+            message_senddm_v1(self.u_id, self.channel_or_dm_id, self.message)  
+    
+        else:
+            message_send_v1(self.u_id, self.channel_or_dm_id, self.message)
+        
+        # resets message count so messages work in the future
+        data_store.update_message_count(future_message_count)
+
+        mutex.release()
+        print('delayed message thread exiting for channel_id ', self.channel_or_dm_id, self.wait)
 
 
 ################################################################################
@@ -420,9 +441,10 @@ def message_sendlater_v1(auth_user_id, channel_id, message, time_sent):
         raise InputError('time_sent is a time in the past')
 
     delayed_message = DelayedMessage(auth_user_id, channel_id, time_sent, message)
+    
     delayed_message.start()
     
-    return {'message_id': data_store.get_messages_count()}
+    return {'message_id': delayed_message.message_id}
 
 def message_sendlaterdm_v1(auth_user_id, dm_id, message, time_sent):
     '''
@@ -452,7 +474,7 @@ def message_sendlaterdm_v1(auth_user_id, dm_id, message, time_sent):
     check_type(message, str)
     check_type(time_sent, float)
 
-    if data_store.is_invalid_channel_id(dm_id):
+    if data_store.is_invalid_dm_id(dm_id):
         raise InputError('dm_id does not refer to a valid dm')
 
     if not data_store.is_user_member_of_dm(dm_id, auth_user_id):
@@ -467,4 +489,4 @@ def message_sendlaterdm_v1(auth_user_id, dm_id, message, time_sent):
     delayed_message = DelayedMessage(auth_user_id, dm_id, time_sent, message)
     delayed_message.start()
 
-    return delayed_message.message_id
+    return {'message_id': delayed_message.message_id}

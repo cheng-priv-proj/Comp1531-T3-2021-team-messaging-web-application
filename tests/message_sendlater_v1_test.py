@@ -46,7 +46,7 @@ def test_standard(register_users, channel_factory):
         'message': 'hi there',
         'time_sent': now + 2
     }).json()
-    print(message_id)
+    
     message_id = message_id.get('message_id')
 
     messages_dict = requests.get(url + 'channel/messages/v2', params = {
@@ -68,15 +68,17 @@ def test_standard(register_users, channel_factory):
         'channel_id': channel_id,
         'start': 0
     }).json()
+
     print(messages_dict)
+
     assert messages_dict == {
         'messages': [
             {
                 'message_id': message_id,
-                'u_id': register_users[0]['token'],
+                'u_id': register_users[0]['auth_user_id'],
                 'message': 'hi there',
                 'time_created': pytest.approx(now + 2, rel=1),
-                'reacts': {},
+                'reacts': [],
                 'is_pinned': False
             }
         ],
@@ -84,7 +86,6 @@ def test_standard(register_users, channel_factory):
         'end': -1
     }
 
-@pytest.mark.skip("This will take > 10 seconds to run")
 def test_multiple(register_users, channel_factory):
     channel_id = channel_factory(register_users[0]['token'])
 
@@ -110,7 +111,7 @@ def test_multiple(register_users, channel_factory):
         'time_sent': now + 5
     }).json().get('message_id')
 
-    messages_dict = requests.get(url + 'channel/messages/v1', params = {
+    messages_dict = requests.get(url + 'channel/messages/v2', params = {
         'token': register_users[0]['token'],
         'channel_id': channel_id,
         'start': 0
@@ -124,36 +125,40 @@ def test_multiple(register_users, channel_factory):
 
     sleep(7)
 
-    messages_dict = requests.get(url + 'dm/messages/v1', json = {
+    messages_dict = requests.get(url + 'channel/messages/v2', params = {
         'token': register_users[0]['token'],
         'channel_id': channel_id,
         'start': 0
     }).json()
 
+    print(message_id_3)
+    print(message_id_1)
+    print(message_id_2)
+    print(messages_dict)
     assert messages_dict == {
         'messages': [
             {
                 'message_id': message_id_3,
-                'u_id': register_users[0]['token'],
+                'u_id': register_users[0]['auth_user_id'],
                 'message': 'hi there',
                 'time_created': pytest.approx(now + 5, rel=1),
-                'reacts': {},
+                'reacts': [],
                 'is_pinned': False
             },
             {
                 'message_id': message_id_1,
-                'u_id': register_users[0]['token'],
+                'u_id': register_users[0]['auth_user_id'],
                 'message': 'hi there',
                 'time_created': pytest.approx(now + 2, rel=1),
-                'reacts': {},
+                'reacts': [],
                 'is_pinned': False
             },
             {
                 'message_id': message_id_2,
-                'u_id': register_users[0]['token'],
+                'u_id': register_users[0]['auth_user_id'],
                 'message': 'hi there',
                 'time_created': pytest.approx(now + 1, rel=1),
-                'reacts': {},
+                'reacts': [],
                 'is_pinned': False
             }
         ],
