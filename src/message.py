@@ -223,7 +223,36 @@ def message_share_v1(auth_user_id, og_message_id, message, channel_id, dm_id):
         Returns { shared_message_id } on success
     '''
 
-    return { 'shared_message_id': 0}
+    check_type(auth_user_id, int)
+    check_type(og_message_id, int)
+    check_type(message, str)
+    check_type(channel_id, int)
+    check_type(dm_id, int)
+
+    if channel_id != -1 and dm_id != -1:
+        raise InputError('neither channel_id nor dm_id are -1')
+    
+    if data_store.is_invalid_channel_id(channel_id) and data_store.is_invalid_dm_id(dm_id):
+        raise InputError('both channel_id and dm_id are invalid')
+
+    id = dm_id if channel_id == -1 else channel_id
+
+    if not data_store.is_user_member_of_channel_or_dm(id, auth_user_id):
+        raise AccessError('the pair of channel_id and dm_id are valid and the authorised user has not joined the channel or DM')
+
+    if len(message) > 1000:
+        raise InputError('message is more than 1000 characters')
+
+    og_channel_or_dm_id = data_store.get_channel_or_dm_id_from_message_id(og_message_id)
+
+    if data_store.is_invalid_message_id(og_message_id) or not data_store.is_user_member_of_channel_or_dm(og_channel_or_dm_id, auth_user_id):
+        raise InputError('og_message_id does not refer to a valid message within a channel/DM that the authorised user has joined')
+
+    og_message = data_store.get_message_from_message_id(og_message_id).get('message')
+    print('hello?')
+    shared_message_id = message_send_v1(auth_user_id, id, og_message + message) if dm_id == -1 else message_senddm_v1(auth_user_id, dm_id, og_message + message)
+    print(shared_message_id)
+    return { 'shared_message_id': shared_message_id.get('message_id')}
 
 def message_react_v1(auth_user_id, message_id, react_id):
     '''
