@@ -69,7 +69,7 @@ def register_channel():
         return channel_id
     return register_channel_function
 
-def test_pin_dm(clear, extract_token, extract_user, extract_message, register_user, register_dm):
+def test_unpin_dm(clear, extract_token, extract_user, extract_message, register_user, register_dm):
     owner_details = register_user('owner@email.com')
     owner_id = extract_user(owner_details)
     owner_token = extract_token(owner_details)
@@ -88,7 +88,12 @@ def test_pin_dm(clear, extract_token, extract_user, extract_message, register_us
         'token': owner_token,
         'message_id': message_id
     })
-    
+
+    requests.post(url + 'message/unpin/v1', json = {
+        'token': owner_token,
+        'message_id': message_id
+    })
+
     messages = requests.get(url + 'dm/messages/v1', params = {
         'token': owner_token,
         'dm_id': dm_id, 
@@ -103,29 +108,34 @@ def test_pin_dm(clear, extract_token, extract_user, extract_message, register_us
                 'message': 'testmessage',
                 'time_created': pytest.approx(pytest.approx(now, rel=2)),
                 'reacts': [],
-                'is_pinned': True
+                'is_pinned': False
             }
         ],
         'start': 0,
         'end': -1
     }
 
-def test_pin_channel(clear, extract_token, extract_user, extract_message, register_user, register_channel):
+def test_unpin_channel(clear, extract_token, extract_user, extract_message, register_user, register_channel):
     owner_details = register_user('owner@email.com')
     owner_id = extract_user(owner_details)
     owner_token = extract_token(owner_details)
 
     now = datetime.utcnow().timestamp()
 
-    channel_id = register_channel(owner_token, 'original_channel', True)
+    channel_id = register_channel(owner_token, 'testchannel', True)
 
-    message_id = extract_message(requests.post(url + 'message/send/v1', json = {
+    message_id = extract_message(requests.post(url + 'message/sendchannel/v1', json = {
         'token': owner_token,
         'channel_id': channel_id,
         'message': 'testmessage' 
     }).json())
 
     requests.post(url + 'message/pin/v1', json = {
+        'token': owner_token,
+        'message_id': message_id
+    })
+
+    requests.post(url + 'message/unpin/v1', json = {
         'token': owner_token,
         'message_id': message_id
     })
@@ -144,7 +154,7 @@ def test_pin_channel(clear, extract_token, extract_user, extract_message, regist
                 'message': 'testmessage',
                 'time_created': pytest.approx(pytest.approx(now, rel=2)),
                 'reacts': [],
-                'is_pinned': True
+                'is_pinned': False
             }
         ],
         'start': 0,
@@ -152,25 +162,6 @@ def test_pin_channel(clear, extract_token, extract_user, extract_message, regist
     }
 
 def test_invalid_message_id(clear, extract_token, extract_message, register_user, register_channel):
-    owner_details = register_user('owner@email.com')
-    owner_token = extract_token(owner_details)
-
-    channel_id = register_channel(owner_token, 'original_channel', True)
-
-    extract_message(requests.post(url + 'message/send/v1', json = {
-        'token': owner_token,
-        'channel_id': channel_id,
-        'message': 'testmessage' 
-    }).json())
-
-    invalid_message_id = -1000
-
-    assert requests.post(url + 'message/pin/v1', json = {
-        'token': owner_token,
-        'message_id': invalid_message_id
-    }).status_code == 400
-
-def test_already_pinned(clear, extract_token, extract_message, register_user, register_channel):
     owner_details = register_user('owner@email.com')
     owner_token = extract_token(owner_details)
 
@@ -187,7 +178,26 @@ def test_already_pinned(clear, extract_token, extract_message, register_user, re
         'message_id': message_id
     })
 
-    assert requests.post(url + 'message/pin/v1', json = {
+    invalid_message_id = -1000
+
+    assert requests.post(url + 'message/unpin/v1', json = {
+        'token': owner_token,
+        'message_id': invalid_message_id
+    }).status_code == 400
+
+def test_not_pinned(clear, extract_token, extract_message, register_user, register_channel):
+    owner_details = register_user('owner@email.com')
+    owner_token = extract_token(owner_details)
+
+    channel_id = register_channel(owner_token, 'original_channel', True)
+
+    message_id = extract_message(requests.post(url + 'message/send/v1', json = {
+        'token': owner_token,
+        'channel_id': channel_id,
+        'message': 'testmessage' 
+    }).json())
+
+    assert requests.post(url + 'message/unpin/v1', json = {
         'token': owner_token,
         'message_id': message_id
     }).status_code == 400
@@ -206,7 +216,14 @@ def test_no_owner_perms(clear, extract_token, extract_message, register_user, re
 
     random_token = register_user('randomuser@email.com')
 
-    assert requests.post(url + 'message/pin/v1', json = {
+    requests.post(url + 'message/pin/v1', json = {
         'token': random_token,
         'message_id': message_id
+    })
+
+    assert requests.post(url + 'message/unpin/v1', json = {
+        'token': owner_token,
+        'message_id': message_id
     }).status_code == 403
+
+
