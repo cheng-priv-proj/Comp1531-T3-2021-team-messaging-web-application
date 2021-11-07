@@ -262,7 +262,7 @@ class Datastore:
     # handle_str
 
     def get_u_id_from_handle_str(self, handle_str):
-        users = self.get_users_from_u_id_dict()
+        users = self.get_users_from_u_id_dict
         return [users[user]['u_id'] for user in users if users[user]['handle_str'] == handle_str][0]
 
     # channel or dm name
@@ -651,6 +651,12 @@ class Datastore:
     def update_handle(self, auth_user_id, handle):
         user = self.get_users_from_u_id_dict().get(auth_user_id)
         user['handle_str'] = handle
+
+        self.update_pickle()
+
+    def update_profile_img_url(self, auth_user_id, img_url):
+        user = self.get_users_from_u_id_dict().get(auth_user_id)
+        user['profile_img_url'] = img_url
 
         self.update_pickle()
 

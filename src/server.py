@@ -745,17 +745,41 @@ def user_profile_sethandle_ep():
 def user_profile_uploadphoto_endpt():
     '''
     put smth here
-    '''
 
-    return user_profile_uploadphoto_v1(0,'',0,0,0,0)
+
+    '''
+    request_data = request.get_json(force = True)
+
+    token = request_data['token']
+    auth_user_id = token_to_auth_id(token)
+    print(auth_user_id)
+    img_url = request_data['img_url']
+    x_start = request_data['x_start']
+    x_end = request_data['x_end']
+    y_start = request_data['y_start']
+    y_end = request_data['y_end']
+    user_profile_uploadphoto_v1(auth_user_id, img_url, x_start, y_start, x_end, y_end )
+
+    return {}
+
 
 @APP.route('/user/stats/v1', methods=['GET'])
 def user_stats_endpt():
     '''
-    put smth here
-    '''
+    Returns the stats for the authorised user
 
-    return user_stats_v1(0)
+    Arguments:
+        token           (str)   - valid token
+    
+    Exceptions:
+        AccessError - occurs when token is invalid
+
+    Return value:
+        Return user_stats
+    '''
+    request_token = request.args.get('token')
+    auth_user_id = token_to_auth_id(request_token)
+    return user_stats_v1(auth_user_id)
 
 @APP.route('/users/stats/v1', methods=['GET'])
 def users_stats_endpt():
