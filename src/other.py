@@ -160,10 +160,13 @@ def check_and_insert_tag_notifications_in_message(message, channel_or_dm_id, aut
     Return value:
         None
     '''
-    tags = [tag for tag in re.findall(r'.*@{1}[a-z0-9]+( )?.*', message) if data_store.is_duplicate_handle(tag)]
+    print('entered')
+    tags = [re.sub(r'\W+', '', tag) for tag in re.findall(r'@{1}[a-z0-9]+[^0-9a-zA-Z| ]?', message)]
+    tags = [tags for tag in tags if data_store.is_duplicate_handle(tag) and data_store.is_user_member_of_channel_or_dm(channel_or_dm_id, data_store.get_u_id_from_handle_str(tag))]
     for tag in tags:
-        message = f'{auth_user_id} tagged you in {data_store.get_name_from_channel_or_dm_id(channel_or_dm_id)}: {message[0:20]}'
-        data_store.insert_notification(data_store.get_u_id_from_handle_str(tag), message, channel_or_dm_id)
+        tagger_handle_str = data_store.get_user_from_u_id(auth_user_id).get('handle_str')
+        message = f'{tagger_handle_str} tagged you in {data_store.get_name_from_channel_or_dm_id(channel_or_dm_id)}: {message[0:20]}'
+        data_store.insert_notification(data_store.get_u_id_from_handle_str(tag[0]), message, channel_or_dm_id)
 
 def insert_invite_channel_or_dm_notifications(channel_or_dm_id, auth_user_id, u_id):
     '''

@@ -54,7 +54,7 @@ def message_send_v1(auth_user_id, channel_id, message):
 
     data_store.insert_message(channel_id, message_dict)
 
-    data_store.update_user_stats_messages_sent(auth_user_id)
+    check_and_insert_tag_notifications_in_message(message, channel_id, auth_user_id)
 
     return { 'message_id': message_id}
 
@@ -107,7 +107,7 @@ def message_senddm_v1(auth_user_id, dm_id, message):
 
     data_store.insert_message(dm_id, message_dict)
 
-    data_store.update_user_stats_messages_sent(auth_user_id)
+    check_and_insert_tag_notifications_in_message(message, dm_id, auth_user_id)
 
     return { 'message_id' : message_id }
 
