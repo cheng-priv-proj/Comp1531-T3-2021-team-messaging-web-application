@@ -1,9 +1,14 @@
 from src.data_store import data_store
+from src.config import url 
 
 from src.error import InputError
 from src.error import AccessError
 from src.other import check_type, check_email_valid
 import re
+from PIL import Image
+import urllib.request
+import sys
+
 
 def user_profile_v1(auth_user_id, u_id):
     '''
@@ -175,6 +180,35 @@ def user_profile_uploadphoto_v1(auth_user_id, img_url, x_start, y_start, x_end, 
     Return value:
         Returns {} on success
     '''
+
+    if x_end <= x_start or y_end <= y_start:
+        raise InputError
+    
+    try:
+        urllib.request.urlretrieve(img_url, 'src/pickle_dump/temp.jpg')
+    except:
+        raise InputError
+
+    imageObject = Image.open('src/pickle_dump/temp.jpg')
+
+    if (imageObject.format != 'JPEG'):
+        raise InputError
+
+    width, height = imageObject.size
+    if x_start < 0 or x_start > width or x_end < 0 or x_end > width:
+        raise InputError
+    if y_start < 0 or y_start > height or y_end < 0 or y_end > height:
+        raise InputError
+
+
+
+    urllib.request.urlretrieve(img_url, 'src/pickle_dump/' + str(auth_user_id) + '.jpg')
+    imageObject = Image.open('src/pickle_dump/' + str(auth_user_id) + '.jpg')
+    cropped = imageObject.crop((x_start, y_start, x_end, y_end))
+    cropped.save('src/pickle_dump/' + str(auth_user_id) + '.jpg')
+
+    data_store.update_profile_img_url(auth_user_id, url + '/src/pickle_dump/' + str(auth_user_id) + '.jpg')
+
 
     return {}
 
