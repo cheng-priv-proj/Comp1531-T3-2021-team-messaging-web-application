@@ -745,9 +745,23 @@ def user_profile_sethandle_ep():
 def user_profile_uploadphoto_endpt():
     '''
     put smth here
-    '''
 
-    return user_profile_uploadphoto_v1(0,'',0,0,0,0)
+
+    '''
+    request_data = request.get_json(force = True)
+
+    token = request_data['token']
+    auth_user_id = token_to_auth_id(token)
+    print(auth_user_id)
+    img_url = request_data['img_url']
+    x_start = request_data['x_start']
+    x_end = request_data['x_end']
+    y_start = request_data['y_start']
+    y_end = request_data['y_end']
+    user_profile_uploadphoto_v1(auth_user_id, img_url, x_start, y_start, x_end, y_end )
+
+    return {}
+
 
 @APP.route('/user/stats/v1', methods=['GET'])
 def user_stats_endpt():
@@ -1054,12 +1068,6 @@ def admin_user_remove_v1_endpt():
 @APP.route('/notifications/get/v1', methods=['GET'])
 def notifications_get_endpt():
     '''
-<<<<<<< HEAD
-    put smth here
-    '''
-
-    return notifications_get_v1(0)
-=======
     Return the user's most recent 20 notifications, ordered from most recent to least recent.
 
     Arguments:
@@ -1075,7 +1083,6 @@ def notifications_get_endpt():
     auth_id = token_to_auth_id(token)
     print(111111)
     return notifications_get_v1(auth_id)
->>>>>>> c24ff9756deaa2f1ad54821f40af80dd331f8110
 
 ################## SEARCH ######################################################
 
@@ -1086,15 +1093,9 @@ def search_endpt():
     '''
 
     return search_v1(0,'')
-<<<<<<< HEAD
 
 ################## STANDUP #####################################################
 
-=======
-
-################## STANDUP #####################################################
-
->>>>>>> c24ff9756deaa2f1ad54821f40af80dd331f8110
 @APP.route('/standup/start/v1', methods=['POST'])
 def standup_start_endpt():
     '''
