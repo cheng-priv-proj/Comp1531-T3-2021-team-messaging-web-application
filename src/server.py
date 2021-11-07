@@ -1054,10 +1054,28 @@ def admin_user_remove_v1_endpt():
 @APP.route('/notifications/get/v1', methods=['GET'])
 def notifications_get_endpt():
     '''
+<<<<<<< HEAD
     put smth here
     '''
 
     return notifications_get_v1(0)
+=======
+    Return the user's most recent 20 notifications, ordered from most recent to least recent.
+
+    Arguments:
+        token           (str) - unique user token
+
+    Exceptions
+        AccessError - Occurs when token is invalid
+
+    Return Value:
+        Returns {'notifications': [notification]}
+    '''
+    token = request.args.get('token')
+    auth_id = token_to_auth_id(token)
+    print(111111)
+    return notifications_get_v1(auth_id)
+>>>>>>> c24ff9756deaa2f1ad54821f40af80dd331f8110
 
 ################## SEARCH ######################################################
 
@@ -1068,9 +1086,15 @@ def search_endpt():
     '''
 
     return search_v1(0,'')
+<<<<<<< HEAD
 
 ################## STANDUP #####################################################
 
+=======
+
+################## STANDUP #####################################################
+
+>>>>>>> c24ff9756deaa2f1ad54821f40af80dd331f8110
 @APP.route('/standup/start/v1', methods=['POST'])
 def standup_start_endpt():
     '''

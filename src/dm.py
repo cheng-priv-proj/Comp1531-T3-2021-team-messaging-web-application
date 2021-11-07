@@ -2,13 +2,7 @@ from src.data_store import data_store
 
 from src.error import InputError
 from src.error import AccessError
-from src.other import check_type
-
-from src.data_store import data_store
-
-from src.error import InputError
-from src.error import AccessError
-from src.other import check_type
+from src.other import check_type, insert_invite_channel_or_dm_notifications
 
 def dm_create_v1(auth_id, u_ids):
     '''
@@ -38,18 +32,25 @@ def dm_create_v1(auth_id, u_ids):
     if any (data_store.is_invalid_user_id(u_id) for u_id in u_ids):
         raise InputError ('an u_id in u_ids does not refer to a valid user')
 
+    
     # Obtaining the handle_strs for all members in channel
+    old_u_ids = u_ids
     u_ids.append(auth_id)
     handle_str_list = sorted([user_info.get(u_id).get('handle_str') for u_id in u_ids])
     user_list = [data_store.get_user_from_u_id(u_id) for u_id in u_ids]
 
     # Creating the channel name and dm_id (ALL DM_ID ARE NEGATIVE AND START AT -1)
-    dm_name = ', '.join(handle_str_list)
     dm_id = (len(data_store.get_dms_from_dm_id_dict()) + 1) * -1
+    dm_name = ', '.join(handle_str_list)
 
     data_store.insert_dm(auth_id, dm_id, user_list, dm_name)
 
+<<<<<<< HEAD
     data_store.update_user_stats_dms_joined(auth_id)
+=======
+    for u_id in old_u_ids:
+        insert_invite_channel_or_dm_notifications(dm_id, auth_id, u_id)
+>>>>>>> c24ff9756deaa2f1ad54821f40af80dd331f8110
 
     return { 'dm_id': dm_id }
 

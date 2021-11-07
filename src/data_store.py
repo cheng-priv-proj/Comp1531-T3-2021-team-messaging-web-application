@@ -262,9 +262,25 @@ class Datastore:
     # handle_str
 
     def get_u_id_from_handle_str(self, handle_str):
+<<<<<<< HEAD
         users = self.get_users_from_u_id_dict()
         return [users[user]['u_id'] for user in users if users[user]['handle_str'] == handle_str][0]
 
+=======
+        users = self.get_users_from_u_id_dict
+        return [users[user]['u_id'] for user in users if users[user]['handle_str'] == handle_str][0]
+
+    # channel or dm name
+
+    def get_name_from_channel_or_dm_id(self, channel_or_dm_id):
+        if channel_or_dm_id < 0:
+            name = self.get_dm_from_dm_id(channel_or_dm_id).get('name')
+        else:
+            name = self.get_channel_from_channel_id(channel_or_dm_id).get('name')
+            
+        return name
+
+>>>>>>> c24ff9756deaa2f1ad54821f40af80dd331f8110
     # Check Methods ############################################################
 
     def is_token_invalid(self, token):
@@ -654,6 +670,13 @@ class Datastore:
         self.__store['message_count'] += 1
         self.update_pickle()
 
+<<<<<<< HEAD
+=======
+    def decrease_message_count(self):
+        self.__store['message_count'] -= 1
+        self.update_pickle()
+
+>>>>>>> c24ff9756deaa2f1ad54821f40af80dd331f8110
     def set(self, store):
         if not isinstance(store, dict):
             raise TypeError('store must be of type dictionary')

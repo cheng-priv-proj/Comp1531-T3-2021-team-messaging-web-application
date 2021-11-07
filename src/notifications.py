@@ -19,4 +19,10 @@ def notifications_get_v1(auth_user_id):
         Returns { notifications } on success
     '''
 
+<<<<<<< HEAD
     return { 'notifications': [] }
+=======
+    check_type(auth_user_id, int)
+
+    return { 'notifications': data_store.get_notifications_from_u_id(auth_user_id)[:20] }
+>>>>>>> c24ff9756deaa2f1ad54821f40af80dd331f8110
