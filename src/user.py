@@ -192,14 +192,9 @@ def user_stats_v1(auth_user_id):
         Returns { user_stats } on success
     '''
 
-    return {
-        'user_stats': {
-            'channels_joined': [{ 'num_channels_joined': 0, 'time_stamp': 0.0 }],
-            'dms_joined': [{'num_dms_joined': 0, 'time_stamp': 0.0}], 
-            'messages_sent': [{'num_messages_sent': 0, 'time_stamp': 0.0}], 
-            'involvement_rate': 0.0,
-        }
-    }
+    check_type(auth_user_id, int)
+
+    return data_store.get_user_stats(auth_user_id)
 
 def users_stats_v1(auth_user_id):
     '''
