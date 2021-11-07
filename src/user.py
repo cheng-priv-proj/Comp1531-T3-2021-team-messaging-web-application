@@ -241,5 +241,7 @@ def users_stats_v1(auth_user_id):
     Return value:
         Returns { workspace_stats } on success
     '''
-    check_type(auth_user_id)
-    return data_store.get_user_stats_from_u_id(auth_user_id)
+    check_type(auth_user_id, int)
+    print('testing2')
+    print(data_store.get_workspace_stats())
+    return {'workspace_stats': data_store.get_workspace_stats()}

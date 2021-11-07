@@ -80,16 +80,16 @@ def test_users_stats_v1_nothing_exists(clear_server, get_valid_token):
         'token': token
     }).json()
 
-    assert response == {
+    assert response['workspace_stats'] == {
         'channels_exist': [{
             'num_channels_exist': 0,
             'time_stamp': pytest.approx(pytest.approx(now, rel=2))
         }],
-        'dms_joined': [{
+        'dms_exist': [{
             'num_dms_exist': 0,
             'time_stamp': pytest.approx(pytest.approx(now, rel=2))
         }],
-        'messages_sent': [{
+        'messages_exist': [{
             'num_messages_exist': 0,
             'time_stamp': pytest.approx(pytest.approx(now, rel=2))
         }],
@@ -110,20 +110,20 @@ def test_users_stats_v1_joined_channels(clear_server, get_valid_token, channel_f
 
     print(response)
 
-    assert response == {
+    assert response['workspace_stats'] == {
         'channels_exist': [{
             'num_channels_exist': 2,
             'time_stamp': pytest.approx(pytest.approx(now, rel=2))
         }],
-        'dms_joined': [{
+        'dms_exist': [{
             'num_dms_exist': 0,
             'time_stamp': pytest.approx(pytest.approx(now, rel=2))
         }],
-        'messages_sent': [{
+        'messages_exist': [{
             'num_messages_exist': 1,
             'time_stamp': pytest.approx(pytest.approx(now, rel=2))
         }],
-        'utilization_rate': 1
+        'utilization_rate': 1.0
     }
 
 
@@ -144,20 +144,20 @@ def test_users_stats_v1_joined_dms(clear_server, get_valid_token, dm_factory, se
 
     print(response)
 
-    assert response == {
+    assert response['workspace_stats'] == {
         'channels_exist': [{
             'num_channels_exist': 0,
             'time_stamp': pytest.approx(pytest.approx(now, rel=2))
         }],
-        'dms_joined': [{
+        'dms_exist': [{
             'num_dms_exist': 2,
             'time_stamp': pytest.approx(pytest.approx(now, rel=2))
         }],
-        'messages_sent': [{
+        'messages_exist': [{
             'num_messages_exist': 2,
             'time_stamp': pytest.approx(pytest.approx(now, rel=2))
         }],
-        'utilization_rate': 1
+        'utilization_rate': 1.0
     }
 
 
@@ -176,25 +176,24 @@ def test_users_stats_v1_joined_channels_and_dms(clear_server, get_valid_token, c
     send_message_dm_factory(token, dm2, 'abcd')
 
     now = datetime.utcnow().timestamp()
-
     response = requests.get(url + 'users/stats/v1', params = {
         'token': token
     }).json()
-    print(response)
-    assert response == {
+    print(response['workspace_stats'])
+    assert response['workspace_stats'] == {
         'channels_exist': [{
             'num_channels_exist': 2,
             'time_stamp': pytest.approx(pytest.approx(now, rel=2))
         }],
-        'dms_joined': [{
+        'dms_exist': [{
             'num_dms_exist': 2,
             'time_stamp': pytest.approx(pytest.approx(now, rel=2))
         }],
-        'messages_sent': [{
+        'messages_exist': [{
             'num_messages_exist': 3,
             'time_stamp': pytest.approx(pytest.approx(now, rel=2))
         }],
-        'utilization_rate': 1
+        'utilization_rate': 1.0
     }
 
 

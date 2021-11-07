@@ -1,4 +1,5 @@
 from re import T
+import re
 import sys
 import signal
 from json import dumps
@@ -784,10 +785,22 @@ def user_stats_endpt():
 @APP.route('/users/stats/v1', methods=['GET'])
 def users_stats_endpt():
     '''
-    put smth here
-    '''
+    Fetches the required statistics about the use of UNSW Streams.
 
-    return users_stats_v1(0)
+    Arguments:
+        token           (str)   - valid token
+
+    Exceptions:
+        AccessError - occurs when token is invalid
+
+    Return value:
+        Returns workplace stats
+    '''
+    print('test')
+    request_token = request.args.get('token')
+    auth_user_id = token_to_auth_id(request_token)
+    print('tests')
+    return users_stats_v1(auth_user_id)
 
 ################## Message #####################################################
 

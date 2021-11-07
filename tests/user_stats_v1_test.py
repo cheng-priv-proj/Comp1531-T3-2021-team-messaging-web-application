@@ -131,8 +131,8 @@ def test_user_stats_v1_joined_dms(clear_server, get_valid_token, dm_factory, sen
     user = get_valid_token
     token = user['token']
     auth_id = user['auth_user_id']
-    dm1 = dm_factory(token, [auth_id])
-    dm2 = dm_factory(token, [auth_id])
+    dm1 = dm_factory(token, [])
+    dm2 = dm_factory(token, [])
     send_message_dm_factory(token, dm1, 'hello')
     send_message_dm_factory(token, dm2, 'abcd')
 
@@ -141,8 +141,6 @@ def test_user_stats_v1_joined_dms(clear_server, get_valid_token, dm_factory, sen
     response = requests.get(url + 'user/stats/v1', params = {
         'token': token
     }).json()
-
-    print(response)
 
     assert response == {
         'channels_joined': [{
@@ -170,8 +168,8 @@ def test_user_stats_v1_joined_channels_and_dms(clear_server, get_valid_token, ch
     channel_factory(token, 'channel2')
     send_message_channel_factory(token, channel1, 'hello')
 
-    dm1 = dm_factory(token, [auth_id])
-    dm2 = dm_factory(token, [auth_id])
+    dm1 = dm_factory(token, [])
+    dm2 = dm_factory(token, [])
     send_message_dm_factory(token, dm1, 'hello')
     send_message_dm_factory(token, dm2, 'abcd')
 
@@ -180,19 +178,19 @@ def test_user_stats_v1_joined_channels_and_dms(clear_server, get_valid_token, ch
     response = requests.get(url + 'user/stats/v1', params = {
         'token': token
     }).json()
-    print(response)
+
     assert response == {
         'channels_joined': [{
             'num_channels_joined': 2,
-            'time_stamp': pytest.approx(pytest.approx(now, rel=2))
+            'time_stamp': pytest.approx(now, rel=2)
         }],
         'dms_joined': [{
             'num_dms_joined': 2,
-            'time_stamp': pytest.approx(pytest.approx(now, rel=2))
+            'time_stamp': pytest.approx(now, rel=2)
         }],
         'messages_sent': [{
             'num_messages_sent': 3,
-            'time_stamp': pytest.approx(pytest.approx(now, rel=2))
+            'time_stamp': pytest.approx(now, rel=2)
         }],
         'involvement_rate': 1
     }

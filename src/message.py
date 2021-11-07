@@ -54,7 +54,8 @@ def message_send_v1(auth_user_id, channel_id, message):
 
     data_store.insert_message(channel_id, message_dict)
 
-    data_store.update_user_stats_messages_sent(auth_user_id)
+    data_store.update_user_stats_messages_sent(auth_user_id, 1)
+    data_store.update_workspace_stats_messages_exist(1)
     check_and_insert_tag_notifications_in_message(message, channel_id, auth_user_id)
 
     return { 'message_id': message_id}
@@ -108,7 +109,8 @@ def message_senddm_v1(auth_user_id, dm_id, message):
 
     data_store.insert_message(dm_id, message_dict)
 
-    data_store.update_user_stats_messages_sent(auth_user_id)
+    data_store.update_user_stats_messages_sent(auth_user_id, 1)
+    data_store.update_workspace_stats_messages_exist(1)
     check_and_insert_tag_notifications_in_message(message, dm_id, auth_user_id)
 
     return { 'message_id' : message_id }
@@ -145,6 +147,7 @@ def message_remove_v1(auth_user_id, message_id):
         raise AccessError ('user does not have proper permissions')
 
     data_store.remove_message(message_id)
+    data_store.update_workspace_stats_dms_exist(-1)
 
     return {}
 
@@ -227,7 +230,8 @@ def message_share_v1(auth_user_id, og_message_id, message, channel_id, dm_id):
         Returns { shared_message_id } on success
     '''
 
-    data_store.update_user_stats_messages_sent(auth_user_id)
+    data_store.update_user_stats_messages_sent(auth_user_id, 1)
+    data_store.update_workspace_stats_messages_exist(1) 
 
     return { 'shared_message_id': 0}
 
