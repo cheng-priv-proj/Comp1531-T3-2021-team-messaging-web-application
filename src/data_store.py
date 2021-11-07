@@ -262,7 +262,7 @@ class Datastore:
     # handle_str
 
     def get_u_id_from_handle_str(self, handle_str):
-        users = self.get_users_from_u_id_dict
+        users = self.get_users_from_u_id_dict()
         return [users[user]['u_id'] for user in users if users[user]['handle_str'] == handle_str][0]
 
     # channel or dm name
@@ -635,6 +635,8 @@ class Datastore:
         self.update_workplace_stats_utilization_rate()
 
     def update_workplace_stats_utilization_rate(self):
+        
+
         self.update_pickle()
         pass
 

@@ -241,12 +241,5 @@ def users_stats_v1(auth_user_id):
     Return value:
         Returns { workspace_stats } on success
     '''
-
-    return {
-        'workspace_stats': {
-            'channels_exist': [{'num_channels_exist': 0, 'time_stamp': 0.0}], 
-            'dms_exist': [{'num_dms_exist': 0, 'time_stamp': 0.0}],
-            'messages_exist': [{'num_messages_exist': 0, 'time_stamp': 0.0}],
-            'utilization_rate': 0.0
-        }
-    }
+    check_type(auth_user_id)
+    return data_store.get_user_stats_from_u_id(auth_user_id)

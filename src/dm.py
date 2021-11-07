@@ -45,12 +45,9 @@ def dm_create_v1(auth_id, u_ids):
 
     data_store.insert_dm(auth_id, dm_id, user_list, dm_name)
 
-<<<<<<< HEAD
     data_store.update_user_stats_dms_joined(auth_id)
-=======
     for u_id in old_u_ids:
         insert_invite_channel_or_dm_notifications(dm_id, auth_id, u_id)
->>>>>>> c24ff9756deaa2f1ad54821f40af80dd331f8110
 
     return { 'dm_id': dm_id }
 

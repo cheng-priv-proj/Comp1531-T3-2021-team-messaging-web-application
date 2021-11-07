@@ -54,11 +54,8 @@ def message_send_v1(auth_user_id, channel_id, message):
 
     data_store.insert_message(channel_id, message_dict)
 
-<<<<<<< HEAD
     data_store.update_user_stats_messages_sent(auth_user_id)
-=======
     check_and_insert_tag_notifications_in_message(message, channel_id, auth_user_id)
->>>>>>> c24ff9756deaa2f1ad54821f40af80dd331f8110
 
     return { 'message_id': message_id}
 
@@ -111,11 +108,8 @@ def message_senddm_v1(auth_user_id, dm_id, message):
 
     data_store.insert_message(dm_id, message_dict)
 
-<<<<<<< HEAD
     data_store.update_user_stats_messages_sent(auth_user_id)
-=======
     check_and_insert_tag_notifications_in_message(message, dm_id, auth_user_id)
->>>>>>> c24ff9756deaa2f1ad54821f40af80dd331f8110
 
     return { 'message_id' : message_id }
 
@@ -328,133 +322,6 @@ def message_unpin_v1(auth_user_id, message_id):
 
     return {}
 
-<<<<<<< HEAD
-def message_share_v1(auth_user_id, og_message_id, message, channel_id, dm_id):
-    '''
-    Given a message_id, shares that message to the given channel or dm with
-    an optional additional message
-    
-    Arguments:
-        auth_user_id    (int)   - authorised user id
-        og_message_id   (int)   - original message id
-        message         (str)   - additional message string
-        channel_id      (int)   - unique channel id
-        dm_id           (int)   - unique dm id
-    
-    Exceptions:
-        TypeError   - occurs when auth_user_id, og_message_id, channel_id, dm_id
-                      are not ints
-        TypeError   - occurs when message is not a str
-        InputError  - occurs when both channel_id and dm_id are invalid
-        InputError  - occurs when neither channel_id nor dm_id are -1
-        InputError  - occurs when og_message_id does not refer to a valid
-                      message within a channel/DM that the authorised user has
-                      joined
-        InputError  - occurs when message is more than 1000 characters
-        AccessError - occurs when the pair of channel_id and dm_id are valid and
-                      the authorised user has not joined the channel or DM
-
-    Return value:
-        Returns { shared_message_id } on success
-    '''
-
-    data_store.update_user_stats_messages_sent(auth_user_id)
-
-    return { 'shared_message_id': 0}
-
-def message_react_v1(auth_user_id, message_id, react_id):
-    '''
-    Given a message_id, shares that message to the given channel or dm with
-    an optional additional message
-    
-    Arguments:
-        auth_user_id    (int)   - authorised user id
-        message_id      (int)   - unique message id
-        react_id        (int)   - unique react id
-    
-    Exceptions:
-        TypeError   - occurs when auth_user_id, message_id, react_id are not ints
-        InputError  - occurs when message_id is not a valid message within a
-                      channel or DM that the authorised user has joined
-        InputError  - occurs when react_id is not a valid react ID
-        InputError  - occurs when the message already contains a react with ID 
-                      react_id from the authorised user
-
-    Return value:
-        Returns {} on success
-    '''
-
-    return {}
-
-def message_unreact_v1(auth_user_id, message_id, react_id):
-    '''
-    Given a message within a channel or DM the authorised user is part of,
-    remove a "react" to that particular message.
-    
-    Arguments:
-        auth_user_id    (int)   - authorised user id
-        message_id      (int)   - unique message id
-        react_id        (int)   - unique react id
-    
-    Exceptions:
-        TypeError   - occurs when auth_user_id, message_id, react_id are not ints
-        InputError  - occurs when message_id is not a valid message within a
-                      channel or DM that the authorised user has joined
-        InputError  - occurs when react_id is not a valid react ID
-        InputError  - occurs when the message does not contain a react with ID
-                      react_id from the authorised user
-    Return value:
-        Returns {} on success
-    '''
-
-    return {}
-
-def message_pin_v1(auth_user_id, message_id):
-    '''
-    Given a message within a channel or DM, mark it as "pinned".
-    
-    Arguments:
-        auth_user_id    (int)   - authorised user id
-        message_id      (int)   - unique message id
-    
-    Exceptions:
-        TypeError   - occurs when auth_user_id, message_id, react_id are not ints
-        InputError  - occurs when message_id is not a valid message within a
-                      channel or DM that the authorised user has joined
-        InputError  - occurs when the message is already pinned
-        AccessError - occurs when message_id refers to a valid message in a
-                      joined channel/DM and the authorised user does not have
-                      owner permissions in the channel/DM
-    Return value:
-        Returns {} on success
-    '''
-
-    return {}
-
-def message_unpin_v1(auth_user_id, message_id):
-    '''
-    Given a message within a channel or DM, remove its mark as pinned.
-    
-    Arguments:
-        auth_user_id    (int)   - authorised user id
-        message_id      (int)   - unique message id
-    
-    Exceptions:
-        TypeError   - occurs when auth_user_id, message_id, react_id are not ints
-        InputError  - occurs when message_id is not a valid message within a
-                      channel or DM that the authorised user has joined
-        InputError  - occurs when the message is not already pinned
-        AccessError - occurs when message_id refers to a valid message in a
-                      joined channel/DM and the authorised user does not have
-                      owner permissions in the channel/DM
-    Return value:
-        Returns {} on success
-    '''
-
-    return {}
-
-=======
->>>>>>> c24ff9756deaa2f1ad54821f40af80dd331f8110
 def message_sendlater_v1(auth_user_id, channel_id, message, time_sent):
     '''
     Send a message from the authorised user to the channel specified by
