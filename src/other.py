@@ -182,7 +182,7 @@ def insert_invite_channel_or_dm_notifications(channel_or_dm_id, auth_user_id, u_
         None
     '''
     user = data_store.get_user_from_u_id(auth_user_id)
-    message = f"{user.get('handle_str')} added you to {data_store.get_name_from_channel_or_dm_id(channel_or_dm_id})"
+    message = f"{user.get('handle_str')} added you to {data_store.get_name_from_channel_or_dm_id(channel_or_dm_id)})"
     data_store.insert_notification(u_id, message, channel_or_dm_id)
 
 def insert_react_message_notification(channel_or_dm_id, auth_user_id, u_id):
