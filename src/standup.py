@@ -24,7 +24,7 @@ def standup_start_v1(auth_user_id, channel_id, length):
     
     Returns { time_finish } on success        
     '''
-    
+     
     return { 'time_finish' : 0.0 }
 
 def standup_active_v1(auth_user_id, channel_id):
