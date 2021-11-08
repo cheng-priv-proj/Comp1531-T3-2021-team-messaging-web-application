@@ -734,6 +734,43 @@ class Datastore:
         self.__store = store
     
 
+
+    # React related stuff pls sort later ########################################
+    # Changes 
+    # - Added react_id to initial
+    # - Added is_invalid_react_id
+    # - Added is_react_already_added_to_message
+
+    def is_invalid_react_id(self, react_id, message_id):
+        message = self.get_message_from_message_id(message_id)
+        for react in message['reacts']:
+            if react['react_id'] == react_id:
+                return False
+        return True
+    
+    def is_user_already_reacted(self, react_id, auth_user_id, message_id):
+        message = self.get_message_from_message_id(message_id)
+        for react in message['reacts']:
+            if react['react_id'] == react_id:
+                if auth_user_id in react['u_ids']:
+                    return True
+        return False
+    
+    def add_react_to_message(self, react_id, auth_user_id, message_id):
+        message = self.get_message_from_message_id(message_id)
+        for react in message['reacts']:
+            if react['react_id'] == react_id:
+                react['u_ids'].append(auth_user_id)
+                react['is_this_user_reacted'] = True
+    
+    def remove_react_from_message(self, react_id, auth_user_id, message_id):
+        message = self.get_message_from_message_id(message_id)
+        for react in message['reacts']:
+            if react['react_id'] == react_id:
+                react['u_ids'].remove(auth_user_id)
+                react['is_this_user_reacted'] = False
+        print(message)
+
 print('Loading Datastore...')
 
 global data_store
