@@ -85,7 +85,7 @@ def test_standup_send_basic_functionality(clear_server, register_user, register_
         'message': 'ownerone: message1',
         'u_id': owner_info['auth_user_id'],
         'time_created': pytest.approx(now, rel=1),
-        'reacts': [],
+        'reacts': [{'react_id': 1, 'u_ids': [], 'is_this_user_reacted': False}],
         'is_pinned': False
     }
 
@@ -114,7 +114,7 @@ def test_standup_send_multiple_messages(clear_server, register_user, register_ch
         'message': 'ownerone: message1\nuserone: message2\nownerone: message3\nuserone: message4',
         'u_id': owner_info['auth_user_id'],
         'time_created': pytest.approx(now, rel=1),
-        'reacts': [],
+        'reacts': [{'react_id': 1, 'u_ids': [], 'is_this_user_reacted': False}],
         'is_pinned': False
     }
 
@@ -135,7 +135,7 @@ def test_standup_send_empty_message(clear_server, register_user, register_channe
         'message': 'ownerone: ',
         'u_id': owner_info['auth_user_id'],
         'time_created': pytest.approx(now, rel=1),
-        'reacts': [],
+        'reacts': [{'react_id': 1, 'u_ids': [], 'is_this_user_reacted': False}],
         'is_pinned': False
     }
     
@@ -155,7 +155,7 @@ def test_standup_send_normal_message_before_standup_over(clear_server, register_
         'message': 'message1',
         'u_id': owner_info['auth_user_id'],
         'time_created': pytest.approx(now, rel=1),
-        'reacts': [],
+        'reacts': [{'react_id': 1, 'u_ids': [], 'is_this_user_reacted': False}],
         'is_pinned': False
     }
 
@@ -167,7 +167,7 @@ def test_standup_send_normal_message_before_standup_over(clear_server, register_
         'message': 'ownerone: ',
         'u_id': owner_info['auth_user_id'],
         'time_created': pytest.approx(now, rel=1),
-        'reacts': [],
+        'reacts': [{'react_id': 1, 'u_ids': [], 'is_this_user_reacted': False}],
         'is_pinned': False
     }
 

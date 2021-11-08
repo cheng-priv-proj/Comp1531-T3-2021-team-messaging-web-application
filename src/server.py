@@ -1015,7 +1015,15 @@ def message_share_endpt():
     put smth here
     '''
 
-    return message_share_v1(0,0,'',0,0)
+    request_data = request.get_json(force = True)
+    message_id = request_data['og_message_id']
+    message = request_data['message']
+    channel_id = request_data['channel_id']
+    dm_id = request_data['dm_id']
+    token = request_data['token']
+    auth_user_id = token_to_auth_id(token)
+
+    return message_share_v1(auth_user_id, message_id, message, channel_id, dm_id)
 
 @APP.route('/message/react/v1', methods=['POST'])
 def message_react_endpt():
@@ -1035,35 +1043,94 @@ def message_unreact_endpt():
 
 @APP.route('/message/pin/v1', methods=['POST'])
 def message_pin_endpt():
-    '''
-    put smth here
-    '''
+    request_data = request.get_json()
+    token = request_data['token']
+    print(token)
+    print(request_data)
+    auth_user_id = token_to_auth_id(token)
+    message_id = request_data.get('message_id')
 
-    return message_pin_v1(0,0)
+    message_pin_v1(auth_user_id, message_id)
+    return {}
 
 @APP.route('/message/unpin/v1', methods=['POST'])
 def message_unpin_endpt():
-    '''
-    put smth here
-    '''
+    request_data = request.get_json()
+    token = request_data['token']
+    auth_user_id = token_to_auth_id(token)
+    message_id = request_data.get('message_id')
 
-    return message_unpin_v1(0,0)
+    message_unpin_v1(auth_user_id, message_id)
+    return {}
+
 
 @APP.route('/message/sendlater/v1', methods=['POST'])
 def message_sendlatere_endpt():
     '''
-    put smth here
-    '''
+    Send a message from the authorised user to the channel specified by
+    channel_id automatically at a specified time in the future.
+    
+    Arguments:
+        token           (int)   - unique access token
+        channel_id      (int)   - unique channel id
+        message         (str)   - message str
+        time_sent       (float) - time as a unix timestamp
+    
+    Exceptions:
+        AccessError - occurs when token is invalid
+        TypeError   - occurs when auth_user_id, channel_id are not ints
+        TypeError   - occurs when message is not a str
+        TypeError   - occurs when time_sent is not a float
+        InputError  - channel_id does not refer to a valid channel
+        InputError  - length of message is over 1000 characters
+        InputError  - time_sent is a time in the past
+        AccessError - channel_id is valid and the authorised user is not a
+                      member of the channel they are trying to post to
 
-    return message_sendlater_v1(0,0,'',0.0)
+    Returns { message_id } on success
+    '''
+    request_data = request.get_json()
+    token = request_data['token']
+    auth_user_id = token_to_auth_id(token)
+    message = request_data['message']
+    channel_id = request_data['channel_id']
+    time_sent = request_data['time_sent']
+
+    return message_sendlater_v1(auth_user_id, channel_id, message, time_sent)
 
 @APP.route('/message/sendlaterdm/v1', methods=['POST'])
 def message_sendlaterdm_endpt():
     '''
-    put smth here
-    '''
+    Send a message from the authorised user to the DM specified by dm_id
+    automatically at a specified time in the future.
+    
+    Arguments:
+        token           (int)   - unique access token
+        dm_id           (int)   - unique dm id
+        message         (str)   - message str
+        time_sent       (float) - time as a unix timestamp
+    
+    Exceptions:
+        AccessError - occurs when token is invalid
+        TypeError   - occurs when auth_user_id, dm_id are not ints
+        TypeError   - occurs when message is not a str
+        TypeError   - occurs when time_sent is not a float
+        InputError  - occurs when dm_id does not refer to a valid DM
+        InputError  - occurs when length of message is over 1000 characters
+        InputError  - occurs when time_sent is a time in the past
+        AccessError - occurs when dm_id is valid and the authorised user is not
+                      a member of the DM they are trying to post to
 
-    return message_sendlaterdm_v1(0,0,'',0.0)
+    Returns { message_id } on success
+    '''
+    request_data = request.get_json()
+    token = request_data['token']
+    auth_user_id = token_to_auth_id(token)
+    message = request_data['message']
+    dm_id = request_data['dm_id']
+    time_sent = request_data['time_sent']
+
+    return message_sendlaterdm_v1(auth_user_id, dm_id, message, time_sent)
 
 
 ############################ ADMIN #############################################

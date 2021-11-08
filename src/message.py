@@ -5,6 +5,12 @@ from src.other import check_type, check_and_insert_tag_notifications_in_message
 
 from datetime import datetime
 
+import threading
+from datetime import datetime, time
+from time import sleep
+
+mutex = threading.RLock()
+
 def message_send_v1(auth_user_id, channel_id, message):
     '''
     Send a message from the authorised user to the channel specified by channel_id
@@ -40,15 +46,17 @@ def message_send_v1(auth_user_id, channel_id, message):
         raise InputError('message has invalid length')
 
     # message ids will start from 0
+    mutex.acquire()
     message_id = data_store.get_messages_count()
     data_store.increment_message_count()
+    mutex.release()
 
     message_dict = {
         'message_id': message_id,
         'u_id': auth_user_id,
         'message': message,
         'time_created': datetime.utcnow().timestamp(),
-        'reacts': [],
+        'reacts': [{'react_id': 1, 'u_ids': [], 'is_this_user_reacted': False}],
         'is_pinned': False
     }
 
@@ -95,15 +103,17 @@ def message_senddm_v1(auth_user_id, dm_id, message):
         raise InputError('message has invalid length')
 
     # message ids will start from 0
+    mutex.acquire()
     message_id = data_store.get_messages_count()
     data_store.increment_message_count()
+    mutex.release()
 
     message_dict = {
         'message_id': message_id,
         'u_id': auth_user_id,
         'message': message,
         'time_created': datetime.utcnow().timestamp(),
-        'reacts': [],
+        'reacts': [{'react_id': 1, 'u_ids': [], 'is_this_user_reacted': False}],
         'is_pinned': False
     }
 
@@ -230,10 +240,36 @@ def message_share_v1(auth_user_id, og_message_id, message, channel_id, dm_id):
         Returns { shared_message_id } on success
     '''
 
-    data_store.update_user_stats_messages_sent(auth_user_id, 1)
-    data_store.update_workspace_stats_messages_exist(1) 
+    check_type(auth_user_id, int)
+    check_type(og_message_id, int)
+    check_type(message, str)
+    check_type(channel_id, int)
+    check_type(dm_id, int)
 
-    return { 'shared_message_id': 0}
+    if channel_id != -1 and dm_id != -1:
+        raise InputError('neither channel_id nor dm_id are -1')
+    
+    if data_store.is_invalid_channel_id(channel_id) and data_store.is_invalid_dm_id(dm_id):
+        raise InputError('both channel_id and dm_id are invalid')
+
+    id = dm_id if channel_id == -1 else channel_id
+
+    if not data_store.is_user_member_of_channel_or_dm(id, auth_user_id):
+        raise AccessError('the pair of channel_id and dm_id are valid and the authorised user has not joined the channel or DM')
+
+    if len(message) > 1000:
+        raise InputError('message is more than 1000 characters')
+
+    og_channel_or_dm_id = data_store.get_channel_or_dm_id_from_message_id(og_message_id)
+
+    if data_store.is_invalid_message_id(og_message_id) or not data_store.is_user_member_of_channel_or_dm(og_channel_or_dm_id, auth_user_id):
+        raise InputError('og_message_id does not refer to a valid message within a channel/DM that the authorised user has joined')
+
+    og_message = data_store.get_message_from_message_id(og_message_id).get('message')
+    print('hello?')
+    shared_message_id = message_send_v1(auth_user_id, id, og_message + message) if dm_id == -1 else message_senddm_v1(auth_user_id, dm_id, og_message + message)
+    print(shared_message_id)
+    return { 'shared_message_id': shared_message_id.get('message_id')}
 
 def message_react_v1(auth_user_id, message_id, react_id):
     '''
@@ -291,7 +327,7 @@ def message_pin_v1(auth_user_id, message_id):
         message_id      (int)   - unique message id
     
     Exceptions:
-        TypeError   - occurs when auth_user_id, message_id, react_id are not ints
+        TypeError   - occurs when auth_user_id, message_id are not ints
         InputError  - occurs when message_id is not a valid message within a
                       channel or DM that the authorised user has joined
         InputError  - occurs when the message is already pinned
@@ -301,6 +337,27 @@ def message_pin_v1(auth_user_id, message_id):
     Return value:
         Returns {} on success
     '''
+
+    check_type(auth_user_id, int)
+    check_type(message_id, int)
+
+
+
+    if data_store.is_invalid_message_id(message_id):
+        raise InputError('Message_id does not refer to a valid message')
+    
+    message = data_store.get_message_from_message_id(message_id)
+    if message['is_pinned']:
+        raise InputError('Message is already pinned')
+
+    channel_or_dm_id = data_store.get_channel_or_dm_id_from_message_id(message_id)
+    if not data_store.is_user_member_of_channel_or_dm(channel_or_dm_id, auth_user_id):
+        raise InputError('User is not a member of the channel with this message')
+        
+    if not data_store.is_user_owner_perms_of_channel_or_dm(channel_or_dm_id, auth_user_id):
+        raise AccessError('User does not have the correct permissions')
+
+    message['is_pinned'] = True 
 
     return {}
 
@@ -313,7 +370,7 @@ def message_unpin_v1(auth_user_id, message_id):
         message_id      (int)   - unique message id
     
     Exceptions:
-        TypeError   - occurs when auth_user_id, message_id, react_id are not ints
+        TypeError   - occurs when auth_user_id, message_id are not ints
         InputError  - occurs when message_id is not a valid message within a
                       channel or DM that the authorised user has joined
         InputError  - occurs when the message is not already pinned
@@ -323,8 +380,70 @@ def message_unpin_v1(auth_user_id, message_id):
     Return value:
         Returns {} on success
     '''
+    check_type(auth_user_id, int)
+    check_type(message_id, int)
+
+    if data_store.is_invalid_message_id(message_id):
+        raise InputError('Message_id does not refer to a valid message')
+    
+    message = data_store.get_message_from_message_id(message_id)
+    if not message['is_pinned']:
+        raise InputError('Message is already unpinned')
+
+    channel_or_dm_id = data_store.get_channel_or_dm_id_from_message_id(message_id)
+    if not data_store.is_user_member_of_channel_or_dm(channel_or_dm_id, auth_user_id):
+        raise InputError('User is not a member of the channel with this message')
+    
+    if not data_store.is_user_owner_perms_of_channel_or_dm(channel_or_dm_id, auth_user_id):
+        raise AccessError('User does not have the correct permissions')
+
+    message['is_pinned'] = False 
 
     return {}
+
+
+################# Standup Thread ###############################################
+
+class DelayedMessage (threading.Thread):
+    def __init__(self, u_id, channel_or_dm_id, timesent, message):
+        threading.Thread.__init__(self)
+        self.u_id = u_id
+        self.channel_or_dm_id = channel_or_dm_id
+        self.wait = timesent - datetime.utcnow().timestamp() 
+        self.message = message
+        
+        mutex.acquire()
+        self.message_id = data_store.get_messages_count()
+        data_store.increment_message_count()
+        mutex.release()
+
+    def run(self):
+        print('delayed message thread started for channel_id ', self.channel_or_dm_id, self.wait)
+ 
+        sleep(self.wait)
+        # locking this shit so that we don't encounter concurrency issues
+        mutex.acquire()
+
+        future_message_count = data_store.get_messages_count()
+
+        data_store.update_message_count(self.message_id)
+        # Resets message count so message_send uses the message count we set it to before
+        
+        if self.channel_or_dm_id < 0:
+            message_senddm_v1(self.u_id, self.channel_or_dm_id, self.message)  
+    
+        else:
+            message_send_v1(self.u_id, self.channel_or_dm_id, self.message)
+        
+        # resets message count so messages work in the future
+        data_store.update_message_count(future_message_count)
+
+        mutex.release()
+        print('delayed message thread exiting for channel_id ', self.channel_or_dm_id, self.wait)
+
+
+################################################################################
+
 
 def message_sendlater_v1(auth_user_id, channel_id, message, time_sent):
     '''
@@ -349,8 +468,28 @@ def message_sendlater_v1(auth_user_id, channel_id, message, time_sent):
 
     Returns { message_id } on success
     '''
+    check_type(auth_user_id, int)
+    check_type(channel_id, int)
+    check_type(message, str)
+    check_type(time_sent, float)
 
-    return { 'message_id': 0}
+    if data_store.is_invalid_channel_id(channel_id):
+        raise InputError('channel_id does not refer to a valid channel')
+
+    if not data_store.is_user_member_of_channel(channel_id, auth_user_id):
+        raise AccessError ('channel_id is valid and the authorised user is not a member of the channel they are trying to post to')
+
+    if len(message) > 1000:
+        raise InputError('length of message is over 1000 characters')
+
+    if time_sent - datetime.utcnow().timestamp() < 0:
+        raise InputError('time_sent is a time in the past')
+
+    delayed_message = DelayedMessage(auth_user_id, channel_id, time_sent, message)
+    
+    delayed_message.start()
+    
+    return {'message_id': delayed_message.message_id}
 
 def message_sendlaterdm_v1(auth_user_id, dm_id, message, time_sent):
     '''
@@ -375,5 +514,24 @@ def message_sendlaterdm_v1(auth_user_id, dm_id, message, time_sent):
 
     Returns { message_id } on success
     '''
+    check_type(auth_user_id, int)
+    check_type(dm_id, int)
+    check_type(message, str)
+    check_type(time_sent, float)
 
-    return { 'message_id': 0}
+    if data_store.is_invalid_dm_id(dm_id):
+        raise InputError('dm_id does not refer to a valid dm')
+
+    if not data_store.is_user_member_of_dm(dm_id, auth_user_id):
+        raise AccessError ('dm_id is valid and the authorised user is not a member of the dm they are trying to post to')
+
+    if len(message) > 1000:
+        raise InputError('length of message is over 1000 characters')
+
+    if time_sent - datetime.utcnow().timestamp() < 0:
+        raise InputError('time_sent is a time in the past')
+
+    delayed_message = DelayedMessage(auth_user_id, dm_id, time_sent, message)
+    delayed_message.start()
+
+    return {'message_id': delayed_message.message_id}

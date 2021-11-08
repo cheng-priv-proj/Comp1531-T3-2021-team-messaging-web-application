@@ -100,17 +100,19 @@ def test_standard(register):
             'message': 'Removed user',
             'time_created': pytest.approx(channel_now, rel = 5),
             'message_id': channel_message.get('message_id'),
-            'reacts': [],
+            'reacts': [{'react_id': 1, 'u_ids': [], 'is_this_user_reacted': False}],
             'is_pinned': False
         }]
     }
 
     # check if dm message has been overwritten
-    assert requests.get(url + 'dm/messages/v1', params = {
+    data =requests.get(url + 'dm/messages/v1', params = {
         'token': register[0].get('token'),
         'dm_id': dm_id_dict.get('dm_id'),
         'start': 0
-    }).json() == {
+    }).json()
+    print(data)
+    assert data == {
         'start': 0,
         'end': -1,
         'messages': [{
@@ -118,7 +120,7 @@ def test_standard(register):
             'message': 'Removed user',
             'time_created': pytest.approx(dm_now, rel = 5),
             'message_id': dm_message.get('message_id'),
-            'reacts': [],
+            'reacts': [{'react_id': 1, 'u_ids': [], 'is_this_user_reacted': False}],
             'is_pinned': False
         }]
     }
