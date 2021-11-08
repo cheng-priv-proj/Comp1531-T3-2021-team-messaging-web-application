@@ -100,7 +100,6 @@ def test_standard(register):
             'message': 'Removed user',
             'time_created': pytest.approx(channel_now, rel = 5),
             'message_id': channel_message.get('message_id'),
-<<<<<<< HEAD
             'reacts': [
                 {  
                     'react_id' : 1,
@@ -108,9 +107,6 @@ def test_standard(register):
                     'is_this_user_reacted' : False
                 }
             ],
-=======
-            'reacts': [{'react_id': 1, 'u_ids': [], 'is_this_user_reacted': False}],
->>>>>>> b3ccab81e3179ca57ca8c7e541d016eaf26e37c0
             'is_pinned': False
         }]
     }
@@ -130,7 +126,6 @@ def test_standard(register):
             'message': 'Removed user',
             'time_created': pytest.approx(dm_now, rel = 5),
             'message_id': dm_message.get('message_id'),
-<<<<<<< HEAD
             'reacts': [
                 {  
                     'react_id' : 1,
@@ -138,9 +133,6 @@ def test_standard(register):
                     'is_this_user_reacted' : False
                 }
             ],
-=======
-            'reacts': [{'react_id': 1, 'u_ids': [], 'is_this_user_reacted': False}],
->>>>>>> b3ccab81e3179ca57ca8c7e541d016eaf26e37c0
             'is_pinned': False
         }]
     }
