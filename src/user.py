@@ -186,8 +186,8 @@ def user_profile_uploadphoto_v1(auth_user_id, img_url, x_start, y_start, x_end, 
     
     try:
         urllib.request.urlretrieve(img_url, 'src/pickle_dump/temp.jpg')
-    except:
-        raise InputError
+    except Exception as user_profile_uploadphoto:
+        raise InputError from user_profile_uploadphoto
 
     imageObject = Image.open('src/pickle_dump/temp.jpg')
 
