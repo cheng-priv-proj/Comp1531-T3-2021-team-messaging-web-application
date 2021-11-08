@@ -2,7 +2,7 @@ from re import T
 import sys
 import signal
 from json import dumps
-from flask import Flask, request
+from flask import Flask, request, send_file
 from flask_cors import CORS
 from src import config
 
@@ -1119,6 +1119,17 @@ def standup_send_endpt():
     '''
 
     return standup_send_v1(0,0,'')
+
+####### Extra ############
+@APP.route('/user/profile/getprofilepic', methods=['GET'])
+def get_profile_pic():
+    '''
+    Return the user's profile picture.
+    '''
+    token = request.args.get('token')
+    auth_user_id = token_to_auth_id(token)
+    
+    return send_file('src/pickle_dump/' + str(auth_user_id) + '.jpg', mimetype = 'image/jpg')
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, quit_gracefully) # For coverage

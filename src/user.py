@@ -182,17 +182,17 @@ def user_profile_uploadphoto_v1(auth_user_id, img_url, x_start, y_start, x_end, 
     '''
 
     if x_end <= x_start or y_end <= y_start:
-        raise InputError
+        raise InputError('Wrong dimensions')
     
     try:
         urllib.request.urlretrieve(img_url, 'src/pickle_dump/temp.jpg')
     except:
-        raise InputError
+        raise InputError('Cant find image')
 
     imageObject = Image.open('src/pickle_dump/temp.jpg')
 
     if (imageObject.format != 'JPEG'):
-        raise InputError
+        raise InputError('Image is not a JPG')
 
     width, height = imageObject.size
     if x_start < 0 or x_start > width or x_end < 0 or x_end > width:
