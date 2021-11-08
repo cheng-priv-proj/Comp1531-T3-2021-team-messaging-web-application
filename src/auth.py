@@ -157,12 +157,14 @@ def auth_passwordreset_request_v1(email):
     if data_store.is_invalid_email(email):
         return
 
+    reset_code = email
+
     email_msg = EmailMessage()
     email_msg.set_content(email)
 
     email_msg['Subject'] = 'Did you recieve it? My message?'
     email_msg['From'] = EMAIL
-    email_msg['To'] = email
+    email_msg['To'] = reset_code
 
     # Send message via a SMTP server.
     s = smtplib.SMTP("smtp.gmail.com", 587)
@@ -175,13 +177,17 @@ def auth_passwordreset_request_v1(email):
     s.close()
 
     auth_user_id = data_store.get_login_from_email(email).get('auth_id')
+
+    # store reset code
+    data_store.insert_reset_code(reset_code, auth_user_id)
+
     all_tokens = data_store.get_u_ids_from_token_dict()
 
     tokens = [token for token in all_tokens if all_tokens[token] == auth_user_id]
 
     for token in tokens:
         auth_logout_v1(token)
-        
+
     return {}
 
 def auth_passwordreset_reset_v1(reset_code, new_password):

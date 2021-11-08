@@ -85,6 +85,10 @@ from datetime import datetime
     
 # message_count: num_messages
 #
+# reset_code:
+#   key: code
+#   value: u_id
+#
 ################################################################################
 
 initial_object = {
@@ -105,7 +109,8 @@ initial_object = {
                         'messages_exist': [{'num_messages_exist': 0, 'time_stamp': 0}], 
                         'utilization_rate': 0 
                         },
-    'message_count': 0
+    'message_count': 0,
+    'reset_codes': {}
 }
 
 class Datastore:
@@ -139,7 +144,8 @@ class Datastore:
                                     'messages_exist': [{'num_messages_exist': 0, 'time_stamp': 0}], 
                                     'utilization_rate': 0 
                                     },
-                'message_count': 0
+                'message_count': 0,
+                'reset_codes': {}
             }, 
             FILE
             )
@@ -264,6 +270,14 @@ class Datastore:
     def get_u_id_from_handle_str(self, handle_str):
         users = self.get_users_from_u_id_dict()
         return [users[user]['u_id'] for user in users if users[user]['handle_str'] == handle_str][0]
+
+    # reset codes
+
+    def get_u_id_from_reset_code_dict(self):
+        return self.__store['reset_codes']
+
+    def get_u_id_from_reset_code(self, reset_code):
+        return self.get_u_id_from_reset_code_dict().get(reset_code)
 
     # channel or dm name
 
@@ -401,6 +415,11 @@ class Datastore:
         
         return False
 
+    def is_reset_code_invalid(self, reset_code):
+        if reset_code in self.get_u_id_from_reset_code_dict():
+            return False
+        return True
+
     # Insertion functions ######################################################
 
     def insert_login(self, email, password, auth_id):
@@ -490,6 +509,9 @@ class Datastore:
                                 })
         self.update_pickle()
 
+    def insert_reset_code(self, reset_code, u_id):
+        self.get_u_id_from_reset_code_dict()[reset_code] = u_id
+
     # Remove ##############################################
 
     def invalidate_token(self, token):
@@ -574,6 +596,9 @@ class Datastore:
         user['handle_str'] = ''
 
         self.update_pickle()
+
+    def remove_reset_code(self, reset_code):
+        del self.get_u_id_from_reset_code_dict[reset_code]
 
     # Update ##################################################################
     
