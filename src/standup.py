@@ -30,7 +30,8 @@ def send_message_buffer(u_id, channel_id, length):
     
     standup = data_store.get_standup_from_channel_id(channel_id)
 
-    message_send_v1(u_id, channel_id, standup.get('messages'))
+    if len(standup.get('messages')) != 0:
+        message_send_v1(u_id, channel_id, standup.get('messages'))
 
     data_store.remove_standup(channel_id)
 
@@ -101,10 +102,21 @@ def standup_active_v1(auth_user_id, channel_id):
     
     Returns { is_active, time_finish } on success        
     '''
+    check_type(auth_user_id, int)
+    check_type(channel_id, int) 
+    
+    if data_store.is_invalid_channel_id(channel_id):
+        raise InputError('channel_id does not refer to a valid channel')
+    
+    if not data_store.is_user_member_of_channel(channel_id, auth_user_id):
+        raise AccessError('channel_id is valid and the authorised user is not a member of the channel')
+    
+    is_active = data_store.is_standup_active(channel_id)
+    time_finish = None if not is_active else data_store.get_standup_from_channel_id(channel_id).get('time_finish')
     
     return {
-        'is_active': False,
-        'time_finish': 0.0
+        'is_active': is_active,
+        'time_finish': time_finish
     }
 
 def standup_send_v1(auth_user_id, channel_id, message):

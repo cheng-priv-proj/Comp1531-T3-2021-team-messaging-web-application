@@ -38,18 +38,22 @@ def register_channel():
 @pytest.fixture
 def create_standup():
     def create_standup_function(token, channel_id, length):
-        return requests.post(url + 'standup/start/v1', json = {'token': token, 'channel_id': channel_id, 'length': length})
+        data = requests.post(url + 'standup/start/v1', json = {'token': token, 'channel_id': channel_id, 'length': length})
+        print(data.json(), 'standup create')
+        return data
     return create_standup_function
 
 @pytest.fixture
 def standup_active():
     def standup_active_function(token, channel_id):
-        response = requests.get(url + 'standup/active/v1', json = {'token': token, 'channel_id': channel_id})
+        print(token, channel_id)
+        response = requests.get(url + 'standup/active/v1', params = {'token': token, 'channel_id': channel_id})
+        print(response)
         return response
     return standup_active_function
 
 
-def test_standup_active_v1_invalid_channel(clear_server, get_valid_token):
+def test_standup_active_v1_invalid_channel(clear_server, standup_active, get_valid_token):
     token = get_valid_token['token']
 
     active = standup_active(token, 1)
@@ -83,10 +87,9 @@ def test_standup_active_v1_active(clear_server, get_valid_token, register_channe
     token = get_valid_token['token']
     channel = register_channel(token, 'channel1', True)
     create_standup(token, channel, 5)
-
+    time_finish = datetime.utcnow().timestamp() + 5
     active = standup_active(token, channel).json()
-
     assert active == {
         'is_active': True,
-        'time_finish': 5
+        'time_finish': pytest.approx(time_finish, rel=2),
     }

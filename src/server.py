@@ -1090,8 +1090,10 @@ def standup_active_endpt():
     '''
     put smth here
     '''
-
-    return standup_active_v1(0,0)
+    token = request.args.get('token')
+    auth_user_id = token_to_auth_id(token)
+    channel_id = int(request.args.get('channel_id'))
+    return standup_active_v1(auth_user_id, channel_id)
 
 @APP.route('/standup/send/v1', methods=['POST'])
 def standup_send_endpt():
@@ -1103,7 +1105,6 @@ def standup_send_endpt():
     auth_id = token_to_auth_id(request_data.get('token'))
     channel_id = request_data.get('channel_id')
     message = request_data.get('message')
-
     return standup_send_v1(auth_id, channel_id, message)
 
 if __name__ == "__main__":
