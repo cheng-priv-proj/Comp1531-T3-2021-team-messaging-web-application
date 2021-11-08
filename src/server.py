@@ -1,4 +1,5 @@
 from re import T
+import re
 import sys
 import signal
 from json import dumps
@@ -6,7 +7,7 @@ from flask import Flask, request
 from flask_cors import CORS
 from src import config
 
-from src.user import user_profile_v1, users_all_v1, user_setname_v1, user_setemail_v1, user_sethandle_v1, user_profile_uploadphoto_v1, user_stats_v1, users_stats_v1
+from src.user import user_profile_v1, users_all_v1, user_setname_v1, user_setemail_v1, user_sethandle_v1, user_profile_uploadphoto_v1, user_stats_v1, users_stats_v1, user_profile_getimg_v1
 from src.channels import channels_listall_v1, channels_list_v1, channels_create_v1
 from src.auth import auth_login_v1, auth_register_v1, auth_logout_v1, auth_passwordreset_request_v1, auth_passwordreset_reset_v1
 from src.dm import dm_create_v1, dm_details_v1, dm_leave_v1, dm_list_v1, dm_remove_v1, dm_details_v1, dm_create_v1, dm_messages_v1
@@ -762,6 +763,27 @@ def user_profile_uploadphoto_endpt():
 
     return {}
 
+@APP.route('/imgurl/', methods=['GET'])
+def user_profileimgurl_endpt():
+    '''
+    Gets the profile image of a user
+    
+    Arguments:
+        token       (string)    - unique user token
+
+    Exceptions:
+        AccessError - Occurs when token is invalid
+
+    Return value:
+        Returns the profile image of the user
+    '''
+    request_data = request.get_json(force = True)
+    token = request_data['token']
+    auth_user_id = token_to_auth_id(token)
+
+    img = user_profile_getimg_v1(auth_user_id)
+
+    return img
 
 @APP.route('/user/stats/v1', methods=['GET'])
 def user_stats_endpt():
@@ -784,10 +806,22 @@ def user_stats_endpt():
 @APP.route('/users/stats/v1', methods=['GET'])
 def users_stats_endpt():
     '''
-    put smth here
-    '''
+    Fetches the required statistics about the use of UNSW Streams.
 
-    return users_stats_v1(0)
+    Arguments:
+        token           (str)   - valid token
+
+    Exceptions:
+        AccessError - occurs when token is invalid
+
+    Return value:
+        Returns workspace stats
+    '''
+    print('test')
+    request_token = request.args.get('token')
+    auth_user_id = token_to_auth_id(request_token)
+    print('tests')
+    return users_stats_v1(auth_user_id)
 
 ################## Message #####################################################
 

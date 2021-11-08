@@ -212,6 +212,27 @@ def user_profile_uploadphoto_v1(auth_user_id, img_url, x_start, y_start, x_end, 
 
     return {}
 
+def user_profile_getimg_v1(url):
+    '''
+    Returns the image of a user
+    
+    Arguments:
+        url     (str)   - url of the image
+        
+    Exceptions:
+        InputError  - occurs when image does not exist
+        
+    Return value:
+        Returns the profile image of a user
+    '''
+    check_type(url, str)
+
+    imageObject = Image.open('src/pickle_dump/' + url + '')
+    if imageObject == None:
+        raise InputError
+    else:
+        return 
+
 def user_stats_v1(auth_user_id):
     '''
     Fetches the required statistics about this user's use of UNSW Streams.
