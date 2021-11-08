@@ -1145,24 +1145,35 @@ def standup_start_endpt():
     '''
     put smth here
     '''
+    request_data = request.get_json()
 
-    return standup_start_v1(0,0,0)
+    auth_id = token_to_auth_id(request_data.get('token'))
+    channel_id = request_data.get('channel_id')
+    length = request_data.get('length')
+
+    return standup_start_v1(auth_id, channel_id, length)
 
 @APP.route('/standup/active/v1', methods=['GET'])
 def standup_active_endpt():
     '''
     put smth here
     '''
-
-    return standup_active_v1(0,0)
+    token = request.args.get('token')
+    auth_user_id = token_to_auth_id(token)
+    channel_id = int(request.args.get('channel_id'))
+    return standup_active_v1(auth_user_id, channel_id)
 
 @APP.route('/standup/send/v1', methods=['POST'])
 def standup_send_endpt():
     '''
     put smth here
     '''
+    request_data = request.get_json()
 
-    return standup_send_v1(0,0,'')
+    auth_id = token_to_auth_id(request_data.get('token'))
+    channel_id = request_data.get('channel_id')
+    message = request_data.get('message')
+    return standup_send_v1(auth_id, channel_id, message)
 
 ####### Extra ############
 @APP.route('/user/profile/getprofilepic', methods=['GET'])

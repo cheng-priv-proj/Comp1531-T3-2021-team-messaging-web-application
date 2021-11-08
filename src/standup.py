@@ -3,6 +3,39 @@ from src.data_store import data_store
 from src.error import InputError
 from src.error import AccessError
 from src.other import check_type
+from src.message import message_send_v1
+
+import threading
+from datetime import datetime, time
+from time import sleep
+
+################# Standup Thread ###############################################
+
+class Standup (threading.Thread):
+    def __init__(self, u_id, channel_id, length):
+        threading.Thread.__init__(self)
+        self.u_id = u_id
+        self.channel_id = channel_id
+        self.length = length
+
+    def run(self):
+        print('standup thread started for channel_id ', self.channel_id)
+
+        send_message_buffer(self.u_id, self.channel_id, self.length)
+
+        print('standup thread exiting for channel_id ', self.channel_id)
+    
+def send_message_buffer(u_id, channel_id, length):
+    sleep(length)
+    
+    standup = data_store.get_standup_from_channel_id(channel_id)
+
+    if len(standup.get('messages')) != 0:
+        message_send_v1(u_id, channel_id, standup.get('messages'))
+
+    data_store.remove_standup(channel_id)
+
+################################################################################
 
 def standup_start_v1(auth_user_id, channel_id, length):
     '''
@@ -24,8 +57,32 @@ def standup_start_v1(auth_user_id, channel_id, length):
     
     Returns { time_finish } on success        
     '''
-     
-    return { 'time_finish' : 0.0 }
+    
+    check_type(auth_user_id, int)
+    check_type(channel_id, int)
+    check_type(length, int)
+
+    if data_store.is_invalid_channel_id(channel_id):
+        raise InputError('channel_id does not refer to a valid channel')
+
+    if not data_store.is_user_member_of_channel(channel_id, auth_user_id):
+        raise AccessError('channel_id is valid and the authorised user is not a member of the channel')
+
+    if length < 0:
+        raise InputError('length is a negative integer')
+
+    if data_store.is_standup_active(channel_id):
+        raise InputError('active standup is currently running in the channel')
+    
+
+    time_finish = datetime.utcnow().timestamp() + length
+
+    data_store.insert_standup(channel_id, time_finish)
+
+    new_standup = Standup(auth_user_id, channel_id, length)
+    new_standup.start()
+
+    return { 'time_finish' : time_finish }
 
 def standup_active_v1(auth_user_id, channel_id):
     '''
@@ -45,10 +102,21 @@ def standup_active_v1(auth_user_id, channel_id):
     
     Returns { is_active, time_finish } on success        
     '''
+    check_type(auth_user_id, int)
+    check_type(channel_id, int) 
+    
+    if data_store.is_invalid_channel_id(channel_id):
+        raise InputError('channel_id does not refer to a valid channel')
+    
+    if not data_store.is_user_member_of_channel(channel_id, auth_user_id):
+        raise AccessError('channel_id is valid and the authorised user is not a member of the channel')
+    
+    is_active = data_store.is_standup_active(channel_id)
+    time_finish = None if not is_active else data_store.get_standup_from_channel_id(channel_id).get('time_finish')
     
     return {
-        'is_active': False,
-        'time_finish': 0.0
+        'is_active': is_active,
+        'time_finish': time_finish
     }
 
 def standup_send_v1(auth_user_id, channel_id, message):
@@ -73,5 +141,30 @@ def standup_send_v1(auth_user_id, channel_id, message):
     
     Returns {} on success        
     '''
+
+    check_type(auth_user_id, int)
+    check_type(channel_id, int)
+    check_type(message, str)
+
+    if data_store.is_invalid_channel_id(channel_id):
+        raise InputError('channel_id does not refer to a valid channel')
+
+    if not data_store.is_user_member_of_channel(channel_id, auth_user_id):
+        raise AccessError('channel_id is valid and the authorised user is not a member of the channel')
+
+    if len(message) > 1000:
+        raise InputError('length of message is over 1000 characters')
+
+    if not data_store.is_standup_active(channel_id):
+        raise InputError('an active standup is not currently running in the channel')
+    
+
+    standup = data_store.get_standup_from_channel_id(channel_id)
+    handle = data_store.get_user_from_u_id(auth_user_id).get('handle_str')
+
+    if standup['messages'] != '':
+        standup['messages'] += '\n'
+
+    standup['messages'] += f'{handle}: {message}'
 
     return {}
