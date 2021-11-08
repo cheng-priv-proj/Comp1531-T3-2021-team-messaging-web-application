@@ -227,7 +227,7 @@ def user_profile_getimg_v1(url):
     '''
     check_type(url, str)
 
-    imageObject = Image.open('src/pickle_dump/' + url + '.jpg')
+    imageObject = Image.open('src/pickle_dump/' + url + '')
     if imageObject == None:
         raise InputError
     else:
