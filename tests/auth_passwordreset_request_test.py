@@ -63,7 +63,7 @@ def test_secret_code_sent(clear, new_email, register_user):
 
     requests.post(url + 'auth/passwordreset/request/v1', json = {
         'email': new_email.email_address
-    }
+    })
 
     with mailslurp_client.ApiClient(configuration) as api_client:
         waitfor_controller = mailslurp_client.WaitForControllerApi(api_client)
@@ -75,7 +75,7 @@ def test_logged_out(clear, new_email, register_channel, register_user):
 
     requests.post(url + 'auth/passwordreset/request/v1', json = {
         'email': new_email.email_address
-    }
+    })
     
     assert requests.post(url + 'channels/create/v2', json = {
         'token': token,
