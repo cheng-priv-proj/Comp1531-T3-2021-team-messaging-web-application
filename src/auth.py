@@ -4,9 +4,11 @@ from src.other import check_type, check_email_valid
 from src.other import handle_str_generation
 from src.other import stream_owner, stream_member
 from src.other import hash_str
-from src.config import SECRET
+from src.config import SECRET, EMAIL, PASSWORD
 import re
 import jwt
+import smtplib
+from email.message import EmailMessage
 
 def auth_login_v1(email, password):
     '''
@@ -137,6 +139,11 @@ def auth_passwordreset_request_v1(email):
     invalid email, as that would pose a security/privacy concern. When a user
     requests a password reset, they should be logged out of all current sessions.
     
+    note that an email has been created for this function:
+
+    email       : 1531isbriansfavsubject@gmail.com
+    password    : 1531brain
+
     Arguments:
         email           (str) - email str
 
@@ -145,9 +152,46 @@ def auth_passwordreset_request_v1(email):
 
     Returns {} on success
     '''
+    check_type(email, str)
+
+    if data_store.is_invalid_email(email):
+        return
+
+    reset_code = email
+
+    email_msg = EmailMessage()
+    email_msg.set_content(email)
+
+    email_msg['Subject'] = 'Did you recieve it? My message?'
+    email_msg['From'] = EMAIL
+    email_msg['To'] = reset_code
+
+    # Send message via a SMTP server.
+    s = smtplib.SMTP("smtp.gmail.com", 587)
+
+    s.ehlo()
+    s.starttls()
+    s.login(EMAIL, PASSWORD)
+
+    s.send_message(email_msg)
+    s.close()
+
+    auth_user_id = data_store.get_login_from_email(email).get('auth_id')
+
+    # store reset code
+    data_store.insert_reset_code(reset_code, auth_user_id)
+
+    all_tokens = data_store.get_u_ids_from_token_dict()
+
+    tokens = [token for token in all_tokens if all_tokens[token] == auth_user_id]
+
+    for token in tokens:
+        auth_logout_v1(token)
 
     return {}
 
+# Using this implementation, what happens if the user accidentally guesses another user's reset code?
+# Big security issue, and large bug
 def auth_passwordreset_reset_v1(reset_code, new_password):
     '''
     Given a reset code for a user, set that user's new password to the
@@ -164,5 +208,22 @@ def auth_passwordreset_reset_v1(reset_code, new_password):
 
     Return {} on success
     '''
+
+    if type(new_password) != str:
+        raise TypeError
+
+    print(new_password)
+    if len(new_password) < 6:
+        raise InputError
+
+    if data_store.is_reset_code_invalid(reset_code) == True:
+        raise InputError
+    
+
+    u_id = data_store.get_u_id_from_reset_code(reset_code)
+
+    data_store.update_password(u_id, new_password)
+
+    data_store.remove_reset_code(reset_code)
 
     return {}
