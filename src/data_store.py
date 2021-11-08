@@ -105,7 +105,7 @@ initial_object = {
                         'messages_exist': [{'num_messages_exist': 0, 'time_stamp': 0}], 
                         'utilization_rate': 0 
                         },
-    'message_count': 0
+    'message_count': 0,
 }
 
 class Datastore:
@@ -669,6 +669,30 @@ class Datastore:
             raise TypeError('store must be of type dictionary')
         self.__store = store
     
+
+
+    # React related stuff pls sort later ########################################
+    # Changes 
+    # - Added react_id to initial
+    # - Added is_invalid_react_id
+    # - Added is_react_already_added_to_message
+
+    def is_invalid_react_id(self, react_id):
+        return True if react_id not in self.__store['react_id'] else False
+    
+    def is_user_reacted_already_added_to_message(self, react_id, auth_user_id, message_id):
+        message = self.get_message_from_message_id(message_id)
+        return True if auth_user_id in message['reacts'] else False
+    
+    def add_react_to_message(self, react_id, auth_user_id, message_id):
+        message = self.get_message_from_message_id(message_id)
+        react_details = {
+            'react_id' : react_id,
+            'u_ids' : [],
+            'is_this_user_reacted' : True
+        }
+        message['reacts'].append(react_id)
+        self.update_pickle()
 
 print('Loading Datastore...')
 

@@ -243,6 +243,26 @@ def message_react_v1(auth_user_id, message_id, react_id):
         Returns {} on success
     '''
 
+    check_type(auth_user_id, int)
+    check_type(message_id, int)
+    check_type(react_id, int)
+
+    # Finds the channel or DM id from the message_id
+    # Move this to database after merging cus I cbb changing datastore rn.
+    data = data_store.get_messages_from_channel_or_dm_id_dict()
+    channel_dm_id = next(id for id in data for message in data[id] if message.get('message_id') == message_id)
+
+    if data_store.is_user_member_of_channel_or_dm(channel_dm_id, auth_user_id):
+        raise InputError('Message_id does not refer to a valid message within a channel/DM')
+    
+    if data_store.is_invalid_react_id(react_id):
+        raise InputError('Invalid react id')
+    
+    if data_store.is_react_already_added_to_message(message_id, auth_user_id, react_id):
+        raise InputError('Message already reacted')
+    
+    data_store.add_react_to_message(message_id, auth_user_id, react_id)
+
     return {}
 
 def message_unreact_v1(auth_user_id, message_id, react_id):

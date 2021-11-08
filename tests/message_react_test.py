@@ -118,7 +118,7 @@ def test_react_own(clear, register, extract_token, extract_user, extract_channel
         'start': 0 }).json()
 
     messages = messages['messages']
-    reacts = messages['reacts']
+    reacts = messages[0]['reacts']
 
     assert reacts == [{
         'react_id' : 1,

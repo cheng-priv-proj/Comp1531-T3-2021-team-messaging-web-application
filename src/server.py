@@ -931,18 +931,57 @@ def message_share_endpt():
 @APP.route('/message/react/v1', methods=['POST'])
 def message_react_endpt():
     '''
-    put smth here
-    '''
+    Given a message within a channel or DM the authorised user is part of, 
+    add a "react" to that particular message.
 
-    return message_react_v1(0,0,0)
+    Arguments:
+        token           (str)   - unique user token
+        message_id      (int)   - unique message id
+        react_id        (int)   - unique react id
+    
+    Exceptions:
+        AccessError - occurs when token is invalid
+        InputError  - occurs when react_id is invalid
+        InputError  - message already contains react with that react_id
+
+    Return Value:
+        Returns {} on success
+    '''
+    request_data = request.get_json(force = True)
+    message_id = request_data['message_id']
+    react_id = request_data['react_id']
+    token = request_data['token']
+    auth_user_id = token_to_auth_id(token)
+
+    return message_react_v1(auth_user_id, message_id, react_id)
 
 @APP.route('/message/unreact/v1', methods=['POST'])
 def message_unreact_endpt():
     '''
-    put smth here
+    Given a message within a channel or DM the authorised user is part of, 
+    remove a "react" to that particular message.
+
+    Arguments:
+        token           (str)   - unique user token
+        message_id      (int)   - unique message id
+        react_id        (int)   - unique react id
+    
+    Exceptions:
+        AccessError - occurs when token is invalid
+        InputError  - occurs when react_id is invalid
+        InputError  - message already contains react with that react_id
+
+    Return Value:
+        Returns {} on success
     '''
 
-    return message_unreact_v1(0,0,0)
+    request_data = request.get_json(force = True)
+    message_id = request_data['message_id']
+    react_id = request_data['react_id']
+    token = request_data['token']
+    auth_user_id = token_to_auth_id(token)
+
+    return message_unreact_v1(auth_user_id, message_id, react_id)
 
 @APP.route('/message/pin/v1', methods=['POST'])
 def message_pin_endpt():
