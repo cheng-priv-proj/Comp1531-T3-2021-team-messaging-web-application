@@ -1,12 +1,13 @@
 from re import T
+import re
 import sys
 import signal
 from json import dumps
-from flask import Flask, request
+from flask import Flask, request, send_file
 from flask_cors import CORS
 from src import config
 
-from src.user import user_profile_v1, users_all_v1, user_setname_v1, user_setemail_v1, user_sethandle_v1, user_profile_uploadphoto_v1, user_stats_v1, users_stats_v1
+from src.user import user_profile_v1, users_all_v1, user_setname_v1, user_setemail_v1, user_sethandle_v1, user_profile_uploadphoto_v1, user_stats_v1, users_stats_v1, user_profile_getimg_v1
 from src.channels import channels_listall_v1, channels_list_v1, channels_create_v1
 from src.auth import auth_login_v1, auth_register_v1, auth_logout_v1, auth_passwordreset_request_v1, auth_passwordreset_reset_v1
 from src.dm import dm_create_v1, dm_details_v1, dm_leave_v1, dm_list_v1, dm_remove_v1, dm_details_v1, dm_create_v1, dm_messages_v1
@@ -148,17 +149,38 @@ def passwordreset_request_endpt():
     '''
     insert something here
     '''
+    email = request.get_json(force = True).get('email')
 
-    return auth_passwordreset_request_v1('')
+    return auth_passwordreset_request_v1(email)
 
 # Auth password reset
 @APP.route('/auth/passwordreset/reset/v1', methods= ['POST'])
 def passwordreset_reset_endpt():
     '''
-    insert something here
-    '''
+    Given a reset code for a user, set that user's new password to the
+    password provided.
+    
+    Arguments:
+        reset_code      (str) - secret reset string
+        new_password    (str) - new password string
 
-    return auth_passwordreset_reset_v1(0,'')
+    Exceptions:
+        TypeError   - occurs when reset_code, new_password are not strs
+        InputError  - reset_code is not a valid reset code
+        InputError  - password entered is less than 6 characters long
+
+    Return {} on success
+    '''
+    register_details = request.get_json(force = True)
+
+    reset_code = register_details.get('reset_code')
+    new_password = register_details.get('new_password')
+    print('reset code is:', reset_code,'pass is:', new_password)
+
+
+    auth_passwordreset_reset_v1(str(reset_code), str(new_password))
+
+    return {}
 
 ###################### Channels ######################
 # Channel create
@@ -745,25 +767,92 @@ def user_profile_sethandle_ep():
 def user_profile_uploadphoto_endpt():
     '''
     put smth here
-    '''
 
-    return user_profile_uploadphoto_v1(0,'',0,0,0,0)
+
+    '''
+    request_data = request.get_json(force = True)
+    token = request_data['token']
+    auth_user_id = token_to_auth_id(token)
+    print(auth_user_id)
+    img_url = request_data['img_url']
+    x_start = request_data['x_start']
+    x_end = request_data['x_end']
+    y_start = request_data['y_start']
+    y_end = request_data['y_end']
+    user_profile_uploadphoto_v1(auth_user_id, img_url, x_start, y_start, x_end, y_end )
+
+    return {}
+
+@APP.route('/imgurl/', methods=['GET'])
+def user_profileimgurl_endpt():
+    '''
+    Gets the profile image of a user
+    
+    Arguments:
+        token       (string)    - unique user token
+
+    Exceptions:
+        AccessError - Occurs when token is invalid
+
+    Return value:
+        Returns the profile image of the user
+    '''
+    request_data = request.get_json(force = True)
+    token = request_data['token']
+    auth_user_id = token_to_auth_id(token)
+
+    img = user_profile_getimg_v1(auth_user_id)
+
+    return img
 
 @APP.route('/user/stats/v1', methods=['GET'])
 def user_stats_endpt():
     '''
-    put smth here
-    '''
+    Returns the stats for the authorised user
 
-    return user_stats_v1(0)
+    Arguments:
+        token           (str)   - valid token
+    
+    Exceptions:
+        AccessError - occurs when token is invalid
+
+    Return value:
+        Return user_stats
+    '''
+    request_token = request.args.get('token')
+    auth_user_id = token_to_auth_id(request_token)
+    return user_stats_v1(auth_user_id)
 
 @APP.route('/users/stats/v1', methods=['GET'])
 def users_stats_endpt():
     '''
-    put smth here
-    '''
+    Fetches the required statistics about the use of UNSW Streams.
+<<<<<<< HEAD
 
-    return users_stats_v1(0)
+    Arguments:
+        token           (str)   - valid token
+
+=======
+
+    Arguments:
+        token           (str)   - valid token
+
+>>>>>>> img_profile_stuff
+    Exceptions:
+        AccessError - occurs when token is invalid
+
+    Return value:
+<<<<<<< HEAD
+        Returns workplace stats
+=======
+        Returns workspace stats
+>>>>>>> img_profile_stuff
+    '''
+    print('test')
+    request_token = request.args.get('token')
+    auth_user_id = token_to_auth_id(request_token)
+    print('tests')
+    return users_stats_v1(auth_user_id)
 
 ################## Message #####################################################
 
@@ -1144,24 +1233,46 @@ def standup_start_endpt():
     '''
     put smth here
     '''
+    request_data = request.get_json()
 
-    return standup_start_v1(0,0,0)
+    auth_id = token_to_auth_id(request_data.get('token'))
+    channel_id = request_data.get('channel_id')
+    length = request_data.get('length')
+
+    return standup_start_v1(auth_id, channel_id, length)
 
 @APP.route('/standup/active/v1', methods=['GET'])
 def standup_active_endpt():
     '''
     put smth here
     '''
-
-    return standup_active_v1(0,0)
+    token = request.args.get('token')
+    auth_user_id = token_to_auth_id(token)
+    channel_id = int(request.args.get('channel_id'))
+    return standup_active_v1(auth_user_id, channel_id)
 
 @APP.route('/standup/send/v1', methods=['POST'])
 def standup_send_endpt():
     '''
     put smth here
     '''
+    request_data = request.get_json()
 
-    return standup_send_v1(0,0,'')
+    auth_id = token_to_auth_id(request_data.get('token'))
+    channel_id = request_data.get('channel_id')
+    message = request_data.get('message')
+    return standup_send_v1(auth_id, channel_id, message)
+
+####### Extra ############
+@APP.route('/user/profile/getprofilepic', methods=['GET'])
+def get_profile_pic():
+    '''
+    Return the user's profile picture.
+    '''
+    token = request.args.get('token')
+    auth_user_id = token_to_auth_id(token)
+    
+    return send_file('src/pickle_dump/' + str(auth_user_id) + '.jpg', mimetype = 'image/jpg')
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, quit_gracefully) # For coverage
