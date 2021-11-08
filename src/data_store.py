@@ -509,12 +509,12 @@ class Datastore:
 
         channel_id = -1
         dm_id = -1
-
+        print('inserted notification')
         if channel_or_dm_id < 0:
             dm_id = channel_or_dm_id
         else:
             channel_id = channel_or_dm_id
-        
+        print(notification_message)
         notifications.insert(0, {
                                 'channel_id': channel_id,
                                 'dm_id': dm_id,

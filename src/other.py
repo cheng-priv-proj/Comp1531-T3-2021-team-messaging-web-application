@@ -205,6 +205,7 @@ def insert_react_message_notification(channel_or_dm_id, auth_user_id, u_id):
     '''
     user = data_store.get_user_from_u_id(auth_user_id)
     message = f"{user.get('handle_str')} reacted to your message in {data_store.get_name_from_channel_or_dm_id(channel_or_dm_id)}"
+    print('notification react')
     data_store.insert_notification(u_id, message, channel_or_dm_id)
 
 stream_owner = 1
