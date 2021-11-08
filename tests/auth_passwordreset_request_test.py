@@ -59,6 +59,7 @@ def new_email():
     
     return inbox
 
+@pytest.mark.skip(reason="Not implemented")
 def test_secret_code_sent(clear, new_email, register_user):
     register_user(new_email.email_address)
 
@@ -70,6 +71,7 @@ def test_secret_code_sent(clear, new_email, register_user):
         waitfor_controller = mailslurp_client.WaitForControllerApi(api_client)
         email = waitfor_controller.wait_for_latest_email(inbox_id=new_email.id, timeout=30000, unread_only=True)
 
+@pytest.mark.skip(reason="Not implemented")
 def test_logged_out(clear, new_email, register_channel, register_user):
     token = register_user(new_email.email_address)
 
