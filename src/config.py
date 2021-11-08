@@ -11,3 +11,6 @@ react_default = [
         'is_this_user_reacted' : False
     }
 ]
+
+EMAIL = '1531isbriansfavsubject@gmail.com'
+PASSWORD = '1531brain'
