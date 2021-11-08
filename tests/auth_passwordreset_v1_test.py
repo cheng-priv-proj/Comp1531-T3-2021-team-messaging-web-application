@@ -49,7 +49,7 @@ def test_successful_password_reset(clear, register_user, new_email):
 
     requests.post(url + 'auth/passwordreset/request/v1', json = {
         'email': new_email.email_address
-    }
+    })
 
     with mailslurp_client.ApiClient(configuration) as api_client:
         waitfor_controller = mailslurp_client.WaitForControllerApi(api_client)
@@ -81,7 +81,7 @@ def test_password_too_short(clear, register_user, new_email):
 
     requests.post(url + 'auth/passwordreset/request/v1', json = {
         'email': new_email.email_address
-    }
+    })
 
     with mailslurp_client.ApiClient(configuration) as api_client:
         waitfor_controller = mailslurp_client.WaitForControllerApi(api_client)
