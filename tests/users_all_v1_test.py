@@ -12,6 +12,16 @@ def extract_token():
         return auth_user_id_dict['token']
     return extract_token_id_function
 
+<<<<<<< HEAD
+=======
+# Extracts the token from a given dictionary.
+@pytest.fixture
+def extract_user():
+    def extract_u_id_function(auth_user_id_dict):
+        return auth_user_id_dict['auth_user_id']
+    return extract_u_id_function
+
+>>>>>>> 02601f59baa5f35f87d36b30fd51d9e7cdd51d2c
 # Call users all
 @pytest.fixture
 def users_all():
@@ -29,6 +39,7 @@ def clear():
 # Assumes handle_str does not require additional processing past concatenation
 @pytest.fixture
 def register_user_return_info():
+<<<<<<< HEAD
     def register_user_return_info_function(email, name_first, name_last):
         registration_info = {
             'username': email, 
@@ -42,6 +53,23 @@ def register_user_return_info():
         owner_id_dict['handle_str'] = registration_info.get('name_first') + registration_info.get('name_last')
         return {**owner_id_dict, **registration_info}
     return register_user_return_info_function
+=======
+    def register_user_function(email, name_first, name_last):
+        registration_info = {
+            'email': email, 
+            'password': 'password', 
+            'name_first': name_first,
+            'name_last': name_last }
+        register = requests.post(url + 'auth/register/v2', json = registration_info)
+        register_dict = register.json()
+        if register.status_code != 403 and register.status_code != 400:
+            owner_id_profile = requests.get(url + 'user/profile/v1', params = {'token': register_dict['token'], 'u_id': register_dict['auth_user_id']})
+            register_dict['profile_img_url'] = owner_id_profile.json()['user']['profile_img_url']
+
+        register_dict['handle_str'] = registration_info.get('name_first') + registration_info.get('name_last')    
+        return {**register_dict, **registration_info}
+    return register_user_function
+>>>>>>> 02601f59baa5f35f87d36b30fd51d9e7cdd51d2c
 
 # Removes token and password key value pairs
 @pytest.fixture
@@ -50,6 +78,12 @@ def user_info_to_user_datatype():
         user_info.pop('token')
         user_info.pop('password')
         
+<<<<<<< HEAD
+=======
+        user_info['u_id'] = user_info['auth_user_id']
+        del user_info['auth_user_id']
+        
+>>>>>>> 02601f59baa5f35f87d36b30fd51d9e7cdd51d2c
         return user_info
     return user_info_to_user_datatype_function
 
@@ -57,6 +91,7 @@ def user_info_to_user_datatype():
 @pytest.fixture
 def sort_users():
     def sort_users_function(users):
+<<<<<<< HEAD
         return users.sorted(key=operator.itemgetter('name_first'))
     return sort_users_function
 
@@ -67,6 +102,33 @@ def test_users_all_one_user(clear, register_user_return_info, users_all, extract
     assert sort_users(user_list) == sort_users(user_info_to_user_datatype(owner_info))
 
 def test_users_all_multiple_users(clear, register_user_return_info, users_all, extract_token, user_info_to_user_datatype, sort_users):
+=======
+        return users
+    return sort_users_function
+
+def test_users_all_one_user(clear, register_user_return_info, users_all, extract_token, user_info_to_user_datatype, sort_users):
+    '''
+    Standard valid test case with one user.
+
+    Expects: 
+        Correct output from user/all.
+    '''
+
+    owner_info = register_user_return_info('owner@gmail.com', 'owner', 'one')
+    owner_token = extract_token(owner_info)
+    user_list = users_all(owner_token).json()['users']
+    
+    assert sort_users(user_list) == [sort_users(user_info_to_user_datatype(owner_info))]
+
+def test_users_all_multiple_users(clear, register_user_return_info, users_all, extract_token, user_info_to_user_datatype, sort_users):
+    '''
+    Standard valid test case with multiple user.
+
+    Expects: 
+        Correct output from user/all.
+    '''
+
+>>>>>>> 02601f59baa5f35f87d36b30fd51d9e7cdd51d2c
     owner_info = register_user_return_info('owner@gmail.com', 'owner', 'one')
     user_list = [owner_info]
     for i in range(0, 100):
@@ -78,10 +140,24 @@ def test_users_all_multiple_users(clear, register_user_return_info, users_all, e
     assert sort_users(user_list_from_users_all) == sort_users([user_info_to_user_datatype(user) for user in user_list])
 
 def test_users_all_works_for_non_owner(clear, register_user_return_info, users_all, extract_token, user_info_to_user_datatype, sort_users):
+<<<<<<< HEAD
     owner_info = register_user_return_info('owner@gmail.com', 'owner', 'one')
     user_info1 = register_user_return_info('user1@gmail.com', 'user', 'two')
     user_info2 = register_user_return_info('user2@gmail.com', 'user', 'three')
     user_info3 = register_user_return_info('user2@gmail.com', 'user', 'four')
+=======
+    '''
+    Standard valid test case with one user(non owner).
+
+    Expects: 
+        Correct output from user/all.
+    '''
+
+    owner_info = register_user_return_info('owner@gmail.com', 'owner', 'one')
+    user_info1 = register_user_return_info('user1@gmail.com', 'user', 'two')
+    user_info2 = register_user_return_info('user2@gmail.com', 'user', 'three')
+    user_info3 = register_user_return_info('user3@gmail.com', 'user', 'four')
+>>>>>>> 02601f59baa5f35f87d36b30fd51d9e7cdd51d2c
     user_list = [owner_info, user_info1, user_info2, user_info3]
 
     user_token = extract_token(user_info1)
@@ -90,6 +166,16 @@ def test_users_all_works_for_non_owner(clear, register_user_return_info, users_a
     assert sort_users(user_list_from_users_all) == sort_users([user_info_to_user_datatype(user) for user in user_list])
 
 def test_users_all_works_for_failed_registration(clear, register_user_return_info, users_all, extract_token, user_info_to_user_datatype, sort_users):
+<<<<<<< HEAD
+=======
+    '''
+    Tests correct output when a failed registration occurs.
+
+    Expects: 
+        Correct output from user/all.
+    '''
+
+>>>>>>> 02601f59baa5f35f87d36b30fd51d9e7cdd51d2c
     owner_info = register_user_return_info('owner@gmail.com', 'owner', 'one')
     user_info1 = register_user_return_info('user1@gmail.com', 'user', 'two')
     register_user_return_info('user1@gmail.com', 'user', 'three')
@@ -102,6 +188,20 @@ def test_users_all_works_for_failed_registration(clear, register_user_return_inf
     assert sort_users(user_lists_from_users_all) == sort_users([user_info_to_user_datatype(user) for user in user_list])
 
 def test_users_all_invalid_token(clear, register_user_return_info, users_all):
+<<<<<<< HEAD
     register_user_return_info('owner@gmail.com', 'owner', 'one')
 
     assert users_all(-123123).status_code() == 403
+=======
+    '''
+    Test case where token is not valid.
+
+    Expects: 
+        AccessError (403 error)
+    '''
+
+    register_user_return_info('owner@gmail.com', 'owner', 'one')
+    status = users_all('-123123')
+
+    assert  status.status_code == 403
+>>>>>>> 02601f59baa5f35f87d36b30fd51d9e7cdd51d2c

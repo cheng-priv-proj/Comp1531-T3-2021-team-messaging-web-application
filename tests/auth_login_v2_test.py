@@ -2,14 +2,13 @@ import pytest
 import requests
 import json
 import flask
-from src import config
+from src import config 
 
 from src.auth import *
 from src.other import clear_v1
 
-# clear_v2
-# Fixture to reset json store before every test
 
+# Fixture to reset json store before every test
 @pytest.fixture
 def clear_server():
     requests.delete(config.url + "clear/v1")
@@ -39,24 +38,44 @@ def auth_id_v2(clear_server):
     return response.json()
 
 def test_standard_v2(auth_id_v2, extract_user_v2):
+    '''
+    Test that expects Access error when given an invalid token.
+
+    Expects: 
+        Successful login (status code 200)
+
+    '''
     dict_id_token = requests.post(config.url + 'auth/login/v2', json={'email': 'example@email.com', 'password': 'potato'}).json()
     assert extract_user_v2(dict_id_token) == extract_user_v2(auth_id_v2), 'Valid case: Auth_id not successful'
 
 def test_incorrect_password_v2(auth_id_v2):
+    '''
+    Test that expects input error when password is incorrect.
+
+    Expects: 
+        InputError (400 error) 
+    '''
+
     resp = requests.post(config.url + 'auth/login/v2', json={'email': 'example@email.com', 'password': 'rongPASSWORD'})
     assert(resp.status_code == 400)
 
-# Test that expects an input error when given a non-existant email.
 def test_email_does_not_exist_v2(auth_id_v2):
+    '''
+    Test that expects an input error when given a non-existant email.
+
+    Expects: 
+        InputError (400 error) 
+    '''
     resp = requests.post(config.url + 'auth/login/v2', json={'email': 'baaaaddexample@email.com', 'password': 'potato'})
     assert(resp.status_code == 400)
 
-# Test that expects an input error when all the fields are invalid. 
 def test_all_incorrect_v2(auth_id_v2):
+    '''
+    Test that expects an input error when all the fields are invalid. 
+
+    Expects: 
+        InputError (400 error) 
+    '''
     resp = requests.post(config.url + 'auth/login/v2', json={'email': 'baaaaddexample@email.com', 'password': 'naughty_potato'})
     assert(resp.status_code == 400)
 
-'''
-def test_invalid_return_token_v2():
-    return
-'''

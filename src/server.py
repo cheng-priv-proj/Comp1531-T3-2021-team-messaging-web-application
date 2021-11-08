@@ -1,5 +1,8 @@
 from re import T
+<<<<<<< HEAD
 import re
+=======
+>>>>>>> 02601f59baa5f35f87d36b30fd51d9e7cdd51d2c
 import sys
 import signal
 from json import dumps
@@ -7,7 +10,11 @@ from flask import Flask, request
 from flask_cors import CORS
 from src import config
 
+<<<<<<< HEAD
 from src.user import user_profile_v1, users_all_v1, user_setname_v1, user_setemail_v1, user_sethandle_v1, user_profile_uploadphoto_v1, user_stats_v1, users_stats_v1, user_profile_getimg_v1
+=======
+from src.user import user_profile_v1, users_all_v1, user_setname_v1, user_setemail_v1, user_sethandle_v1, user_profile_uploadphoto_v1, user_stats_v1, users_stats_v1
+>>>>>>> 02601f59baa5f35f87d36b30fd51d9e7cdd51d2c
 from src.channels import channels_listall_v1, channels_list_v1, channels_create_v1
 from src.auth import auth_login_v1, auth_register_v1, auth_logout_v1, auth_passwordreset_request_v1, auth_passwordreset_reset_v1
 from src.dm import dm_create_v1, dm_details_v1, dm_leave_v1, dm_list_v1, dm_remove_v1, dm_details_v1, dm_create_v1, dm_messages_v1
@@ -263,6 +270,7 @@ def channel_messages_ep():
     auth_user_id = token_to_auth_id(token)
     channel_id = request.args.get('channel_id')
     start = request.args.get('start')
+<<<<<<< HEAD
 
     return channel_messages_v1(auth_user_id, int(channel_id), int(start))
 
@@ -294,6 +302,39 @@ def channel_leave_endpt():
     auth_user_id = token_to_auth_id(token)
     channel_id = leave_input.get('channel_id')
 
+=======
+
+    return channel_messages_v1(auth_user_id, int(channel_id), int(start))
+
+@APP.route('/channel/leave/v1', methods = ['POST'])
+def channel_leave_endpt():
+    '''
+    Given a channel with ID channel_id that the authorised user is a member of,
+    remove them as a member of the channel.
+
+    Arguments:
+        token           (str)   - unique user token
+        channel_id      (int)   - unique channel id
+
+    Exceptions:
+        TypeError   - occurs when token is not a str
+        TypeError   - occurs when channel_id is not a int
+        AccessError - occurs when token is invalid
+        InputError  - occurs when channel_id is invalid
+        AccessError - occurs when channel_id is valid and the authorised user is
+                      not a member of the channel
+
+    Return value:
+        Returns {} on success
+    '''
+
+    leave_input = request.get_json(force = True)
+
+    token = leave_input.get('token')
+    auth_user_id = token_to_auth_id(token)
+    channel_id = leave_input.get('channel_id')
+
+>>>>>>> 02601f59baa5f35f87d36b30fd51d9e7cdd51d2c
     return channel_leave_v1(auth_user_id, channel_id)
 
 @APP.route('/channels/list/v2', methods = ['GET'])
@@ -385,6 +426,7 @@ def channel_join_endpt():
 @APP.route("/channel/details/v2", methods=['GET'])
 def channel_details_endpt():
 
+<<<<<<< HEAD
     '''
     Returns the details of a given channel that an authorised user has access to.
 
@@ -478,6 +520,101 @@ def channel_addowner_endpt():
     '''
     Make user with user id u_id an owner of the channel.
 
+=======
+    '''
+    Returns the details of a given channel that an authorised user has access to.
+
+    Arguments:
+        auth_user_id    (int)   - authorised user id
+        channel_id      (int)   - unique channel id
+
+    Exceptions:
+        TypeError   - occurs when auth_user_id, channel_id are not ints
+        InputError  - occurs when channel_id is invalid
+        AccessError - occurs when channel_id is valid but the authorised user is
+                    not a member of the channel
+
+    Return value:
+        Returns {name, is_public, owner_members, all_members} on success
+    '''
+
+    token = request.args.get('token')
+    auth_id = token_to_auth_id(token)
+    channel_id = request.args.get('channel_id')
+
+
+    return channel_details_v1(auth_id, int(channel_id))
+
+################################ DM #########################################
+
+@APP.route("/dm/create/v1", methods=['POST'])
+def dm_create_endpt():
+    '''
+    Create a DM an invite a list of users to that dm
+
+    Methods:
+        Post
+
+    Arguments:
+        token           (int)   - unique user token
+        u_ids           (int)   - list of unique user tokens
+
+    Exceptions:
+        AccessError - occurs when token is inavlid
+        TypeError   - occurs when auth_user_id is not an int
+        TypeError   - occurs when u_id is not a list
+        AccessError - occurs when auth_user_id is invalid
+        InputError  - occurs when invalid u_id in u_ids
+
+    Return value:
+        Returns {dm_id} on success
+    '''
+    request_data = request.get_json(force = True)
+    auth_user_id = token_to_auth_id(request_data['token'])
+    u_ids = request_data['u_ids']
+
+    return_dict = dm_create_v1(auth_user_id, u_ids)
+    return return_dict
+
+@APP.route("/dm/details/v1", methods=['GET'])
+def dm_details_endpt():
+    '''
+    Given a DM with ID dm_id that the authorised user is a member of, 
+    provide basic details about the DM.
+
+    Methods:
+        Get
+
+    Arguments:
+        token           (int)   - unique user token
+        dm_id           (int)   - unique dm id
+
+    Exceptions:
+        AccessError - occurs when token is invalid
+        TypeError   - occurs when auth_user_id is not an int
+        TypeError   - occurs when dm_id is not an int
+        AccessError - occurs when auth_user_id is invalid
+        InputError  - occurs when dm_id does not refer to a valid DM
+        AccessError - occurs when dm_id is valid and the authorised user is not a member of the DM
+
+    Return value:
+        Returns {name, members} on success
+    '''
+
+    
+    token = request.args.get('token')
+    auth_user_id = token_to_auth_id(token)
+    dm_id = request.args.get('dm_id')
+
+    return_dict = dm_details_v1(auth_user_id, int(dm_id))
+    return return_dict
+
+@APP.route('/channel/addowner/v1', methods=['POST'])
+def channel_addowner_endpt():
+    '''
+    Make user with user id u_id an owner of the channel.
+
+>>>>>>> 02601f59baa5f35f87d36b30fd51d9e7cdd51d2c
     Arguments:
         token           (int)   - unique user token
         channel_id      (int)   - unique channel id
@@ -746,6 +883,7 @@ def user_profile_sethandle_ep():
 def user_profile_uploadphoto_endpt():
     '''
     put smth here
+<<<<<<< HEAD
 
 
     '''
@@ -784,10 +922,16 @@ def user_profileimgurl_endpt():
     img = user_profile_getimg_v1(auth_user_id)
 
     return img
+=======
+    '''
+
+    return user_profile_uploadphoto_v1(0,'',0,0,0,0)
+>>>>>>> 02601f59baa5f35f87d36b30fd51d9e7cdd51d2c
 
 @APP.route('/user/stats/v1', methods=['GET'])
 def user_stats_endpt():
     '''
+<<<<<<< HEAD
     Returns the stats for the authorised user
 
     Arguments:
@@ -802,10 +946,17 @@ def user_stats_endpt():
     request_token = request.args.get('token')
     auth_user_id = token_to_auth_id(request_token)
     return user_stats_v1(auth_user_id)
+=======
+    put smth here
+    '''
+
+    return user_stats_v1(0)
+>>>>>>> 02601f59baa5f35f87d36b30fd51d9e7cdd51d2c
 
 @APP.route('/users/stats/v1', methods=['GET'])
 def users_stats_endpt():
     '''
+<<<<<<< HEAD
     Fetches the required statistics about the use of UNSW Streams.
 
     Arguments:
@@ -822,6 +973,12 @@ def users_stats_endpt():
     auth_user_id = token_to_auth_id(request_token)
     print('tests')
     return users_stats_v1(auth_user_id)
+=======
+    put smth here
+    '''
+
+    return users_stats_v1(0)
+>>>>>>> 02601f59baa5f35f87d36b30fd51d9e7cdd51d2c
 
 ################## Message #####################################################
 
@@ -853,6 +1010,7 @@ def message_send_endpt():
     auth_user_id = token_to_auth_id(token)
     channel_id = request_data['channel_id']
     message = request_data['message']
+<<<<<<< HEAD
 
     return_dict = message_send_v1(auth_user_id, channel_id, message)
     return return_dict
@@ -923,6 +1081,78 @@ def message_senddm_endpt():
     return_dict = message_senddm_v1(auth_user_id, dm_id, message)
     return return_dict
 
+=======
+
+    return_dict = message_send_v1(auth_user_id, channel_id, message)
+    return return_dict
+
+@APP.route("/dm/messages/v1", methods=['GET'])
+def dm_messages_endpt():
+    '''
+    Returns a list of messages between index 'start' and up to 'start' + 50 from a
+    given DM that the authorised user has access to. Additionally returns
+    'start', and 'end' = 'start' + 50
+
+    Arguments:
+        token           (str)   - unique user token
+        dm_id           (int)   - unique dm id
+        start           (int)   - message index (most recent message has index 0)
+
+    Exceptions:
+        TypeError   - occurs when auth_user_id, dm_id, start are not ints
+        InputError   - dm_id does not refer to a valid DM
+        InputError  - occurs when start is negative
+        InputError  - occurs when start is greater than the total number of messages
+                    in the channel
+        AccessError - dm_id is valid and the authorised user is not a member of the DM
+
+    Return value:
+        Returns { messages, start, end } on success
+        Returns { messages, start, -1 } if the function has returned the least
+        recent message
+
+    '''
+
+    token = request.args.get('token')
+    auth_id = token_to_auth_id(token)
+    dm_id = request.args.get('dm_id')
+    start = request.args.get('start')
+
+    return dm_messages_v1(auth_id, int(dm_id), int(start))
+
+@APP.route("/message/senddm/v1", methods=['POST'])
+def message_senddm_endpt():
+    '''
+    Send a message from the authorised user to the dm specified by dm_id
+
+    Arguments:
+        token           (str)   - unique user token
+        dm_id           (int)   - unique dm id
+        message         (str)   - message string
+
+    Exceptions:
+        AccessError - occurs when token is invalid
+        TypeError   - occurs when auth_user_id, dm_id are not ints
+        TypeError   - occurs when message is not a str
+        AccessError - occurs when auth_user_id is invalid
+        AccessError - occurs when dm_id is valid but the authorised user is not
+                    a member of the channel
+        InputError  - occurs when message is less than 1 or more than 1000 characters
+
+    Return value:
+        Returns {message_id} on success
+    '''
+
+    request_data = request.get_json(force = True)
+    token = request_data['token']
+    auth_user_id = token_to_auth_id(token)
+    dm_id = request_data['dm_id']
+    message = request_data['message']
+
+    return_dict = message_senddm_v1(auth_user_id, dm_id, message)
+    return return_dict
+
+>>>>>>> 02601f59baa5f35f87d36b30fd51d9e7cdd51d2c
 @APP.route("/message/edit/v1", methods=['PUT'])
 def message_edit_endpt():
     '''
@@ -1157,4 +1387,8 @@ def standup_send_endpt():
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, quit_gracefully) # For coverage
     APP.run(port=config.port, debug=True) # Do not edit this port
+<<<<<<< HEAD
     
+=======
+    
+>>>>>>> 02601f59baa5f35f87d36b30fd51d9e7cdd51d2c

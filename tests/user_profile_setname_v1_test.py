@@ -21,7 +21,11 @@ def extract_user():
 @pytest.fixture
 def user_profile():
     def user_profile_function(token, u_id):
+<<<<<<< HEAD
         return requests.get(url + 'user/profile/v1', json = {
+=======
+        return requests.get(url + 'user/profile/v1', params = {
+>>>>>>> 02601f59baa5f35f87d36b30fd51d9e7cdd51d2c
             'token': token,
             'u_id': u_id
          })
@@ -59,30 +63,88 @@ def register_user():
     return register_user_function
 
 def test_user_profile_setname_basic_functionality(clear, register_user, user_profile, user_profile_setname, extract_user, extract_token):
+<<<<<<< HEAD
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     user_profile_setname(extract_token(owner_info), 'ownera', 'asdd')
 
     assert user_profile(extract_token(owner_info), extract_user(owner_info)).json() == {
+=======
+    '''
+    Standard valid test case.
+
+    Expects: 
+        Correct output from user/profile.
+    '''
+
+    owner_info = register_user('owner@gmail.com', 'owner', 'one')
+    user_profile_setname(extract_token(owner_info), 'ownera', 'asdd')
+
+    assert user_profile(extract_token(owner_info), extract_user(owner_info)).json().get('user') == {
+>>>>>>> 02601f59baa5f35f87d36b30fd51d9e7cdd51d2c
         'u_id': extract_user(owner_info),
         'handle_str': 'ownerone',
         'name_first': 'ownera',
         'name_last': 'asdd',
+<<<<<<< HEAD
+=======
+        'profile_img_url': user_profile(extract_token(owner_info), extract_user(owner_info)).json().get('user').get('profile_img_url'),
+>>>>>>> 02601f59baa5f35f87d36b30fd51d9e7cdd51d2c
         'email': 'owner@gmail.com',
     }
 
 def test_user_profile_setname_invalid_token(clear, user_profile_setname):
+<<<<<<< HEAD
     assert user_profile_setname('asdasd', 'owner', 'one').status_code == 403
 
 def test_user_profile_setname_invalid_token_and_name(clear, user_profile_setname):
     assert user_profile_setname('asdasd', '', '').status_code == 403
 
 def test_user_profile_setname_too_long(clear, user_profile_setname, register_user, extract_token):
+=======
+    '''
+    Test case where token is not valid.
+
+    Expects: 
+        AccessError (403 error)
+    '''
+
+    assert user_profile_setname('asdasd', 'owner', 'one').status_code == 403
+
+def test_user_profile_setname_invalid_token_and_name(clear, user_profile_setname):
+    '''
+    Test case where access error is expected to take precedence.
+
+    Expects: 
+        AccessError (403 error)
+    '''
+
+    assert user_profile_setname('asdasd', '', '').status_code == 403
+
+def test_user_profile_setname_too_long(clear, user_profile_setname, register_user, extract_token):
+    '''
+    Test case that expects an input error when the name string is too long.
+
+    Expects: 
+        InputError (400 error)
+    '''
+
+>>>>>>> 02601f59baa5f35f87d36b30fd51d9e7cdd51d2c
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
 
     assert user_profile_setname(extract_token(owner_info), 'owner', 'a' * 51).status_code == 400
     assert user_profile_setname(extract_token(owner_info), 'a' * 51, 'one').status_code == 400
 
 def test_user_profile_setname_too_short(clear, user_profile_setname, register_user, extract_token):
+<<<<<<< HEAD
+=======
+    '''
+    Test case that expects an input error when the name string is too short.
+
+    Expects: 
+        InputError (400 error)
+    '''
+
+>>>>>>> 02601f59baa5f35f87d36b30fd51d9e7cdd51d2c
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
 
     assert user_profile_setname(extract_token(owner_info), '', 'one').status_code == 400

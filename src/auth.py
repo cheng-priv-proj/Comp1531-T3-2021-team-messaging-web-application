@@ -1,10 +1,12 @@
 from src.data_store import data_store
 from src.error import InputError
-from src.other import check_type
+from src.other import check_type, check_email_valid
 from src.other import handle_str_generation
-from src.other import stream_owner
-from src.other import stream_member
+from src.other import stream_owner, stream_member
+from src.other import hash_str
+from src.config import SECRET
 import re
+import jwt
 
 def auth_login_v1(email, password):
     '''
@@ -20,26 +22,31 @@ def auth_login_v1(email, password):
         InputError - occurs when password is not correct
 
     Return value:
-        Returns auth_id on success
+        Returns {token, auth_user_id} on success
     '''
 
-    # check for valid input types
     check_type(email, str)
     check_type(password, str)
     
-    # input error if email doesn't belong to a user
     if data_store.is_invalid_email(email):
         raise InputError ('email does not belong to a user')
     
     login = data_store.get_login_from_email(email)
 
-    # input error if password is wrong
-    if password != login.get('password'):
+    if hash_str(password) != login.get('password'):
         raise InputError ('password is not correct')
 
     auth_user_id = login.get("auth_id")
 
-    return { 'auth_user_id': auth_user_id }
+    token = jwt.encode({
+                'auth_user_id': auth_user_id,
+                'token_count': len(data_store.get_u_ids_from_token_dict())
+                },
+                 SECRET, algorithm='HS256')
+
+    data_store.insert_token(token, auth_user_id)
+
+    return { 'token': token,'auth_user_id': auth_user_id }
 
 def auth_register_v1(email, password, name_first, name_last):
     '''
@@ -64,7 +71,7 @@ def auth_register_v1(email, password, name_first, name_last):
                     or more than 50
 
     Return value:
-        Returns auth_id on success
+        Returns {auth_user_id} on success
     '''
 
     # checking for valid input types
@@ -73,9 +80,7 @@ def auth_register_v1(email, password, name_first, name_last):
     check_type(name_first, str)
     check_type(name_last, str)
 
-    # check for valid email format
-    if not re.fullmatch(r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$', email):
-        raise InputError ('incorrect email format')
+    check_email_valid(email)
 
     # check for valid password, name_first and name_last lengths
     if len(password) < 6:
@@ -93,10 +98,71 @@ def auth_register_v1(email, password, name_first, name_last):
     auth_user_id = len(data_store.get_users_from_u_id_dict())
     handle_str = handle_str_generation(name_first, name_last)
 
+    # hash the password
+    encrypted_password = hash_str(password)
+
     # insert new data into dicts
     perm = stream_owner if auth_user_id == 0 else stream_member
-    data_store.insert_user_perm(auth_user_id, perm)
     data_store.insert_user(auth_user_id, email, name_first, name_last, handle_str)
-    data_store.insert_login(email, password, auth_user_id)
+    data_store.insert_user_perm(auth_user_id, perm)
+    data_store.insert_login(email, encrypted_password, auth_user_id)
 
     return { 'auth_user_id': auth_user_id }
+
+
+def auth_logout_v1(token):
+    '''
+    Given an active token, invalidates the token to log the user out.
+
+    Arguments:
+        token           (str) - unique user token
+
+    Exceptions:
+        N/A
+
+    Return value:
+        Returns {} on success
+    '''
+
+    data_store.invalidate_token(token)
+
+    return {}
+
+def auth_passwordreset_request_v1(email):
+    '''
+    Given an email address, if the user is a registered user, sends them an
+    email containing a specific secret code, that when entered in
+    auth/passwordreset/reset, shows that the user trying to reset the password
+    is the one who got sent this email. No error should be raised when passed an
+    invalid email, as that would pose a security/privacy concern. When a user
+    requests a password reset, they should be logged out of all current sessions.
+    
+    Arguments:
+        email           (str) - email str
+
+    Exceptions:
+        N/A
+
+    Returns {} on success
+    '''
+
+    return {}
+
+def auth_passwordreset_reset_v1(reset_code, new_password):
+    '''
+    Given a reset code for a user, set that user's new password to the
+    password provided.
+    
+    Arguments:
+        reset_code      (str) - secret reset string
+        new_password    (str) - new password string
+
+    Exceptions:
+        TypeError   - occurs when reset_code, new_password are not strs
+        InputError  - reset_code is not a valid reset code
+        InputError  - password entered is less than 6 characters long
+
+    Return {} on success
+    '''
+
+    return {}
