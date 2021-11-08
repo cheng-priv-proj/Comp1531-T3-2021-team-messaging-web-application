@@ -190,6 +190,8 @@ def auth_passwordreset_request_v1(email):
 
     return {}
 
+# Using this implementation, what happens if the user accidentally guesses another user's reset code?
+# Big security issue, and large bug
 def auth_passwordreset_reset_v1(reset_code, new_password):
     '''
     Given a reset code for a user, set that user's new password to the
@@ -206,5 +208,22 @@ def auth_passwordreset_reset_v1(reset_code, new_password):
 
     Return {} on success
     '''
+
+    if type(new_password) != str:
+        raise TypeError
+
+    print(new_password)
+    if len(new_password) < 6:
+        raise InputError
+
+    if data_store.is_reset_code_invalid(reset_code) == True:
+        raise InputError
+    
+
+    u_id = data_store.get_u_id_from_reset_code(reset_code)
+
+    data_store.update_password(u_id, password)
+
+    data_store.remove_reset_code(reset_code)
 
     return {}

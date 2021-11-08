@@ -602,6 +602,17 @@ class Datastore:
 
     # Update ##################################################################
     
+    def update_password(self, auth_user_id, password):
+        user = self.get_users_from_u_id_dict().get(auth_user_id)
+        login_info = self.get_logins_from_email_dict()
+        email = user['email']
+
+        login_info[email] = password
+
+
+
+        self.update_pickle()
+
     def update_name(self, auth_user_id, name_first, name_last):
         user = self.get_users_from_u_id_dict().get(auth_user_id)
         user['name_first'] = name_first

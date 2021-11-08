@@ -56,7 +56,7 @@ def test_successful_password_reset(clear, register_user, new_email):
         email = waitfor_controller.wait_for_latest_email(inbox_id=new_email.id, timeout=30000, unread_only=True)
     
     requests.post(url + 'auth/passwordreset/reset/v1', json = {
-        'reset_code': email.subject,
+        'reset_code': email.body,
         'new_password': 'new_password'
     })
 
@@ -88,7 +88,7 @@ def test_password_too_short(clear, register_user, new_email):
         email = waitfor_controller.wait_for_latest_email(inbox_id=new_email.id, timeout=30000, unread_only=True)
     
     assert requests.post(url + 'auth/passwordreset/reset/v1', json = {
-        'reset_code': email.subject,
+        'reset_code': email.body,
         'new_password': 'short'
     }).status_code == 400
 

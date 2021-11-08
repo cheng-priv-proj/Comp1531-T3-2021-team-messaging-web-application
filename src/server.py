@@ -156,10 +156,30 @@ def passwordreset_request_endpt():
 @APP.route('/auth/passwordreset/reset/v1', methods= ['POST'])
 def passwordreset_reset_endpt():
     '''
-    insert something here
-    '''
+    Given a reset code for a user, set that user's new password to the
+    password provided.
+    
+    Arguments:
+        reset_code      (str) - secret reset string
+        new_password    (str) - new password string
 
-    return auth_passwordreset_reset_v1(0,'')
+    Exceptions:
+        TypeError   - occurs when reset_code, new_password are not strs
+        InputError  - reset_code is not a valid reset code
+        InputError  - password entered is less than 6 characters long
+
+    Return {} on success
+    '''
+    register_details = request.get_json(force = True)
+
+    reset_code = register_details.get('reset_code')
+    new_password = register_details.get('new_password')
+    print('reset code is:', reset_code,'pass is:', new_password)
+
+
+    auth_passwordreset_reset_v1(str(reset_code), str(new_password))
+
+    return {}
 
 ###################### Channels ######################
 # Channel create
