@@ -182,17 +182,17 @@ def user_profile_uploadphoto_v1(auth_user_id, img_url, x_start, y_start, x_end, 
     '''
 
     if x_end <= x_start or y_end <= y_start:
-        raise InputError
+        raise InputError('Wrong dimensions')
     
     try:
         urllib.request.urlretrieve(img_url, 'src/pickle_dump/temp.jpg')
-    except Exception as E:
-        raise InputError from E
+    except Exception as user_profile_uploadphoto:
+        raise InputError from user_profile_uploadphoto
 
     imageObject = Image.open('src/pickle_dump/temp.jpg')
 
     if (imageObject.format != 'JPEG'):
-        raise InputError
+        raise InputError('Image is not a JPG')
 
     width, height = imageObject.size
     if x_start < 0 or x_start > width or x_end < 0 or x_end > width:
@@ -212,6 +212,26 @@ def user_profile_uploadphoto_v1(auth_user_id, img_url, x_start, y_start, x_end, 
 
     return {}
 
+def user_profile_getimg_v1(url):
+    '''
+    Returns the image of a user
+    
+    Arguments:
+        url     (str)   - url of the image
+        
+    Exceptions:
+        InputError  - occurs when image does not exist
+        
+    Return value:
+        Returns the profile image of a user
+    '''
+    check_type(url, str)
+
+    imageObject = Image.open('src/pickle_dump/' + url + '.')
+    if imageObject == None:
+        raise InputError
+    else:
+        return imageObject
 def user_stats_v1(auth_user_id):
     '''
     Fetches the required statistics about this user's use of UNSW Streams.
@@ -245,3 +265,4 @@ def users_stats_v1(auth_user_id):
     print('testing2')
     print(data_store.get_workspace_stats())
     return {'workspace_stats': data_store.get_workspace_stats()}
+
