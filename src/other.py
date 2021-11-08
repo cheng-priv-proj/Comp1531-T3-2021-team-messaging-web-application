@@ -147,5 +147,65 @@ def check_email_valid(email):
     if not re.fullmatch(r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$', email):
         raise InputError ('incorrect email format')
 
+def check_and_insert_tag_notifications_in_message(message, channel_or_dm_id, auth_user_id):
+    '''
+    Checks a message for valid tags and inserts notification if exists
+
+    Arguments:
+        message (str), channel_or_dm_id (int), auth_user_id (int)
+
+    Exceptions:
+        None
+
+    Return value:
+        None
+    '''
+
+    if data_store.is_standup_active(channel_or_dm_id):
+        return
+
+    print('entered')
+    tags = [re.sub(r'\W+', '', tag) for tag in re.findall(r'@{1}[a-z0-9]+[^0-9a-zA-Z| ]?', message)]
+    tags = [tags for tag in tags if data_store.is_duplicate_handle(tag) and data_store.is_user_member_of_channel_or_dm(channel_or_dm_id, data_store.get_u_id_from_handle_str(tag))]
+    for tag in tags:
+        print(tag)
+        tagger_handle_str = data_store.get_user_from_u_id(auth_user_id).get('handle_str')
+        message = f'{tagger_handle_str} tagged you in {data_store.get_name_from_channel_or_dm_id(channel_or_dm_id)}: {message[0:20]}'
+        data_store.insert_notification(data_store.get_u_id_from_handle_str(tag[0]), message, channel_or_dm_id)
+
+def insert_invite_channel_or_dm_notifications(channel_or_dm_id, auth_user_id, u_id):
+    '''
+    Inserts notification when you are invited to a dm or channeli
+
+    Arguments:
+        channel_or_dm_id (int), auth_user_id (int), u_id (int)
+
+    Exceptions:
+        None
+
+    Return Value: 
+        None
+    '''
+    user = data_store.get_user_from_u_id(auth_user_id)
+    message = f"{user.get('handle_str')} added you to {data_store.get_name_from_channel_or_dm_id(channel_or_dm_id)}"
+    data_store.insert_notification(u_id, message, channel_or_dm_id)
+
+def insert_react_message_notification(channel_or_dm_id, auth_user_id, u_id):
+    '''
+    Inserts notification when users react to your message
+
+    Arguments:
+        channel_or_dm_id (int), auth_user_id (int), u_id (int)
+
+    Exceptions:
+        None
+
+    Return Value: 
+        None
+    '''
+    user = data_store.get_user_from_u_id(auth_user_id)
+    message = f"{user.get('handle_str')} reacted to your message in {data_store.get_name_from_channel_or_dm_id(channel_or_dm_id)}"
+    data_store.insert_notification(u_id, message, channel_or_dm_id)
+
 stream_owner = 1
 stream_member = 2

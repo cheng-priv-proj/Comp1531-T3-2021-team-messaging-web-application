@@ -75,7 +75,7 @@ from datetime import datetime
 #               involvement_rate 
 #               } 
 #
-# workplace_stats:
+# workspace_stats:
 # value: dict {
 #              channels_exist: [{num_channels_exist, time_stamp}], 
 #              dms_exist: [{num_dms_exist, time_stamp}], 
@@ -84,6 +84,10 @@ from datetime import datetime
 #              }
     
 # message_count: num_messages
+#
+# reset_code:
+#   key: code
+#   value: u_id
 #
 ################################################################################
 
@@ -99,13 +103,14 @@ initial_object = {
     'notifications': {},
     'perms' : {},
     'user_stats': {},
-    'workplace_stats': { 
+    'workspace_stats': { 
                         'channels_exist': [{'num_channels_exist': 0, 'time_stamp': 0}], 
                         'dms_exist': [{'num_dms_exist': 0, 'time_stamp': 0}], 
                         'messages_exist': [{'num_messages_exist': 0, 'time_stamp': 0}], 
                         'utilization_rate': 0 
                         },
     'message_count': 0,
+    'reset_codes': {}
 }
 
 class Datastore:
@@ -133,13 +138,14 @@ class Datastore:
                 'notifications': {},
                 'perms' : {},
                 'user_stats': {},
-                'workplace_stats': { 
+                'workspace_stats': { 
                                     'channels_exist': [{'num_channels_exist': 0, 'time_stamp': 0}], 
                                     'dms_exist': [{'num_dms_exist': 0, 'time_stamp': 0}], 
                                     'messages_exist': [{'num_messages_exist': 0, 'time_stamp': 0}], 
                                     'utilization_rate': 0 
                                     },
-                'message_count': 0
+                'message_count': 0,
+                'reset_codes': {}
             }, 
             FILE
             )
@@ -190,6 +196,9 @@ class Datastore:
 
     def get_dm_creator_from_dm_id(self, dm_id):
         return self.get_dms_from_dm_id_dict().get(dm_id).get('creator')
+
+    def get_dm_members_from_dm_id(self, dm_id):
+        return self.get_dm_from_dm_id(dm_id).get('members')
 
     # standups
 
@@ -246,10 +255,12 @@ class Datastore:
         return self.__store['user_stats']
     
     def get_user_stats_from_u_id(self, u_id):
+        self.update_user_stats_involvement_rate(u_id)
         return self.get_user_stats_from_u_id_dict().get(u_id)
     
-    def get_workplace_stats(self):
-        return self.__store['workplace_stats']
+    def get_workspace_stats(self):
+        self.update_workspace_stats_utilization_rate()
+        return self.__store['workspace_stats']
 
     # notifications
 
@@ -264,6 +275,14 @@ class Datastore:
     def get_u_id_from_handle_str(self, handle_str):
         users = self.get_users_from_u_id_dict()
         return [users[user]['u_id'] for user in users if users[user]['handle_str'] == handle_str][0]
+
+    # reset codes
+
+    def get_u_id_from_reset_code_dict(self):
+        return self.__store['reset_codes']
+
+    def get_u_id_from_reset_code(self, reset_code):
+        return self.get_u_id_from_reset_code_dict().get(reset_code)
 
     # channel or dm name
 
@@ -401,6 +420,11 @@ class Datastore:
         
         return False
 
+    def is_reset_code_invalid(self, reset_code):
+        if reset_code in self.get_u_id_from_reset_code_dict():
+            return False
+        return True
+
     # Insertion functions ######################################################
 
     def insert_login(self, email, password, auth_id):
@@ -490,6 +514,9 @@ class Datastore:
                                 })
         self.update_pickle()
 
+    def insert_reset_code(self, reset_code, u_id):
+        self.get_u_id_from_reset_code_dict()[reset_code] = u_id
+
     # Remove ##############################################
 
     def invalidate_token(self, token):
@@ -565,7 +592,7 @@ class Datastore:
 
         # remove user_stats
         del self.get_user_stats_from_u_id_dict()[u_id]
-        self.update_workplace_stats_utilization_rate()
+        self.update_workspace_stats_utilization_rate()
 
         # Update user/profile
         user['email'] = ''
@@ -575,8 +602,23 @@ class Datastore:
 
         self.update_pickle()
 
+    def remove_reset_code(self, reset_code):
+        
+        del self.get_u_id_from_reset_code_dict()[reset_code]
+
     # Update ##################################################################
     
+    def update_password(self, auth_user_id, password):
+        user = self.get_users_from_u_id_dict().get(auth_user_id)
+        login_info = self.get_logins_from_email_dict()
+        email = user['email']
+
+        login_info[email] = password
+
+
+
+        self.update_pickle()
+
     def update_name(self, auth_user_id, name_first, name_last):
         user = self.get_users_from_u_id_dict().get(auth_user_id)
         user['name_first'] = name_first
@@ -584,59 +626,59 @@ class Datastore:
 
         self.update_pickle()
     
-    def update_user_stats_channels_joined(self, u_id):
-        user_stats_channels = self.get_user_stats_from_u_id(u_id)['channels_joined']
-        user_stats_channels[0]['num_channels_joined'] += 1
+    def update_user_stats_channels_joined(self, u_id, change):
+        user_stats_channels = self.__store['user_stats'][u_id]['channels_joined']
+        user_stats_channels[0]['num_channels_joined'] += change
         user_stats_channels[0]['time_stamp'] = datetime.utcnow().timestamp()
-        self.update_user_stats_involvement_rate(u_id)
     
-    def update_user_stats_dms_joined(self, u_id):
-        user_stats_dms = self.get_user_stats_from_u_id(u_id)['dms_joined']
-        user_stats_dms[0]['num_dms_joined'] += 1
+    def update_user_stats_dms_joined(self, u_id, change):
+        user_stats_dms = self.__store['user_stats'][u_id]['dms_joined']
+        user_stats_dms[0]['num_dms_joined'] += change
         user_stats_dms[0]['time_stamp'] = datetime.utcnow().timestamp()
-        self.update_user_stats_involvement_rate(u_id)
 
-    def update_user_stats_messages_sent(self, u_id):
-        user_stats_messages = self.get_user_stats_from_u_id(u_id)['messages_sent']
-        user_stats_messages[0]['num_messages_sent'] += 1
+    def update_user_stats_messages_sent(self, u_id, change):
+        user_stats_messages = self.__store['user_stats'][u_id]['messages_sent']
+        user_stats_messages[0]['num_messages_sent'] += change
         user_stats_messages[0]['time_stamp'] = datetime.utcnow().timestamp()
-        self.update_user_stats_involvement_rate(u_id)
 
     def update_user_stats_involvement_rate(self, u_id):
-        user_stats = self.get_user_stats_from_u_id(u_id)
-        workplace_stats = self.get_workplace_stats()
+        user_stats = self.__store['user_stats'][u_id]
+        workspace_stats = self.__store['workspace_stats']
 
         user_sum = user_stats['messages_sent'][0]['num_messages_sent'] + user_stats['dms_joined'][0]['num_dms_joined'] + user_stats['channels_joined'][0]['num_channels_joined']
-        workplace_sum = workplace_stats['channels_exist'][0]['num_channels_exist'] + workplace_stats['dms_exist'][0]['num_dms_exist'] + workplace_stats['messages_exist'][0]['num_messages_exist']
+        workspace_sum = workspace_stats['channels_exist'][0]['num_channels_exist'] + workspace_stats['dms_exist'][0]['num_dms_exist'] + workspace_stats['messages_exist'][0]['num_messages_exist']
 
-        if workplace_sum == 0:
+        if workspace_sum == 0:
             user_stats['involvement_rate'] = 0
         else:
-            user_stats['involvement_rate'] = user_sum / workplace_sum
+            user_stats['involvement_rate'] = user_sum / workspace_sum
+        
+        print('user_sum', user_sum)
+        print('workspace_sum', workspace_sum)
+        print('involvment', user_stats['involvement_rate'])
 
-        self.update_pickle()
-    
     def update_workspace_stats_channels_exist(self, change):
-        workplace_stats_channels = self.get_workplace_stats()['channels_exist']
-        workplace_stats_channels[0]['num_channels_exist'] += change
-        workplace_stats_channels[0]['time_stamp'] = datetime.utcnow().timestamp
-        self.update_workplace_stats_utilization_rate()
+        workspace_stats_channels = self.__store['workspace_stats']['channels_exist']
+        workspace_stats_channels[0]['num_channels_exist'] += change
+        workspace_stats_channels[0]['time_stamp'] = datetime.utcnow().timestamp()
 
-    def update_workplace_stats_dms_exist(self, change):
-        workplace_stats_dms = self.get_workplace_stats()['dms_exist']
-        workplace_stats_dms[0]['num_dms_exist'] += change
-        workplace_stats_dms[0]['time_stamp'] = datetime.utcnow().timestamp
-        self.update_workplace_stats_utilization_rate()
+    def update_workspace_stats_dms_exist(self, change):
+        print('dm_change' ,change)
+        workspace_stats_dms = self.__store['workspace_stats']['dms_exist']
+        workspace_stats_dms[0]['num_dms_exist'] += change
+        workspace_stats_dms[0]['time_stamp'] = datetime.utcnow().timestamp()
 
-    def update_workplace_stats_messages_exist(self, change):
-        workplace_stats_messages = self.get_workplace_stats()['messages_exist']
-        workplace_stats_messages[0]['num_messages_exist'] += change
-        workplace_stats_messages[0]['time_stamp'] = datetime.utcnow().timestamp
-        self.update_workplace_stats_utilization_rate()
+    def update_workspace_stats_messages_exist(self, change):
+        workspace_stats_messages = self.__store['workspace_stats']['messages_exist']
+        workspace_stats_messages[0]['num_messages_exist'] += change
+        workspace_stats_messages[0]['time_stamp'] = datetime.utcnow().timestamp()
 
-    def update_workplace_stats_utilization_rate(self):
+    def update_workspace_stats_utilization_rate(self):
+        num_users_who_have_joined_a_channel_or_dm = len([user_stats for user_stats in self.get_user_stats_from_u_id_dict().values() if user_stats['channels_joined'][0]['num_channels_joined'] > 0 or user_stats['dms_joined'][0]['num_dms_joined'] > 0])
+        total_users = len(self.get_user_stats_from_u_id_dict()) 
+
+        self.__store['workspace_stats']['utilization_rate'] = num_users_who_have_joined_a_channel_or_dm / total_users
         self.update_pickle()
-        pass
 
     def update_email(self, auth_user_id, email):
         user = self.get_users_from_u_id_dict().get(auth_user_id)
@@ -654,6 +696,12 @@ class Datastore:
 
         self.update_pickle()
 
+    def update_profile_img_url(self, auth_user_id, img_url):
+        user = self.get_users_from_u_id_dict().get(auth_user_id)
+        user['profile_img_url'] = img_url
+
+        self.update_pickle()
+
     def update_value(self, dict_key, key, value):
         self.__store[dict_key][key] = value
         self.update_pickle()
@@ -662,6 +710,10 @@ class Datastore:
         
     def increment_message_count(self):
         self.__store['message_count'] += 1
+        self.update_pickle()
+
+    def decrease_message_count(self):
+        self.__store['message_count'] -= 1
         self.update_pickle()
 
     def set(self, store):
