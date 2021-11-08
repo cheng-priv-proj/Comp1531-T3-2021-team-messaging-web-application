@@ -638,9 +638,9 @@ class Datastore:
         self.__store['message_count'] = number
         self.update_pickle()
 
-    def update_user_stats_channels_joined(self, u_id):
+    def update_user_stats_channels_joined(self, u_id, change):
         user_stats_channels = self.get_user_stats_from_u_id(u_id)['channels_joined']
-        user_stats_channels[0]['num_channels_joined'] += 1
+        user_stats_channels[0]['num_channels_joined'] += change
         user_stats_channels[0]['time_stamp'] = datetime.utcnow().timestamp()
     
     def update_user_stats_dms_joined(self, u_id, change):
