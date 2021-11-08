@@ -227,11 +227,11 @@ def user_profile_getimg_v1(url):
     '''
     check_type(url, str)
 
-    imageObject = Image.open('src/pickle_dump/' + url + '')
+    imageObject = Image.open('src/pickle_dump/' + url + '.')
     if imageObject == None:
         raise InputError
     else:
-        return 
+        return imageObject
 
 def user_stats_v1(auth_user_id):
     '''
