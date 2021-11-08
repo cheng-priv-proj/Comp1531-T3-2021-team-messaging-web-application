@@ -16,7 +16,7 @@ def extract_token():
 @pytest.fixture
 def users_all():
     def users_all_function(token):
-        return requests.get(url + 'users/all/v1', json = {
+        return requests.get(url + 'users/all/v1', params = {
             'token': token
          })
     return users_all_function
@@ -31,12 +31,13 @@ def clear():
 def register_user_return_info():
     def register_user_return_info_function(email, name_first, name_last):
         registration_info = {
-            'email': email, 
+            'username': email, 
             'password': 'password', 
             'name_first': name_first,
-            'name_last': name_last 
-        }
+            'name_last': name_last }
         owner_id_dict = requests.post(url + 'auth/register/v2', json = registration_info).json()
+        if owner_id_dict.status_code == 400 or owner_id_dict.status_code == 403:
+            return {}
         
         owner_id_dict['handle_str'] = registration_info.get('name_first') + registration_info.get('name_last')
         return {**owner_id_dict, **registration_info}
@@ -49,9 +50,6 @@ def user_info_to_user_datatype():
         user_info.pop('token')
         user_info.pop('password')
         
-        user_info['u_id'] = user_info['auth_user_id']
-        del user_info['auth_user_id']
-        
         return user_info
     return user_info_to_user_datatype_function
 
@@ -59,15 +57,14 @@ def user_info_to_user_datatype():
 @pytest.fixture
 def sort_users():
     def sort_users_function(users):
-        return users
+        return users.sorted(key=operator.itemgetter('name_first'))
     return sort_users_function
 
 def test_users_all_one_user(clear, register_user_return_info, users_all, extract_token, user_info_to_user_datatype, sort_users):
     owner_info = register_user_return_info('owner@gmail.com', 'owner', 'one')
     owner_token = extract_token(owner_info)
     user_list = users_all(owner_token).json()['users']
-    
-    assert sort_users(user_list) == [sort_users(user_info_to_user_datatype(owner_info))]
+    assert sort_users(user_list) == sort_users(user_info_to_user_datatype(owner_info))
 
 def test_users_all_multiple_users(clear, register_user_return_info, users_all, extract_token, user_info_to_user_datatype, sort_users):
     owner_info = register_user_return_info('owner@gmail.com', 'owner', 'one')
@@ -84,7 +81,7 @@ def test_users_all_works_for_non_owner(clear, register_user_return_info, users_a
     owner_info = register_user_return_info('owner@gmail.com', 'owner', 'one')
     user_info1 = register_user_return_info('user1@gmail.com', 'user', 'two')
     user_info2 = register_user_return_info('user2@gmail.com', 'user', 'three')
-    user_info3 = register_user_return_info('user3@gmail.com', 'user', 'four')
+    user_info3 = register_user_return_info('user2@gmail.com', 'user', 'four')
     user_list = [owner_info, user_info1, user_info2, user_info3]
 
     user_token = extract_token(user_info1)
@@ -106,6 +103,5 @@ def test_users_all_works_for_failed_registration(clear, register_user_return_inf
 
 def test_users_all_invalid_token(clear, register_user_return_info, users_all):
     register_user_return_info('owner@gmail.com', 'owner', 'one')
-    status = users_all('-123123')
 
-    assert  status.status_code == 403
+    assert users_all(-123123).status_code() == 403
