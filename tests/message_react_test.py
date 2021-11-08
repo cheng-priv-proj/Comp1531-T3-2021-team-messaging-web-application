@@ -155,14 +155,14 @@ def test_react_not_own(clear, register, extract_token, extract_user, extract_cha
         'start': 0 }).json()
 
     messages = messages['messages']
-    reacts = messages['reacts']
+    reacts = messages[0]['reacts']
 
     assert reacts == [{
         'react_id' : 1,
-        'u_ids' : [auth_id_v2['token']],
-        'is_this_user_reacted' : False
+        'u_ids' : [auth_id_v2['auth_user_id']],
+        'is_this_user_reacted' : True
     }]
-
+    
 def test_invalid_message_id(clear, register, extract_token, extract_user, extract_channel, extract_message, auth_id_v2):
     '''
     message_id is not a valid message within a channel or DM that the authorised user has joined
@@ -186,7 +186,6 @@ def test_invalid_message_id(clear, register, extract_token, extract_user, extrac
         'message_id': 69696969,
         'react_id': 1 }).status_code == 400
     
-
 def test_invalid_react_id(clear, register, extract_token, extract_user, extract_channel, extract_message, auth_id_v2):
     '''
     Invalid React id
@@ -209,7 +208,6 @@ def test_invalid_react_id(clear, register, extract_token, extract_user, extract_
         'token': auth_id_v2['token'],
         'message_id': extract_message(message_id),
         'react_id': 420}).status_code == 400
-
 
 def test_already_reacted_id(clear, register, extract_token, extract_user, extract_channel, extract_message, auth_id_v2):
     '''
@@ -238,7 +236,6 @@ def test_already_reacted_id(clear, register, extract_token, extract_user, extrac
         'token': auth_id_v2['token'],
         'message_id': extract_message(message_id),
         'react_id': 1}).status_code == 400
-
 
 def test_react_own_dm(clear, get_user_1, auth_id_v2, extract_message):
     '''
@@ -270,14 +267,13 @@ def test_react_own_dm(clear, get_user_1, auth_id_v2, extract_message):
         'start': 0 }).json()
 
     messages = messages['messages']
-    reacts = messages['reacts']
+    reacts = messages[0]['reacts']
 
     assert reacts == [{
         'react_id' : 1,
         'u_ids' : [get_user_1['auth_user_id']],
         'is_this_user_reacted' : True
     }]
-
 
 def test_react_not_own_dm(clear, get_user_1, auth_id_v2, extract_message):
     '''
@@ -309,10 +305,10 @@ def test_react_not_own_dm(clear, get_user_1, auth_id_v2, extract_message):
         'start': 0 }).json()
 
     messages = messages['messages']
-    reacts = messages['reacts']
+    reacts = messages[0]['reacts']
 
     assert reacts == [{
         'react_id' : 1,
-        'u_ids' : [auth_id_v2['token']],
-        'is_this_user_reacted' : False
+        'u_ids' : [auth_id_v2['auth_user_id']],
+        'is_this_user_reacted' : True
     }]

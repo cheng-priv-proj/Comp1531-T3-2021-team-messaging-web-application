@@ -48,7 +48,13 @@ def message_send_v1(auth_user_id, channel_id, message):
         'u_id': auth_user_id,
         'message': message,
         'time_created': datetime.utcnow().timestamp(),
-        'reacts': [],
+        'reacts': [
+            {  
+                'react_id' : 1,
+                'u_ids' : [],
+                'is_this_user_reacted' : False
+            }
+        ],
         'is_pinned': False
     }
 
@@ -99,7 +105,13 @@ def message_senddm_v1(auth_user_id, dm_id, message):
         'u_id': auth_user_id,
         'message': message,
         'time_created': datetime.utcnow().timestamp(),
-        'reacts': [],
+        'reacts': [
+            {  
+                'react_id' : 1,
+                'u_ids' : [],
+                'is_this_user_reacted' : False
+            }
+        ],
         'is_pinned': False
     }
 
@@ -246,22 +258,21 @@ def message_react_v1(auth_user_id, message_id, react_id):
     check_type(auth_user_id, int)
     check_type(message_id, int)
     check_type(react_id, int)
+    
+    if data_store.is_invalid_message_id(message_id):
+        raise InputError('Invalid message_id')
 
-    # Finds the channel or DM id from the message_id
-    # Move this to database after merging cus I cbb changing datastore rn.
-    data = data_store.get_messages_from_channel_or_dm_id_dict()
-    channel_dm_id = next(id for id in data for message in data[id] if message.get('message_id') == message_id)
-
-    if data_store.is_user_member_of_channel_or_dm(channel_dm_id, auth_user_id):
+    channel_dm_id = data_store.get_channel_or_dm_id_from_message_id(message_id)
+    if not data_store.is_user_member_of_channel_or_dm(channel_dm_id, auth_user_id):
         raise InputError('Message_id does not refer to a valid message within a channel/DM')
     
-    if data_store.is_invalid_react_id(react_id):
+    if data_store.is_invalid_react_id(react_id, message_id):
         raise InputError('Invalid react id')
     
-    if data_store.is_react_already_added_to_message(message_id, auth_user_id, react_id):
+    if data_store.is_user_already_reacted(react_id, auth_user_id, message_id):
         raise InputError('Message already reacted')
     
-    data_store.add_react_to_message(message_id, auth_user_id, react_id)
+    data_store.add_react_to_message(react_id, auth_user_id, message_id)
 
     return {}
 
@@ -285,6 +296,25 @@ def message_unreact_v1(auth_user_id, message_id, react_id):
     Return value:
         Returns {} on success
     '''
+    
+    check_type(auth_user_id, int)
+    check_type(message_id, int)
+    check_type(react_id, int)
+    
+    if data_store.is_invalid_message_id(message_id):
+        raise InputError('Invalid message_id')
+
+    channel_dm_id = data_store.get_channel_or_dm_id_from_message_id(message_id)
+    if not data_store.is_user_member_of_channel_or_dm(channel_dm_id, auth_user_id):
+        raise InputError('Message_id does not refer to a valid message within a channel/DM')
+    
+    if data_store.is_invalid_react_id(react_id, message_id):
+        raise InputError('Invalid react id')
+
+    if not data_store.is_user_already_reacted(react_id, auth_user_id, message_id):
+        raise InputError('Message not reacted')
+
+    data_store.remove_react_from_message(react_id, auth_user_id, message_id)
 
     return {}
 
