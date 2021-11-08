@@ -356,6 +356,14 @@ class Datastore:
         
         return self.is_channel_owner(channel_or_dm_id, u_id) 
 
+    def is_user_owner_perms_of_channel_or_dm(self, channel_or_dm_id, u_id):
+        if  (data_store.is_user_member_of_channel_or_dm(channel_or_dm_id, u_id) and 
+            (data_store.is_user_owner_of_channel_or_dm(channel_or_dm_id, u_id) or 
+            (data_store.is_stream_owner(u_id) and channel_or_dm_id > 0))):
+            return True
+        
+        return False
+
     def is_standup_active(self, channel_id):
         standups = self.get_standups_from_channel_id_dict()
         if channel_id in standups:
@@ -626,8 +634,12 @@ class Datastore:
 
         self.update_pickle()
     
+    def update_message_count(self, number):
+        self.__store['message_count'] = number
+        self.update_pickle()
+
     def update_user_stats_channels_joined(self, u_id, change):
-        user_stats_channels = self.__store['user_stats'][u_id]['channels_joined']
+        user_stats_channels = self.get_user_stats_from_u_id(u_id)['channels_joined']
         user_stats_channels[0]['num_channels_joined'] += change
         user_stats_channels[0]['time_stamp'] = datetime.utcnow().timestamp()
     

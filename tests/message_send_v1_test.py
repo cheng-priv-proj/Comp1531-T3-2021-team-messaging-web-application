@@ -81,6 +81,7 @@ def test_send_one_valid_message(clear, register, extract_token, extract_user, ex
                 'u_id': extract_user(register),
                 'message': 'testmessage',
                 'time_created':  pytest.approx(now, rel=2),
+<<<<<<< HEAD
                 'reacts': [
                     {  
                     'react_id' : 1,
@@ -88,6 +89,9 @@ def test_send_one_valid_message(clear, register, extract_token, extract_user, ex
                     'is_this_user_reacted' : False
                     }
                 ],
+=======
+                'reacts': [{'react_id': 1, 'u_ids': [], 'is_this_user_reacted': False}],
+>>>>>>> b3ccab81e3179ca57ca8c7e541d016eaf26e37c0
                 'is_pinned': False
             }
         ],
@@ -131,6 +135,7 @@ def test_send_multiple_valid_messages(clear, register, extract_token, extract_us
                 'u_id': owner_id,
                 'message': 'testmessage2',
                 'time_created': pytest.approx(now, rel=2),
+<<<<<<< HEAD
                 'reacts': [
                     {  
                     'react_id' : 1,
@@ -138,6 +143,9 @@ def test_send_multiple_valid_messages(clear, register, extract_token, extract_us
                     'is_this_user_reacted' : False
                     }
                 ],
+=======
+                'reacts': [{'react_id': 1, 'u_ids': [], 'is_this_user_reacted': False}],
+>>>>>>> b3ccab81e3179ca57ca8c7e541d016eaf26e37c0
                 'is_pinned': False
             },
             {
@@ -145,6 +153,7 @@ def test_send_multiple_valid_messages(clear, register, extract_token, extract_us
                 'u_id': owner_id,
                 'message': 'testmessage1',
                 'time_created': pytest.approx(now, rel=2),
+<<<<<<< HEAD
                 'reacts': [
                     {  
                     'react_id' : 1,
@@ -152,6 +161,9 @@ def test_send_multiple_valid_messages(clear, register, extract_token, extract_us
                     'is_this_user_reacted' : False
                     }
                 ],
+=======
+                'reacts': [{'react_id': 1, 'u_ids': [], 'is_this_user_reacted': False}],
+>>>>>>> b3ccab81e3179ca57ca8c7e541d016eaf26e37c0
                 'is_pinned': False
             },
             {
@@ -159,6 +171,7 @@ def test_send_multiple_valid_messages(clear, register, extract_token, extract_us
                 'u_id': owner_id,
                 'message': 'testmessage0',
                 'time_created':  pytest.approx(now, rel=2),
+<<<<<<< HEAD
                 'reacts': [
                     {  
                     'react_id' : 1,
@@ -166,6 +179,9 @@ def test_send_multiple_valid_messages(clear, register, extract_token, extract_us
                     'is_this_user_reacted' : False
                     }
                 ],
+=======
+                'reacts': [{'react_id': 1, 'u_ids': [], 'is_this_user_reacted': False}],
+>>>>>>> b3ccab81e3179ca57ca8c7e541d016eaf26e37c0
                 'is_pinned': False
             }
             ],
@@ -190,7 +206,7 @@ def test_send_invalid_message_to_short(clear, register, extract_token, extract_c
         'token': owner_token,
         'channel_id': channel_id,
         'message': '',
-        'reacts': []
+        'reacts': [{'react_id': 1, 'u_ids': [], 'is_this_user_reacted': False}]
     }).status_code == 400
 
 def test_send_invalid_message_to_long(clear, register, extract_token, extract_channel):
@@ -208,7 +224,7 @@ def test_send_invalid_message_to_long(clear, register, extract_token, extract_ch
         'token': owner_token,
         'channel_id': channel_id,
         'message': 'a' * 1001,
-        'reacts': []
+        'reacts': [{'react_id': 1, 'u_ids': [], 'is_this_user_reacted': False}]
     }).status_code == 400
 
 def test_send_valid_message_unauthorized_user(clear, register, extract_token, extract_channel):
