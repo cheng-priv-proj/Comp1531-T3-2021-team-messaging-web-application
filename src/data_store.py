@@ -598,7 +598,8 @@ class Datastore:
         self.update_pickle()
 
     def remove_reset_code(self, reset_code):
-        del self.get_u_id_from_reset_code_dict[reset_code]
+        
+        del self.get_u_id_from_reset_code_dict()[reset_code]
 
     # Update ##################################################################
     

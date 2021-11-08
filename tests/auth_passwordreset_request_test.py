@@ -69,7 +69,7 @@ def test_secret_code_sent(clear, new_email, register_user):
 
     with mailslurp_client.ApiClient(configuration) as api_client:
         waitfor_controller = mailslurp_client.WaitForControllerApi(api_client)
-        email = waitfor_controller.wait_for_latest_email(inbox_id=new_email.id, timeout=30000, unread_only=True)
+        waitfor_controller.wait_for_latest_email(inbox_id=new_email.id, timeout=30000, unread_only=True)
 
 @pytest.mark.skip(reason="Not implemented")
 def test_logged_out(clear, new_email, register_channel, register_user):

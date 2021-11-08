@@ -222,7 +222,7 @@ def auth_passwordreset_reset_v1(reset_code, new_password):
 
     u_id = data_store.get_u_id_from_reset_code(reset_code)
 
-    data_store.update_password(u_id, password)
+    data_store.update_password(u_id, new_password)
 
     data_store.remove_reset_code(reset_code)
 
