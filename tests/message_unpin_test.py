@@ -107,7 +107,7 @@ def test_unpin_dm(clear, extract_token, extract_user, extract_message, register_
                 'u_id': owner_id,
                 'message': 'testmessage',
                 'time_created': pytest.approx(pytest.approx(now, rel=2)),
-                'reacts': [],
+                'reacts': [{'react_id': 1, 'u_ids': [], 'is_this_user_reacted': False}],
                 'is_pinned': False
             }
         ],
@@ -153,7 +153,7 @@ def test_unpin_channel(clear, extract_token, extract_user, extract_message, regi
                 'u_id': owner_id,
                 'message': 'testmessage',
                 'time_created': pytest.approx(pytest.approx(now, rel=2)),
-                'reacts': [],
+                'reacts': [{'react_id': 1, 'u_ids': [], 'is_this_user_reacted': False}],
                 'is_pinned': False
             }
         ],

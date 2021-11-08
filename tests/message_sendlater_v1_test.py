@@ -78,7 +78,7 @@ def test_standard(register_users, channel_factory):
                 'u_id': register_users[0]['auth_user_id'],
                 'message': 'hi there',
                 'time_created': pytest.approx(now + 2, rel=1),
-                'reacts': [],
+                'reacts': [{'react_id': 1, 'u_ids': [], 'is_this_user_reacted': False}],
                 'is_pinned': False
             }
         ],
@@ -142,7 +142,7 @@ def test_multiple(register_users, channel_factory):
                 'u_id': register_users[0]['auth_user_id'],
                 'message': 'hi there',
                 'time_created': pytest.approx(now + 5, rel=1),
-                'reacts': [],
+                'reacts': [{'react_id': 1, 'u_ids': [], 'is_this_user_reacted': False}],
                 'is_pinned': False
             },
             {
@@ -150,7 +150,7 @@ def test_multiple(register_users, channel_factory):
                 'u_id': register_users[0]['auth_user_id'],
                 'message': 'hi there',
                 'time_created': pytest.approx(now + 2, rel=1),
-                'reacts': [],
+                'reacts': [{'react_id': 1, 'u_ids': [], 'is_this_user_reacted': False}],
                 'is_pinned': False
             },
             {
@@ -158,7 +158,7 @@ def test_multiple(register_users, channel_factory):
                 'u_id': register_users[0]['auth_user_id'],
                 'message': 'hi there',
                 'time_created': pytest.approx(now + 1, rel=1),
-                'reacts': [],
+                'reacts': [{'react_id': 1, 'u_ids': [], 'is_this_user_reacted': False}],
                 'is_pinned': False
             }
         ],

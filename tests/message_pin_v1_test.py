@@ -102,7 +102,7 @@ def test_pin_dm(clear, extract_token, extract_user, extract_message, register_us
                 'u_id': owner_id,
                 'message': 'testmessage',
                 'time_created': pytest.approx(pytest.approx(now, rel=2)),
-                'reacts': [],
+                'reacts': [{'react_id': 1, 'u_ids': [], 'is_this_user_reacted': False}],
                 'is_pinned': True
             }
         ],
@@ -143,7 +143,7 @@ def test_pin_channel(clear, extract_token, extract_user, extract_message, regist
                 'u_id': owner_id,
                 'message': 'testmessage',
                 'time_created': pytest.approx(pytest.approx(now, rel=2)),
-                'reacts': [],
+                'reacts': [{'react_id': 1, 'u_ids': [], 'is_this_user_reacted': False}],
                 'is_pinned': True
             }
         ],

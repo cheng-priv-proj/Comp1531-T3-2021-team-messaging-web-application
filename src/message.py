@@ -56,7 +56,7 @@ def message_send_v1(auth_user_id, channel_id, message):
         'u_id': auth_user_id,
         'message': message,
         'time_created': datetime.utcnow().timestamp(),
-        'reacts': [],
+        'reacts': [{'react_id': 1, 'u_ids': [], 'is_this_user_reacted': False}],
         'is_pinned': False
     }
 
@@ -111,7 +111,7 @@ def message_senddm_v1(auth_user_id, dm_id, message):
         'u_id': auth_user_id,
         'message': message,
         'time_created': datetime.utcnow().timestamp(),
-        'reacts': [],
+        'reacts': [{'react_id': 1, 'u_ids': [], 'is_this_user_reacted': False}],
         'is_pinned': False
     }
 
