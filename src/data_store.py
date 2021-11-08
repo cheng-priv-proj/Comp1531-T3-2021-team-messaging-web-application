@@ -337,6 +337,14 @@ class Datastore:
         
         return self.is_channel_owner(channel_or_dm_id, u_id) 
 
+    def is_user_owner_perms_of_channel_or_dm(self, channel_or_dm_id, u_id):
+        if  (data_store.is_user_member_of_channel_or_dm(channel_or_dm_id, u_id) and 
+            (data_store.is_user_owner_of_channel_or_dm(channel_or_dm_id, u_id) or 
+            (data_store.is_stream_owner(u_id) and channel_or_dm_id > 0))):
+            return True
+        
+        return False
+
     def is_standup_active(self, channel_id):
         standups = self.get_standups_from_channel_id_dict()
         if channel_id in standups:

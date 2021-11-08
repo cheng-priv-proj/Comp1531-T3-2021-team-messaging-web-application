@@ -956,6 +956,8 @@ def message_unreact_endpt():
 def message_pin_endpt():
     request_data = request.get_json()
     token = request_data['token']
+    print(token)
+    print(request_data)
     auth_user_id = token_to_auth_id(token)
     message_id = request_data.get('message_id')
 

@@ -336,23 +336,23 @@ def message_pin_v1(auth_user_id, message_id):
     check_type(auth_user_id, int)
     check_type(message_id, int)
 
-    is_invalid_message = data_store.is_invalid_message_id(message_id)
-    channel_or_dm_id = data_store.get_channel_or_dm_id_from_message_id(message_id)
-    is_member = data_store.is_user_member_of_channel_or_dm(channel_or_dm_id, auth_user_id)
 
-    if is_invalid_message == True and is_member == True:
+
+    if data_store.is_invalid_message_id(message_id):
         raise InputError('Message_id does not refer to a valid message')
+    
+    message = data_store.get_message_from_message_id(message_id)
+    if message['is_pinned']:
+        raise InputError('Message is already pinned')
 
-    if is_invalid_message == False and is_member == False:
+    channel_or_dm_id = data_store.get_channel_or_dm_id_from_message_id(message_id)
+    if not data_store.is_user_member_of_channel_or_dm(channel_or_dm_id, auth_user_id):
+        raise InputError('User is not a member of the channel with this message')
+        
+    if not data_store.is_user_owner_perms_of_channel_or_dm(channel_or_dm_id, auth_user_id):
         raise AccessError('User does not have the correct permissions')
 
-    message = data_store.get_message_from_message_id(message_id)
-    
-
-    if message['is_pinned'] == True:
-        raise InputError('Message is already pinned')
-    else:
-        message['is_pinned'] = True 
+    message['is_pinned'] = True 
 
     return {}
 
@@ -378,23 +378,21 @@ def message_unpin_v1(auth_user_id, message_id):
     check_type(auth_user_id, int)
     check_type(message_id, int)
 
-    is_invalid_message = data_store.is_invalid_message_id(message_id)
-    channel_or_dm_id = data_store.get_channel_or_dm_id_from_message_id(message_id)
-    is_member = data_store.is_user_member_of_channel_or_dm(channel_or_dm_id, auth_user_id)
-
-    if is_invalid_message == True and is_member == True:
+    if data_store.is_invalid_message_id(message_id):
         raise InputError('Message_id does not refer to a valid message')
+    
+    message = data_store.get_message_from_message_id(message_id)
+    if not message['is_pinned']:
+        raise InputError('Message is already unpinned')
 
-    if is_invalid_message == False and is_member == False:
+    channel_or_dm_id = data_store.get_channel_or_dm_id_from_message_id(message_id)
+    if not data_store.is_user_member_of_channel_or_dm(channel_or_dm_id, auth_user_id):
+        raise InputError('User is not a member of the channel with this message')
+    
+    if not data_store.is_user_owner_perms_of_channel_or_dm(channel_or_dm_id, auth_user_id):
         raise AccessError('User does not have the correct permissions')
 
-    message = data_store.get_message_from_message_id(message_id)
-    
-    
-    if message['is_pinned'] == False:
-        raise InputError('Message is already unpinned')
-    else:
-        message['is_pinned'] = False 
+    message['is_pinned'] = False 
 
     return {}
 

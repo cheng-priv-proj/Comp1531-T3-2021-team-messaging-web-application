@@ -197,14 +197,22 @@ def test_no_owner_perms(clear, extract_token, extract_message, register_user, re
     owner_token = extract_token(owner_details)
 
     channel_id = register_channel(owner_token, 'original_channel', True)
-
+    print(owner_token)
+    print(channel_id)
     message_id = extract_message(requests.post(url + 'message/send/v1', json = {
         'token': owner_token,
         'channel_id': channel_id,
         'message': 'testmessage' 
     }).json())
 
-    random_token = register_user('randomuser@email.com')
+    user_info = register_user('randomuser@email.com')
+    random_token = extract_token(user_info)
+
+    requests.post(url + 'channel/invite/v2', json = {
+        'token': owner_token,
+        'channel_id': channel_id,
+        'u_id': user_info['auth_user_id']
+    })
 
     assert requests.post(url + 'message/pin/v1', json = {
         'token': random_token,
