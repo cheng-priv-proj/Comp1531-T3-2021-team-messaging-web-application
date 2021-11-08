@@ -148,8 +148,9 @@ def passwordreset_request_endpt():
     '''
     insert something here
     '''
+    email = request.get_json(force = True).get('email')
 
-    return auth_passwordreset_request_v1('')
+    return auth_passwordreset_request_v1(email)
 
 # Auth password reset
 @APP.route('/auth/passwordreset/reset/v1', methods= ['POST'])

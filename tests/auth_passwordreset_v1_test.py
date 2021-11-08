@@ -7,7 +7,7 @@ from src.config import url
 configuration = mailslurp_client.Configuration()
 # Pls don't hack jk unless you know what you're doing :D 
 # Gon be buggy asf glhf 
-configuration.api_key['x-api-key'] = "6c91d6e6e7970c0bff72eeb53a79cc29a7d50e2c158015ebb4fcdd45ee203f75"
+configuration.api_key['x-api-key'] = "e050c5c764815755bb821286544405db1c28893b56b94f3a19a1d145d3db05c2"
 
 # Clears storage 
 @pytest.fixture

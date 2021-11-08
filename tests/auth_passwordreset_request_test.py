@@ -7,7 +7,7 @@ from src.config import url
 configuration = mailslurp_client.Configuration()
 # Pls don't hack jk unless you know what you're doing :D 
 # Gon be buggy asf glhf 
-configuration.api_key['x-api-key'] = "6c91d6e6e7970c0bff72eeb53a79cc29a7d50e2c158015ebb4fcdd45ee203f75"
+configuration.api_key['x-api-key'] = "e050c5c764815755bb821286544405db1c28893b56b94f3a19a1d145d3db05c2"
 
 # Clears storage 
 @pytest.fixture
@@ -18,6 +18,7 @@ def clear():
 @pytest.fixture
 def register_channel():
     def register_channel_function(token, name, is_public):
+        print(token)
         channel_details = {
             'token': token,
             'name': name,
@@ -41,7 +42,7 @@ def register_user():
         }
         details_dict = requests.post(url + 'auth/register/v2', json = user_details).json()
 
-        return details_dict
+        return details_dict['token']
     return register_user_function
 
 @pytest.fixture
@@ -71,6 +72,7 @@ def test_secret_code_sent(clear, new_email, register_user):
 
 def test_logged_out(clear, new_email, register_channel, register_user):
     token = register_user(new_email.email_address)
+
     register_channel(token, 'channel', True)
 
     requests.post(url + 'auth/passwordreset/request/v1', json = {
