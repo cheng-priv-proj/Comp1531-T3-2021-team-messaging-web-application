@@ -48,7 +48,8 @@ def test_member_invite_v2(clear_server, get_invitee, get_user_1):
 
     requests.post(config.url + 'channel/invite/v2', json={'token': get_user_1['token'], 'channel_id': extracted_channel_id, 'u_id': get_invitee['auth_user_id']}).json()
     details = requests.get(config.url + 'channel/details/v2', params={'token': get_user_1['token'], 'channel_id': extracted_channel_id}).json()
-
+    img_url = requests.get(config.url + 'user/profile/v1', params = {'token': get_user_1['token'], 'u_id': get_user_1['auth_user_id']}).json()['user']['profile_img_url']
+    
     assert details["all_members"] == [
         {
             'u_id': get_user_1['auth_user_id'],
@@ -56,7 +57,7 @@ def test_member_invite_v2(clear_server, get_invitee, get_user_1):
             'name_first': 'owner',
             'name_last': 'one',
             'handle_str': 'ownerone',
-            'profile_img_url': 'link_to_default'
+            'profile_img_url': img_url
         },
         {
             'u_id': get_invitee['auth_user_id'],
@@ -64,7 +65,7 @@ def test_member_invite_v2(clear_server, get_invitee, get_user_1):
             'name_first': 'John',
             'name_last': 'smith',
             'handle_str': 'johnsmith',
-            'profile_img_url': 'link_to_default'
+            'profile_img_url': img_url
         }
     ]
 
@@ -91,6 +92,7 @@ def test_invite_multiple_v2(clear_server, get_invitee, get_user_1):
     requests.post(config.url + 'channel/invite/v2', json={'token': get_invitee['token'], 'channel_id': extracted_channel_id, 'u_id': user_3_dict['auth_user_id']}).json()
 
     details = requests.get(config.url + 'channel/details/v2', params={'token': get_user_1['token'], 'channel_id': extracted_channel_id}).json()
+    img_url = requests.get(config.url + 'user/profile/v1', params = {'token': get_user_1['token'], 'u_id': get_user_1['auth_user_id']}).json()['user']['profile_img_url']
     assert details["all_members"] == [
         {
             'u_id': get_user_1['auth_user_id'],
@@ -98,7 +100,7 @@ def test_invite_multiple_v2(clear_server, get_invitee, get_user_1):
             'name_first': 'owner',
             'name_last': 'one',
             'handle_str': 'ownerone',
-            'profile_img_url': 'link_to_default'
+            'profile_img_url': img_url
         },
         {
             'u_id': get_invitee['auth_user_id'],
@@ -106,7 +108,7 @@ def test_invite_multiple_v2(clear_server, get_invitee, get_user_1):
             'name_first': 'John',
             'name_last': 'smith',
             'handle_str': 'johnsmith',
-            'profile_img_url': 'link_to_default'
+            'profile_img_url': img_url
         },
         {
             'u_id': user_3_dict['auth_user_id'],
@@ -114,7 +116,7 @@ def test_invite_multiple_v2(clear_server, get_invitee, get_user_1):
             'name_first': 'Johno',
             'name_last': 'smith',
             'handle_str': 'johnosmith',
-            'profile_img_url': 'link_to_default'
+            'profile_img_url': img_url
         }
     ]
 
@@ -131,7 +133,7 @@ def test_private_invite(clear_server, get_invitee, get_user_1):
 
     requests.post(config.url + 'channel/invite/v2', json={'token': get_user_1['token'], 'channel_id': extracted_channel_id, 'u_id': get_invitee['auth_user_id']}).json()
     details = requests.get(config.url + 'channel/details/v2', params={'token': get_user_1['token'], 'channel_id': extracted_channel_id}).json()
-
+    img_url = requests.get(config.url + 'user/profile/v1', params = {'token': get_user_1['token'], 'u_id': get_user_1['auth_user_id']}).json()['user']['profile_img_url']
     assert details["all_members"] == [
         {
             'u_id': get_user_1['auth_user_id'],
@@ -139,7 +141,7 @@ def test_private_invite(clear_server, get_invitee, get_user_1):
             'name_first': 'owner',
             'name_last': 'one',
             'handle_str': 'ownerone',
-            'profile_img_url': 'link_to_default'
+            'profile_img_url': img_url
         },
         {
             'u_id': get_invitee['auth_user_id'],
@@ -147,7 +149,7 @@ def test_private_invite(clear_server, get_invitee, get_user_1):
             'name_first': 'John',
             'name_last': 'smith',
             'handle_str': 'johnsmith',
-            'profile_img_url': 'link_to_default'
+            'profile_img_url': img_url
         }
     ]
 

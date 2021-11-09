@@ -1,6 +1,7 @@
 import pickle
 import os
 from datetime import datetime
+from src.config import url
 
 ######### DATASTORE STRUCTURE ##################################################
 #  
@@ -237,7 +238,7 @@ class Datastore:
         return self.__store['users']
 
     def get_user_from_u_id(self, u_id):
-        return self.get_users_from_u_id_dict().get(u_id)
+        return self.get_users_from_u_id_dict().get(u_id) 
 
     def get_user_perms_from_u_id_dict(self):
         return self.__store['perms']
@@ -248,6 +249,11 @@ class Datastore:
     def get_num_streams_owners(self):
         perms = self.get_user_perms_from_u_id_dict().items()
         return len([u_id for u_id, perm_id in perms if perm_id == 1])
+
+    # profile_img_url
+    
+    def get_profile_img_url_from_u_id(self, u_id):
+        return self.__store['users'][u_id]['profile_img_url']
 
     # stats
 
@@ -453,7 +459,7 @@ class Datastore:
             'name_first': name_first,
             'name_last': name_last,
             'handle_str': handle_str,
-            'profile_img_url': 'link_to_default'
+            'profile_img_url': url + 'src/pickle_dump/default.jpg'
         }
         self.get_user_stats_from_u_id_dict()[u_id] = {
             'channels_joined': [{'num_channels_joined': 0, 'time_stamp': 0}], 

@@ -120,7 +120,7 @@ def test_returns_all_info(clear, first_register):
     channel_id = first_register.get('channel_id')
 
     channel_details = requests.get(url + 'channel/details/v2', params = {'token': token, "channel_id": channel_id}).json()
-
+    img_url = requests.get(url + 'user/profile/v1', params = {'token': token, 'u_id': first_register.get('auth_user_id')}).json()['user']['profile_img_url']
     assert channel_details == {
         'name': 'channel',
         'is_public': True,
@@ -131,7 +131,7 @@ def test_returns_all_info(clear, first_register):
                 'name_first': 'global',
                 'name_last': 'user',
                 'handle_str': 'globaluser',
-                'profile_img_url': 'link_to_default'
+                'profile_img_url': img_url
             }
         ],
         'all_members': [
@@ -141,7 +141,7 @@ def test_returns_all_info(clear, first_register):
                 'name_first': 'global',
                 'name_last': 'user',
                 'handle_str': 'globaluser',
-                'profile_img_url': 'link_to_default'
+                'profile_img_url': img_url
             }
         ]
     }
