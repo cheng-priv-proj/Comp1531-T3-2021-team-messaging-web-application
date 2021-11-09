@@ -1263,7 +1263,13 @@ def search_endpt():
     put smth here
     '''
 
-    return search_v1(0,'')
+    token = request.args.get('token')
+    auth_user_id = token_to_auth_id(token)
+
+    query_str = request.args.get('query_str')
+
+    return search_v1(auth_user_id, query_str)
+
 
 ################## STANDUP #####################################################
 
