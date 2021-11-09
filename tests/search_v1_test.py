@@ -119,7 +119,7 @@ def test_search_v1_1_channel(clear_server, get_valid_token, channel_factory, sen
         'u_id': auth_id,
         'message': 'hello',
         'time_created': pytest.approx(pytest.approx(now, rel=2)),
-        'reacts': [],
+        'reacts': [{'react_id': 1, 'u_ids': [], 'is_this_user_reacted': False}],
         'is_pinned': False
     }]}
 
@@ -147,7 +147,7 @@ def test_search_v1_2_channels(clear_server, get_valid_token, channel_factory, se
         'u_id': auth_id,
         'message': 'hello',
         'time_created': pytest.approx(pytest.approx(now, rel=2)),
-        'reacts': [],
+        'reacts': [{'react_id': 1, 'u_ids': [], 'is_this_user_reacted': False}],
         'is_pinned': False
     },
     {
@@ -155,7 +155,7 @@ def test_search_v1_2_channels(clear_server, get_valid_token, channel_factory, se
         'u_id': auth_id,
         'message': 'hello',
         'time_created': pytest.approx(pytest.approx(now, rel=2)),
-        'reacts': [],
+        'reacts': [{'react_id': 1, 'u_ids': [], 'is_this_user_reacted': False}],
         'is_pinned': False
     }]}
 
@@ -186,7 +186,7 @@ def test_search_v1_1_channel_1_dm(clear_server, get_valid_token, channel_factory
         'u_id': auth_id,
         'message': 'hello',
         'time_created': pytest.approx(pytest.approx(now, rel=2)),
-        'reacts': [],
+        'reacts': [{'react_id': 1, 'u_ids': [], 'is_this_user_reacted': False}],
         'is_pinned': False
     },
     {
@@ -194,7 +194,7 @@ def test_search_v1_1_channel_1_dm(clear_server, get_valid_token, channel_factory
         'u_id': auth_id,
         'message': 'hello',
         'time_created': pytest.approx(pytest.approx(now, rel=2)),
-        'reacts': [],
+        'reacts': [{'react_id': 1, 'u_ids': [], 'is_this_user_reacted': False}],
         'is_pinned': False
     }]}
 
@@ -221,13 +221,13 @@ def test_search_v1_2_dms(clear_server, get_valid_token, dm_factory, send_message
         'query_str': 'hello'
     }).json()
 
-
+    print(response)
     assert response == {'messages' : [{
         'message_id': message_id1,
         'u_id': auth_id,
         'message': 'hello',
         'time_created': pytest.approx(pytest.approx(now, rel=2)),
-        'reacts': [],
+        'reacts': [{'react_id': 1, 'u_ids': [], 'is_this_user_reacted': False}],
         'is_pinned': False 
     },
     {
@@ -235,7 +235,7 @@ def test_search_v1_2_dms(clear_server, get_valid_token, dm_factory, send_message
         'u_id': auth_id,
         'message': 'hello',
         'time_created': pytest.approx(pytest.approx(now, rel=2)),
-        'reacts': [],
+        'reacts': [{'react_id': 1, 'u_ids': [], 'is_this_user_reacted': False}],
         'is_pinned': False
     }]}
 

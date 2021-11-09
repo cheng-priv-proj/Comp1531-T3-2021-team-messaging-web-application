@@ -21,7 +21,8 @@ def search_v1(auth_user_id, query_str):
     Return value:
         Returns { messages } on success
     '''
-
+    print('query_str')
+    print(query_str)
     if len(query_str) > 1000 or len(query_str) < 1:
         raise InputError('length of query_str is less than 1 or over 1000 characters')
 
