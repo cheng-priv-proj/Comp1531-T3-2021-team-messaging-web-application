@@ -31,22 +31,28 @@ def dm_create_v1(auth_id, u_ids):
 
     if any (data_store.is_invalid_user_id(u_id) for u_id in u_ids):
         raise InputError ('an u_id in u_ids does not refer to a valid user')
-
+    print('inputs',u_ids, auth_id)
     
     # Obtaining the handle_strs for all members in channel
-    old_u_ids = u_ids
+    old_u_ids = [u_id for u_id in u_ids]
     u_ids.append(auth_id)
     handle_str_list = sorted([user_info.get(u_id).get('handle_str') for u_id in u_ids])
     user_list = [data_store.get_user_from_u_id(u_id) for u_id in u_ids]
 
     # Creating the channel name and dm_id (ALL DM_ID ARE NEGATIVE AND START AT -1)
-    dm_id = (len(data_store.get_dms_from_dm_id_dict()) + 1) * -1
     dm_name = ', '.join(handle_str_list)
+    dm_id = (len(data_store.get_dms_from_dm_id_dict()) + 2) * -1
 
     data_store.insert_dm(auth_id, dm_id, user_list, dm_name)
 
+    data_store.update_user_stats_dms_joined(auth_id, 1)
+    print('auth_id', auth_id)
+    print('old', old_u_ids)
     for u_id in old_u_ids:
+        data_store.update_user_stats_dms_joined(u_id, 1)
         insert_invite_channel_or_dm_notifications(dm_id, auth_id, u_id)
+
+    data_store.update_workspace_stats_dms_exist(1)
 
     return { 'dm_id': dm_id }
 
@@ -198,6 +204,8 @@ def dm_leave_v1(auth_id, dm_id):
     
     dm['members'] = [user for user in dm.get('members') if user.get('u_id') != auth_id]
 
+    data_store.update_user_stats_dms_joined(auth_id, -1)
+
     return {}
 
 def dm_remove_v1(auth_id, dm_id):
@@ -227,5 +235,9 @@ def dm_remove_v1(auth_id, dm_id):
         raise AccessError ('dm_id is valid and the authorised user is not creator of the DM')
 
     data_store.remove_dm(dm_id)
+    data_store.update_workspace_stats_dms_exist(-1)
+    for user_id in data_store.get_dm_members_from_dm_id(dm_id):
+        data_store.update_user_stats_dms_joined(user_id, -1)
 
     return {}
+

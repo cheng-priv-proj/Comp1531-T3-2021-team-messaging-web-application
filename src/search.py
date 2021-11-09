@@ -21,5 +21,49 @@ def search_v1(auth_user_id, query_str):
     Return value:
         Returns { messages } on success
     '''
+    print('query_str')
+    print(query_str)
+    if len(query_str) > 1000 or len(query_str) < 1:
+        raise InputError('length of query_str is less than 1 or over 1000 characters')
 
-    return { 'messages': []}
+
+    returning_messages_list = []
+
+    channels_dict = data_store.get_channels_from_channel_id_dict()
+
+    channels = [{
+                    'channel_id': channel_id,
+                    'name': channels_dict.get(channel_id).get('name')
+                }
+                for channel_id in channels_dict
+                if data_store.is_user_member_of_channel(channel_id, auth_user_id)
+               ]
+
+    
+
+    for element in channels:
+        messages = data_store.get_messages_from_channel_or_dm_id(element['channel_id'])
+        for message in messages:
+            if message['u_id'] == auth_user_id:
+                if query_str in message['message']:
+                    returning_messages_list.append(message)
+
+    dm_dict = data_store.get_dms_from_dm_id_dict().items()
+
+    dms = [ {
+                'dm_id': dm_id,
+                'name': dm['details']['name']
+            }
+            for dm_id, dm in dm_dict
+            if data_store.is_user_member_of_dm(dm_id, auth_user_id)
+          ]
+
+    for element in dms:
+        messages = data_store.get_messages_from_channel_or_dm_id(element['dm_id'])
+        for message in messages:
+            if message['u_id'] == auth_user_id:
+                if query_str in message['message']:
+                    returning_messages_list.append(message)
+
+
+    return { 'messages': returning_messages_list}

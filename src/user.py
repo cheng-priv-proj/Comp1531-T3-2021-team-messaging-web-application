@@ -234,7 +234,6 @@ def user_profile_getimg_v1(auth_user_id):
         raise InputError
     else:
         return imageObject
-
 def user_stats_v1(auth_user_id):
     '''
     Fetches the required statistics about this user's use of UNSW Streams.
@@ -264,12 +263,8 @@ def users_stats_v1(auth_user_id):
     Return value:
         Returns { workspace_stats } on success
     '''
+    check_type(auth_user_id, int)
+    print('testing2')
+    print(data_store.get_workspace_stats())
+    return {'workspace_stats': data_store.get_workspace_stats()}
 
-    return {
-        'workspace_stats': {
-            'channels_exist': [{'num_channels_exist': 0, 'time_stamp': 0.0}], 
-            'dms_exist': [{'num_dms_exist': 0, 'time_stamp': 0.0}],
-            'messages_exist': [{'num_messages_exist': 0, 'time_stamp': 0.0}],
-            'utilization_rate': 0.0
-        }
-    }

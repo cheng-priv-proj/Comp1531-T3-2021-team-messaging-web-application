@@ -160,6 +160,10 @@ def check_and_insert_tag_notifications_in_message(message, channel_or_dm_id, aut
     Return value:
         None
     '''
+
+    if data_store.is_standup_active(channel_or_dm_id):
+        return
+
     print('entered')
     tags = [re.sub(r'\W+', '', tag) for tag in re.findall(r'@{1}[a-z0-9]+[^0-9a-zA-Z| ]?', message)]
     tags = [tags for tag in tags if data_store.is_duplicate_handle(tag) and data_store.is_user_member_of_channel_or_dm(channel_or_dm_id, data_store.get_u_id_from_handle_str(tag))]
@@ -201,6 +205,7 @@ def insert_react_message_notification(channel_or_dm_id, auth_user_id, u_id):
     '''
     user = data_store.get_user_from_u_id(auth_user_id)
     message = f"{user.get('handle_str')} reacted to your message in {data_store.get_name_from_channel_or_dm_id(channel_or_dm_id)}"
+    print('notification react')
     data_store.insert_notification(u_id, message, channel_or_dm_id)
 
 stream_owner = 1

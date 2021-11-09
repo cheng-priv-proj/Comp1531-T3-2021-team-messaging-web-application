@@ -149,17 +149,38 @@ def passwordreset_request_endpt():
     '''
     insert something here
     '''
+    email = request.get_json(force = True).get('email')
 
-    return auth_passwordreset_request_v1('')
+    return auth_passwordreset_request_v1(email)
 
 # Auth password reset
 @APP.route('/auth/passwordreset/reset/v1', methods= ['POST'])
 def passwordreset_reset_endpt():
     '''
-    insert something here
-    '''
+    Given a reset code for a user, set that user's new password to the
+    password provided.
+    
+    Arguments:
+        reset_code      (str) - secret reset string
+        new_password    (str) - new password string
 
-    return auth_passwordreset_reset_v1(0,'')
+    Exceptions:
+        TypeError   - occurs when reset_code, new_password are not strs
+        InputError  - reset_code is not a valid reset code
+        InputError  - password entered is less than 6 characters long
+
+    Return {} on success
+    '''
+    register_details = request.get_json(force = True)
+
+    reset_code = register_details.get('reset_code')
+    new_password = register_details.get('new_password')
+    print('reset code is:', reset_code,'pass is:', new_password)
+
+
+    auth_passwordreset_reset_v1(str(reset_code), str(new_password))
+
+    return {}
 
 ###################### Channels ######################
 # Channel create
@@ -750,7 +771,6 @@ def user_profile_uploadphoto_endpt():
 
     '''
     request_data = request.get_json(force = True)
-
     token = request_data['token']
     auth_user_id = token_to_auth_id(token)
     print(auth_user_id)
@@ -807,15 +827,26 @@ def user_stats_endpt():
 def users_stats_endpt():
     '''
     Fetches the required statistics about the use of UNSW Streams.
+<<<<<<< HEAD
 
     Arguments:
         token           (str)   - valid token
 
+=======
+
+    Arguments:
+        token           (str)   - valid token
+
+>>>>>>> img_profile_stuff
     Exceptions:
         AccessError - occurs when token is invalid
 
     Return value:
+<<<<<<< HEAD
+        Returns workplace stats
+=======
         Returns workspace stats
+>>>>>>> img_profile_stuff
     '''
     print('test')
     request_token = request.args.get('token')
@@ -984,55 +1015,161 @@ def message_share_endpt():
     put smth here
     '''
 
-    return message_share_v1(0,0,'',0,0)
+    request_data = request.get_json(force = True)
+    message_id = request_data['og_message_id']
+    message = request_data['message']
+    channel_id = request_data['channel_id']
+    dm_id = request_data['dm_id']
+    token = request_data['token']
+    auth_user_id = token_to_auth_id(token)
+
+    return message_share_v1(auth_user_id, message_id, message, channel_id, dm_id)
 
 @APP.route('/message/react/v1', methods=['POST'])
 def message_react_endpt():
     '''
-    put smth here
-    '''
+    Given a message within a channel or DM the authorised user is part of, 
+    add a "react" to that particular message.
 
-    return message_react_v1(0,0,0)
+    Arguments:
+        token           (str)   - unique user token
+        message_id      (int)   - unique message id
+        react_id        (int)   - unique react id
+    
+    Exceptions:
+        AccessError - occurs when token is invalid
+        InputError  - occurs when react_id is invalid
+        InputError  - message already contains react with that react_id
+
+    Return Value:
+        Returns {} on success
+    '''
+    request_data = request.get_json(force = True)
+    message_id = request_data['message_id']
+    react_id = request_data['react_id']
+    token = request_data['token']
+    auth_user_id = token_to_auth_id(token)
+
+    return message_react_v1(auth_user_id, message_id, react_id)
 
 @APP.route('/message/unreact/v1', methods=['POST'])
 def message_unreact_endpt():
     '''
-    put smth here
+    Given a message within a channel or DM the authorised user is part of, 
+    remove a "react" to that particular message.
+
+    Arguments:
+        token           (str)   - unique user token
+        message_id      (int)   - unique message id
+        react_id        (int)   - unique react id
+    
+    Exceptions:
+        AccessError - occurs when token is invalid
+        InputError  - occurs when react_id is invalid
+        InputError  - message already contains react with that react_id
+
+    Return Value:
+        Returns {} on success
     '''
 
-    return message_unreact_v1(0,0,0)
+    request_data = request.get_json(force = True)
+    message_id = request_data['message_id']
+    react_id = request_data['react_id']
+    token = request_data['token']
+    auth_user_id = token_to_auth_id(token)
+
+    return message_unreact_v1(auth_user_id, message_id, react_id)
 
 @APP.route('/message/pin/v1', methods=['POST'])
 def message_pin_endpt():
-    '''
-    put smth here
-    '''
+    request_data = request.get_json()
+    token = request_data['token']
+    print(token)
+    print(request_data)
+    auth_user_id = token_to_auth_id(token)
+    message_id = request_data.get('message_id')
 
-    return message_pin_v1(0,0)
+    message_pin_v1(auth_user_id, message_id)
+    return {}
 
 @APP.route('/message/unpin/v1', methods=['POST'])
 def message_unpin_endpt():
-    '''
-    put smth here
-    '''
+    request_data = request.get_json()
+    token = request_data['token']
+    auth_user_id = token_to_auth_id(token)
+    message_id = request_data.get('message_id')
 
-    return message_unpin_v1(0,0)
+    message_unpin_v1(auth_user_id, message_id)
+    return {}
+
 
 @APP.route('/message/sendlater/v1', methods=['POST'])
 def message_sendlatere_endpt():
     '''
-    put smth here
-    '''
+    Send a message from the authorised user to the channel specified by
+    channel_id automatically at a specified time in the future.
+    
+    Arguments:
+        token           (int)   - unique access token
+        channel_id      (int)   - unique channel id
+        message         (str)   - message str
+        time_sent       (float) - time as a unix timestamp
+    
+    Exceptions:
+        AccessError - occurs when token is invalid
+        TypeError   - occurs when auth_user_id, channel_id are not ints
+        TypeError   - occurs when message is not a str
+        TypeError   - occurs when time_sent is not a float
+        InputError  - channel_id does not refer to a valid channel
+        InputError  - length of message is over 1000 characters
+        InputError  - time_sent is a time in the past
+        AccessError - channel_id is valid and the authorised user is not a
+                      member of the channel they are trying to post to
 
-    return message_sendlater_v1(0,0,'',0.0)
+    Returns { message_id } on success
+    '''
+    request_data = request.get_json()
+    token = request_data['token']
+    auth_user_id = token_to_auth_id(token)
+    message = request_data['message']
+    channel_id = request_data['channel_id']
+    time_sent = request_data['time_sent']
+
+    return message_sendlater_v1(auth_user_id, channel_id, message, time_sent)
 
 @APP.route('/message/sendlaterdm/v1', methods=['POST'])
 def message_sendlaterdm_endpt():
     '''
-    put smth here
-    '''
+    Send a message from the authorised user to the DM specified by dm_id
+    automatically at a specified time in the future.
+    
+    Arguments:
+        token           (int)   - unique access token
+        dm_id           (int)   - unique dm id
+        message         (str)   - message str
+        time_sent       (float) - time as a unix timestamp
+    
+    Exceptions:
+        AccessError - occurs when token is invalid
+        TypeError   - occurs when auth_user_id, dm_id are not ints
+        TypeError   - occurs when message is not a str
+        TypeError   - occurs when time_sent is not a float
+        InputError  - occurs when dm_id does not refer to a valid DM
+        InputError  - occurs when length of message is over 1000 characters
+        InputError  - occurs when time_sent is a time in the past
+        AccessError - occurs when dm_id is valid and the authorised user is not
+                      a member of the DM they are trying to post to
 
-    return message_sendlaterdm_v1(0,0,'',0.0)
+    Returns { message_id } on success
+    '''
+    request_data = request.get_json()
+    token = request_data['token']
+    auth_user_id = token_to_auth_id(token)
+    message = request_data['message']
+    dm_id = request_data['dm_id']
+    time_sent = request_data['time_sent']
+
+    return message_sendlaterdm_v1(auth_user_id, dm_id, message, time_sent)
 
 
 ############################ ADMIN #############################################
@@ -1126,7 +1263,13 @@ def search_endpt():
     put smth here
     '''
 
-    return search_v1(0,'')
+    token = request.args.get('token')
+    auth_user_id = token_to_auth_id(token)
+
+    query_str = request.args.get('query_str')
+
+    return search_v1(auth_user_id, query_str)
+
 
 ################## STANDUP #####################################################
 
@@ -1135,24 +1278,35 @@ def standup_start_endpt():
     '''
     put smth here
     '''
+    request_data = request.get_json()
 
-    return standup_start_v1(0,0,0)
+    auth_id = token_to_auth_id(request_data.get('token'))
+    channel_id = request_data.get('channel_id')
+    length = request_data.get('length')
+
+    return standup_start_v1(auth_id, channel_id, length)
 
 @APP.route('/standup/active/v1', methods=['GET'])
 def standup_active_endpt():
     '''
     put smth here
     '''
-
-    return standup_active_v1(0,0)
+    token = request.args.get('token')
+    auth_user_id = token_to_auth_id(token)
+    channel_id = int(request.args.get('channel_id'))
+    return standup_active_v1(auth_user_id, channel_id)
 
 @APP.route('/standup/send/v1', methods=['POST'])
 def standup_send_endpt():
     '''
     put smth here
     '''
+    request_data = request.get_json()
 
-    return standup_send_v1(0,0,'')
+    auth_id = token_to_auth_id(request_data.get('token'))
+    channel_id = request_data.get('channel_id')
+    message = request_data.get('message')
+    return standup_send_v1(auth_id, channel_id, message)
 
 ####### Extra ############
 @APP.route('/user/profile/getprofilepic', methods=['GET'])
