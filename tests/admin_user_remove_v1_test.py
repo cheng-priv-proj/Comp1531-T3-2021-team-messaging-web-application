@@ -51,7 +51,7 @@ def test_standard(register):
     })
 
     dm_now = datetime.utcnow().timestamp()
-    
+    img_url = requests.get(url + 'user/profile/v1', params = {'token': register[1].get('token'), 'u_id': register[1].get('auth_user_id')}).json()['user']['profile_img_url']
     channel_message = requests.post(url + 'message/send/v1', json={
         'token': register[1].get('token'),
         'channel_id': channel_id_dict.get('channel_id'),
@@ -84,7 +84,7 @@ def test_standard(register):
         'name_first': 'Removed',
         'name_last': 'user',
         'handle_str': '',
-        'profile_img_url': 'link_to_default'
+        'profile_img_url': img_url
     }
 
     # check if channel message has been overwritten
@@ -147,7 +147,7 @@ def test_standard(register):
             'name_first': 'owner',
             'name_last': 'one',
             'handle_str': 'ownerone',
-            'profile_img_url': 'link_to_default'
+            'profile_img_url': img_url
 
         }]
     }
@@ -169,7 +169,7 @@ def test_standard(register):
         'name_first': 'user',
         'name_last': 'one',
         'handle_str': 'userone',
-        'profile_img_url': 'link_to_default'
+        'profile_img_url': img_url
     }
 
 def test_invalid_u_id(register):

@@ -148,7 +148,7 @@ def test_dm_details_v1_returns_members(clear_server, get_valid_token, get_valid_
         'token': user1['token'], 
         'dm_id': dm_id['dm_id']
         }).json()
-
+    img_url = requests.get(config.url + 'user/profile/v1', params = {'token': user1['token'], 'u_id': user1['auth_user_id']}).json()['user']['profile_img_url']
     assert resp_details['members'] == [
         {
             'u_id': user2['auth_user_id'],
@@ -156,7 +156,7 @@ def test_dm_details_v1_returns_members(clear_server, get_valid_token, get_valid_
             'name_first': 'owner',
             'name_last': 'one',
             'handle_str': 'ownerone',
-            'profile_img_url': 'link_to_default'
+            'profile_img_url': img_url
         },
         {
             'u_id': user1['auth_user_id'],
@@ -164,6 +164,6 @@ def test_dm_details_v1_returns_members(clear_server, get_valid_token, get_valid_
             'name_first': 'John',
             'name_last': 'smith',
             'handle_str': 'johnsmith',
-            'profile_img_url': 'link_to_default'
+            'profile_img_url': img_url
         },
     ]

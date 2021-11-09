@@ -143,6 +143,7 @@ def test_dm_id_correct(clear, user1, extract_dm, extract_token, extract_id):
         'dm_id': dm_id
     }).json()
     
+    img_url = requests.get(config.url + 'user/profile/v1', params = {'token': token1, 'u_id': auth1}).json()['user']['profile_img_url']
     # Find all members
     assert dm_details == {
         'name': 'aone',
@@ -153,7 +154,7 @@ def test_dm_id_correct(clear, user1, extract_dm, extract_token, extract_id):
                 'name_first': 'a',
                 'name_last': 'one',
                 'handle_str': 'aone',
-                'profile_img_url': 'link_to_default'
+                'profile_img_url': img_url
             }
         ]
     }
@@ -180,6 +181,7 @@ def test_only_creator_dm(clear, user1, extract_dm, extract_token, extract_id):
         'dm_id': dm_id
     }).json()
     
+    img_url = requests.get(config.url + 'user/profile/v1', params = {'token': token1, 'u_id': auth1}).json()['user']['profile_img_url']
     # Find all members
     assert dm_details == {
         'name': 'aone',
@@ -190,7 +192,7 @@ def test_only_creator_dm(clear, user1, extract_dm, extract_token, extract_id):
                 'name_first': 'a',
                 'name_last': 'one',
                 'handle_str': 'aone',
-                'profile_img_url': 'link_to_default'
+                'profile_img_url': img_url
             }
         ]
     }
@@ -219,7 +221,9 @@ def test_multiple_handles(clear, user1, user2, extract_dm, extract_id, extract_t
         'dm_id': dm_id
     }).json()
     
-    # Find all members
+    img_url = requests.get(config.url + 'user/profile/v1', params = {'token': token1, 'u_id': user1_id}).json()['user']['profile_img_url']
+    
+    # Find all members  
     assert dm_details == {
         'name': 'aone, btwo',
         'members': [
@@ -229,7 +233,7 @@ def test_multiple_handles(clear, user1, user2, extract_dm, extract_id, extract_t
                 'name_first': 'b',
                 'name_last': 'two',
                 'handle_str': 'btwo',
-                'profile_img_url': 'link_to_default'
+                'profile_img_url': img_url
             },
             {
                 'u_id': user1_id,
@@ -237,7 +241,7 @@ def test_multiple_handles(clear, user1, user2, extract_dm, extract_id, extract_t
                 'name_first': 'a',
                 'name_last': 'one',
                 'handle_str': 'aone',
-                'profile_img_url': 'link_to_default'
+                'profile_img_url': img_url
             },
         ]
     }
