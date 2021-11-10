@@ -96,6 +96,6 @@ def test_standard_upload_photo(clear_server, get_valid_token, upload_photo_facto
          }).json()
 
     profile = profile['user']
-    assert(profile['profile_img_url'] == config.url + 'pickle_dump/' + str(get_valid_token['auth_user_id']) + '.jpg')
+    assert(profile['profile_img_url'] == config.url + str(get_valid_token['auth_user_id']) + '.jpg')
 
 

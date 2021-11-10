@@ -459,7 +459,7 @@ class Datastore:
             'name_first': name_first,
             'name_last': name_last,
             'handle_str': handle_str,
-            'profile_img_url': url + 'src/pickle_dump/default.jpg'
+            'profile_img_url': url + 'default.jpg'
         }
         self.get_user_stats_from_u_id_dict()[u_id] = {
             'channels_joined': [{'num_channels_joined': 0, 'time_stamp': 0}], 
