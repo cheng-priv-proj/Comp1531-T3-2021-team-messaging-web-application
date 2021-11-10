@@ -671,6 +671,9 @@ class Datastore:
         else:
             user_stats['involvement_rate'] = user_sum / workspace_sum
         
+        if user_stats['involvement_rate'] > 1:
+            user_stats['involvement_rate'] = 1
+
         print('user_sum', user_sum)
         print('workspace_sum', workspace_sum)
         print('involvment', user_stats['involvement_rate'])
