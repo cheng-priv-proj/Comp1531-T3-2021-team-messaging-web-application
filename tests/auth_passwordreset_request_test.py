@@ -74,6 +74,9 @@ def test_secret_code_sent(clear, number_of_emails, register_user):
     
     assert (len_emails_before_request + 1) == len_emails_after_request
 
+def test_invalid_email(clear, register_user):
+    register_user('notanemail')
+
 def test_logged_out(clear, register_channel, register_user):
     token = register_user(gmail)
 
