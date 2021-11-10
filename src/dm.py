@@ -165,6 +165,8 @@ def dm_messages_v1(auth_id, dm_id, start):
     # accounts for when given empty channel and start = 0
     end = start + 50 if start + 50 < num_messages else -1
     
+    data_store.update_reacted_or_not(auth_id, dm_id)
+    
     return {
         'messages' : messages[start: start + 50],
         'start': start,

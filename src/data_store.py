@@ -776,6 +776,16 @@ class Datastore:
                 react['u_ids'].remove(auth_user_id)
                 react['is_this_user_reacted'] = False
         print(message)
+    
+    def update_reacted_or_not(self, auth_user_id, channel_dm_id):
+        for message in self.get_messages_from_channel_or_dm_id(channel_dm_id):
+            print(message)
+            for react in message['reacts']:
+                print(react)
+                if auth_user_id not in react['u_ids']:
+                    react['is_this_user_reacted'] = False
+                else:
+                    react['is_this_user_reacted'] = True
 
 print('Loading Datastore...')
 

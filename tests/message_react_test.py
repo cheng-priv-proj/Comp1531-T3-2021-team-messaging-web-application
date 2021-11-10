@@ -160,7 +160,7 @@ def test_react_not_own(clear, register, extract_token, extract_user, extract_cha
     assert reacts == [{
         'react_id' : 1,
         'u_ids' : [auth_id_v2['auth_user_id']],
-        'is_this_user_reacted' : True
+        'is_this_user_reacted' : False
     }]
     
 def test_invalid_message_id(clear, register, extract_token, extract_user, extract_channel, extract_message, auth_id_v2):
@@ -310,7 +310,7 @@ def test_react_not_own_dm(clear, get_user_1, auth_id_v2, extract_message):
     assert reacts == [{
         'react_id' : 1,
         'u_ids' : [auth_id_v2['auth_user_id']],
-        'is_this_user_reacted' : True
+        'is_this_user_reacted' : False
     }]
 
 def test_not_member(clear, register, auth_id_v2, extract_token, extract_user, extract_channel, extract_message):
