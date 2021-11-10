@@ -312,3 +312,27 @@ def test_react_not_own_dm(clear, get_user_1, auth_id_v2, extract_message):
         'u_ids' : [auth_id_v2['auth_user_id']],
         'is_this_user_reacted' : True
     }]
+
+def test_not_member(clear, register, auth_id_v2, extract_token, extract_user, extract_channel, extract_message):
+    '''
+    Tests reacting when a user is not a member of the channel
+
+    Expects: 
+        InputError
+    '''
+
+    channel_id = extract_channel(register)
+    owner_token = extract_token(register)
+
+    user_token = extract_token(auth_id_v2)
+
+    message_id = requests.post(url + 'message/send/v1', json = {
+        'token': owner_token,
+        'channel_id': channel_id,
+        'message': 'testmessage' }).json()
+
+    assert requests.post(url + 'message/react/v1', json = {
+        'token': user_token,
+        'message_id': extract_message(message_id),
+        'react_id': 1 }).status_code == 400
+    

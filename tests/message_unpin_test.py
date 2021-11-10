@@ -233,4 +233,29 @@ def test_no_owner_perms(clear, extract_token, extract_message, register_user, re
         'message_id': message_id
     }).status_code == 403
 
+def test_not_member(clear, extract_token, extract_message, register_user, register_channel):
+    owner_details = register_user('owner@email.com')
+    owner_token = extract_token(owner_details)
+
+    channel_id = register_channel(owner_token, 'original_channel', True)
+
+    message_id = extract_message(requests.post(url + 'message/send/v1', json = {
+        'token': owner_token,
+        'channel_id': channel_id,
+        'message': 'testmessage' 
+    }).json())
+
+    user_info = register_user('randomuser@email.com')
+    random_token = extract_token(user_info)
+
+    requests.post(url + 'message/pin/v1', json = {
+        'token': owner_token,
+        'message_id': message_id
+    })
+
+    assert requests.post(url + 'message/unpin/v1', json = {
+        'token': random_token,
+        'message_id': message_id
+    }).status_code == 400
+
 

@@ -44,9 +44,8 @@ def search_v1(auth_user_id, query_str):
     for element in channels:
         messages = data_store.get_messages_from_channel_or_dm_id(element['channel_id'])
         for message in messages:
-            if message['u_id'] == auth_user_id:
-                if query_str in message['message']:
-                    returning_messages_list.append(message)
+            if query_str in message['message']:
+                returning_messages_list.append(message)
 
     dm_dict = data_store.get_dms_from_dm_id_dict().items()
 
@@ -61,9 +60,8 @@ def search_v1(auth_user_id, query_str):
     for element in dms:
         messages = data_store.get_messages_from_channel_or_dm_id(element['dm_id'])
         for message in messages:
-            if message['u_id'] == auth_user_id:
-                if query_str in message['message']:
-                    returning_messages_list.append(message)
+            if query_str in message['message']:
+                returning_messages_list.append(message)
 
 
     return { 'messages': returning_messages_list}
