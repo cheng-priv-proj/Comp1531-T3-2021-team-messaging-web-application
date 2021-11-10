@@ -214,18 +214,17 @@ def test_standup_send_invalid_channel_id(clear_server, register_user, register_c
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     owner_token = extract_token(owner_info)
 
-    send_standup_message(owner_token, 123123123123, 'message1').status_code == 400
+    assert send_standup_message(owner_token, 123123123123, 'message1').status_code == 400
 
 def test_standup_send_not_authorized_user(clear_server, register_user, register_channel, extract_token, create_standup, send_standup_message):
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     owner_token = extract_token(owner_info)
     user_info = register_user('user@gmail.com', 'user', 'one')
-    extract_token(user_info)
+    user_token = extract_token(user_info)
 
     channel_id = register_channel(owner_token, 'channel1', True)
     create_standup(owner_token, channel_id, 5).json()
-    send_standup_message(owner_token, channel_id, 'message1').status_code == 403
-
+    assert send_standup_message(user_token, channel_id, 'message1').status_code == 403
 
 
 

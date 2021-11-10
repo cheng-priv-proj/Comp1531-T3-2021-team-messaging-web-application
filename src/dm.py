@@ -233,11 +233,12 @@ def dm_remove_v1(auth_id, dm_id):
     
     if not data_store.is_user_owner_of_channel_or_dm(dm_id, auth_id):
         raise AccessError ('dm_id is valid and the authorised user is not creator of the DM')
+    print(data_store.get_dm_members_from_dm_id(dm_id))
+    for user in data_store.get_dm_members_from_dm_id(dm_id):
+        data_store.update_user_stats_dms_joined(user['u_id'], -1)
 
     data_store.remove_dm(dm_id)
     data_store.update_workspace_stats_dms_exist(-1)
-    for user_id in data_store.get_dm_members_from_dm_id(dm_id):
-        data_store.update_user_stats_dms_joined(user_id, -1)
 
     return {}
 

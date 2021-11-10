@@ -827,26 +827,15 @@ def user_stats_endpt():
 def users_stats_endpt():
     '''
     Fetches the required statistics about the use of UNSW Streams.
-<<<<<<< HEAD
 
     Arguments:
         token           (str)   - valid token
 
-=======
-
-    Arguments:
-        token           (str)   - valid token
-
->>>>>>> img_profile_stuff
     Exceptions:
         AccessError - occurs when token is invalid
 
     Return value:
-<<<<<<< HEAD
-        Returns workplace stats
-=======
         Returns workspace stats
->>>>>>> img_profile_stuff
     '''
     print('test')
     request_token = request.args.get('token')

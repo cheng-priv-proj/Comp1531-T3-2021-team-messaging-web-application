@@ -79,6 +79,16 @@ def get_user_1():
     return response.json()
 
 @pytest.fixture
+def get_user_2():
+    response = requests.post(url + 'auth/register/v2', json={
+        'email': 'user@test.com', 
+        'password': 'spotato', 
+        'name_first': 'user', 
+        'name_last' : 'one'
+        })
+    return response.json()
+
+@pytest.fixture
 def auth_id_v2():
     response = requests.post(url + 'auth/register/v2', json={
         'email': 'example@email.com', 
@@ -228,6 +238,27 @@ def test_unreact_not_own(clear, register, extract_token, extract_user, extract_c
     owner_token = extract_token(register)
 
     requests.post(url + 'channel/join/v2', json = {'token': auth_id_v2['token'],'channel_id': channel_id})
+
+    message_id = requests.post(url + 'message/send/v1', json = {
+        'token': owner_token,
+        'channel_id': channel_id,
+        'message': 'testmessage' }).json()
+
+    assert requests.post(url + 'message/unreact/v1', json = {
+        'token': auth_id_v2['token'],
+        'message_id': extract_message(message_id),
+        'react_id': 1 }).status_code == 400
+    
+def test_not_member(clear, register, extract_token, extract_user, extract_channel, extract_message, auth_id_v2):
+    '''
+    Unreacts to a message that they did not send.
+
+    Expects: 
+        inputerror
+    '''
+
+    channel_id = extract_channel(register)
+    owner_token = extract_token(register)
 
     message_id = requests.post(url + 'message/send/v1', json = {
         'token': owner_token,

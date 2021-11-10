@@ -2,6 +2,7 @@ import pytest
 import requests
 from datetime import datetime
 from src.config import url
+from time import sleep
 
 @pytest.fixture
 def clear_server():
@@ -63,6 +64,8 @@ def test_create_standup_basic_functionality(clear_server, register_channel, regi
     now = datetime.now().timestamp()        
     assert standup_info['time_finish'] == pytest.approx(now + 5, rel=2)
 
+    sleep(5)
+
 def test_create_standup_no_second_standup(clear_server, register_channel, register_user, create_standup, extract_token):
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     owner_token = extract_token(owner_info)
@@ -85,8 +88,8 @@ def test_create_standup_negative_length(clear_server, register_channel, register
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     owner_token = extract_token(owner_info)
 
-    register_channel(owner_token, 'channel1', True)
-    error = create_standup(owner_token, 12312, -5).status_code
+    channel_id = register_channel(owner_token, 'channel1', True)
+    error = create_standup(owner_token, channel_id, -5).status_code
     
     assert error == 400
 
