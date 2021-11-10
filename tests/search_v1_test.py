@@ -257,8 +257,8 @@ def test_search_v1_query_str_not_found_2(clear_server, get_valid_token, channel_
     channel = channel_factory(token, 'channel1')
     dm = dm_factory(token, [auth_id])
 
-    message_id1 = send_message_dm_factory(token, dm, 'GENERAL KENOBI')
-    message_id2 = send_message_channel_factory(token, channel, 'GENERAL KENOBI')
+    send_message_dm_factory(token, dm, 'GENERAL KENOBI')
+    send_message_channel_factory(token, channel, 'GENERAL KENOBI')
 
     response = requests.get(url + 'search/v1', params = {
         'token': token,
