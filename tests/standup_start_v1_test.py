@@ -58,11 +58,11 @@ def test_create_standup_basic_functionality(clear_server, register_channel, regi
     owner_token = extract_token(owner_info)
 
     channel_id = register_channel(owner_token, 'channel1', True)
-    standup_info = create_standup(owner_token, channel_id, 5).json()
+    standup_info = create_standup(owner_token, channel_id, 2).json()
 
 
     now = datetime.now().timestamp()        
-    assert standup_info['time_finish'] == pytest.approx(now + 5, rel=2)
+    assert standup_info['time_finish'] == pytest.approx(now + 2, rel=2)
 
     sleep(5)
 
@@ -71,8 +71,8 @@ def test_create_standup_no_second_standup(clear_server, register_channel, regist
     owner_token = extract_token(owner_info)
 
     channel_id = register_channel(owner_token, 'channel1', True)
-    create_standup(owner_token, channel_id, 5).json()
-    error = create_standup(owner_token, channel_id, 5).status_code
+    create_standup(owner_token, channel_id, 2).json()
+    error = create_standup(owner_token, channel_id, 2).status_code
 
     assert error == 400
 
@@ -80,7 +80,7 @@ def test_create_standup_invalid_channel_id(clear_server, register_user, create_s
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     owner_token = extract_token(owner_info)
 
-    error = create_standup(owner_token, 12312, 5).status_code
+    error = create_standup(owner_token, 12312, 2).status_code
 
     assert error == 400
 
@@ -99,7 +99,7 @@ def test_create_standup_unauthorized_member(clear_server, register_channel, regi
 
     user_info = register_user('user@gmail.com', 'user', 'one')
     channel_id = register_channel(owner_token, 'channel1', False)
-    error = create_standup(extract_token(user_info), channel_id, 5).status_code
+    error = create_standup(extract_token(user_info), channel_id, 2).status_code
 
     assert error == 403
 
@@ -120,9 +120,9 @@ def test_multiple_standups(clear_server, register_channel, register_user, create
 
     channel_id1 = register_channel(owner_token, 'channel1', False)
     channel_id2 = register_channel(owner_token, 'channel2', False)
-    standup_id1 = create_standup(owner_token, channel_id1, 5).json()
-    standup_id2 = create_standup(owner_token, channel_id2, 5).json()
+    standup_id1 = create_standup(owner_token, channel_id1, 2).json()
+    standup_id2 = create_standup(owner_token, channel_id2, 2).json()
     now = datetime.now().timestamp()
 
-    assert standup_id1['time_finish'] == pytest.approx(now + 5, rel=2)
-    assert standup_id2['time_finish'] == pytest.approx(now + 5, rel=2)
+    assert standup_id1['time_finish'] == pytest.approx(now + 2, rel=2)
+    assert standup_id2['time_finish'] == pytest.approx(now + 2, rel=2)

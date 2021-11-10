@@ -1,13 +1,13 @@
 import pytest
 import requests
-import mailslurp_client
+import imaplib
+import email
 
 from src.config import url
 
-configuration = mailslurp_client.Configuration()
-# Pls don't hack jk unless you know what you're doing :D 
-# Gon be buggy asf glhf 
-configuration.api_key['x-api-key'] = "e050c5c764815755bb821286544405db1c28893b56b94f3a19a1d145d3db05c2"
+gmail = 'comp1531receive@gmail.com'
+password = 'EAGLE13A'
+gmail_host= 'imap.gmail.com'
 
 # Clears storage 
 @pytest.fixture
@@ -46,39 +46,46 @@ def register_user():
     return register_user_function
 
 @pytest.fixture
-def new_email():
-    with mailslurp_client.ApiClient(configuration) as api_client:
+def number_of_emails():
+    def new_email_function():
+        mail = imaplib.IMAP4_SSL(gmail_host)
+        mail.login(gmail, password)
+        mail.select("INBOX")
+        type, data = mail.search(None, 'ALL')
+        
+        assert type == 'OK'
+        
+        mail_ids = data[0]
+        id_list = mail_ids.split()
+        return len(id_list)
+    return new_email_function
 
-        # create an inbox using the inbox controller
-        api_instance = mailslurp_client.InboxControllerApi(api_client)
-        inbox = api_instance.create_inbox()
 
-        # check the id and email_address of the inbox
-        assert len(inbox.id) > 0
-        assert "mailslurp.com" in inbox.email_address
+def test_secret_code_sent(clear, number_of_emails, register_user):
+    register_user(gmail)
     
-    return inbox
-
-@pytest.mark.skip(reason="Not implemented")
-def test_secret_code_sent(clear, new_email, register_user):
-    register_user(new_email.email_address)
+    len_emails_before_request = number_of_emails()
 
     requests.post(url + 'auth/passwordreset/request/v1', json = {
-        'email': new_email.email_address
+        'email': gmail
+    })
+    
+    len_emails_after_request = number_of_emails()
+    
+    assert (len_emails_before_request + 1) == len_emails_after_request
+
+def test_invalid_email(clear, register_user):
+    requests.post(url + 'auth/passwordreset/request/v1', json = {
+        'email': 'notvalid@'
     })
 
-    with mailslurp_client.ApiClient(configuration) as api_client:
-        waitfor_controller = mailslurp_client.WaitForControllerApi(api_client)
-        waitfor_controller.wait_for_latest_email(inbox_id=new_email.id, timeout=30000, unread_only=True)
-
-@pytest.mark.skip(reason="Not implemented")
-def test_logged_out(clear, new_email, register_channel, register_user):
-    token = register_user(new_email.email_address)
+def test_logged_out(clear, register_channel, register_user):
+    token = register_user(gmail)
 
     register_channel(token, 'channel', True)
 
     requests.post(url + 'auth/passwordreset/request/v1', json = {
-        'email': new_email.email_address
+        'email': gmail
     })
     
     assert requests.post(url + 'channels/create/v2', json = {
