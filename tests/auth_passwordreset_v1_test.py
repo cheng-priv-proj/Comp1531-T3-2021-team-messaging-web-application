@@ -1,13 +1,14 @@
 import pytest
 import requests
-import mailslurp_client
+import imaplib
+from email.header import decode_header
+import email
 
 from src.config import url
 
-configuration = mailslurp_client.Configuration()
-# Pls don't hack jk unless you know what you're doing :D 
-# Gon be buggy asf glhf 
-configuration.api_key['x-api-key'] = "e050c5c764815755bb821286544405db1c28893b56b94f3a19a1d145d3db05c2"
+gmail = 'comp1531receive@gmail.com'
+password = 'EAGLE13A'
+gmail_host= 'imap.gmail.com'
 
 # Clears storage 
 @pytest.fixture
@@ -30,46 +31,45 @@ def register_user():
     return register_user_function
 
 @pytest.fixture
-def new_email():
-    with mailslurp_client.ApiClient(configuration) as api_client:
+def get_most_recent_code():
+    def new_email_function():
+        mail = imaplib.IMAP4_SSL(gmail_host)
+        mail.login(gmail, password)
+        status, messages = mail.select("INBOX")
+        assert status == 'OK'
+        messages = int(messages[0])
+        
+        status, msg = mail.fetch(str(messages - 1), "(RFC822)")
+        assert status == 'OK'
+        for response in msg:
+            if isinstance(response, tuple):
+                message = email.message_from_bytes(response[1])
+                body = message.get_payload()
+        
+        return body.strip()
+    return new_email_function
 
-        # create an inbox using the inbox controller
-        api_instance = mailslurp_client.InboxControllerApi(api_client)
-        inbox = api_instance.create_inbox()
-
-        # check the id and email_address of the inbox
-        assert len(inbox.id) > 0
-        assert "mailslurp.com" in inbox.email_address
-    
-    return inbox
-
-@pytest.mark.skip(reason="Not implemented")
-def test_successful_password_reset(clear, register_user, new_email):
-    # Create a user
-    register_user(new_email.email_address)
-
+def test_successful_password_reset(clear, register_user, get_most_recent_code):
+    register_user(gmail)
     requests.post(url + 'auth/passwordreset/request/v1', json = {
-        'email': new_email.email_address
+        'email': gmail
     })
-
-    with mailslurp_client.ApiClient(configuration) as api_client:
-        waitfor_controller = mailslurp_client.WaitForControllerApi(api_client)
-        email = waitfor_controller.wait_for_latest_email(inbox_id=new_email.id, timeout=30000, unread_only=True)
+    
+    body = get_most_recent_code()
     
     requests.post(url + 'auth/passwordreset/reset/v1', json = {
-        'reset_code': email.body,
+        'reset_code': body,
         'new_password': 'new_password'
     })
-
+    
     assert requests.post(url + 'auth/login/v2', json = {
-        'email': new_email.email_address,
+        'email': gmail,
         'password': 'new_password'
     }).status_code == 200
 
-@pytest.mark.skip(reason="Not implemented")
-def test_invalid_reset_code(clear, register_user, new_email):
+def test_invalid_reset_code(clear, register_user):
     # Create a user
-    register_user(new_email.email_address)
+    register_user(gmail)
     invalid_reset_code = ''
 
     assert requests.post(url + 'auth/passwordreset/reset/v1', json = {
@@ -77,21 +77,18 @@ def test_invalid_reset_code(clear, register_user, new_email):
         'new_password': 'new_password'
     }).status_code == 400
 
-@pytest.mark.skip(reason="Not implemented")
-def test_password_too_short(clear, register_user, new_email):
+def test_password_too_short(clear, register_user, get_most_recent_code):
     # Create a user
-    register_user(new_email.email_address)
+    register_user(gmail)
 
     requests.post(url + 'auth/passwordreset/request/v1', json = {
-        'email': new_email.email_address
+        'email': gmail
     })
 
-    with mailslurp_client.ApiClient(configuration) as api_client:
-        waitfor_controller = mailslurp_client.WaitForControllerApi(api_client)
-        email = waitfor_controller.wait_for_latest_email(inbox_id=new_email.id, timeout=30000, unread_only=True)
+    body = get_most_recent_code()
     
     assert requests.post(url + 'auth/passwordreset/reset/v1', json = {
-        'reset_code': email.body,
+        'reset_code': body,
         'new_password': 'short'
     }).status_code == 400
 
