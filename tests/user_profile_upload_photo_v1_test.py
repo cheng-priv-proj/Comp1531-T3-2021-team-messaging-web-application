@@ -68,7 +68,18 @@ def test_user_profile_upload_photo_v1_invalid_dimensions(clear_server, get_valid
 def test_user_profile_upload_photo_v1_invalid_end_dimensions_2(clear_server, get_valid_token, upload_photo_factory):
     token = get_valid_token['token']
     img_url = 'http://cgi.cse.unsw.edu.au/~jas/home/pics/jas.jpg'
-    response = upload_photo_factory(token, img_url, 0, 0, 700, 700)
+    response = upload_photo_factory(token, img_url, 0, 0, -700, 100)
+
+    assert response.status_code == 400
+
+    response = upload_photo_factory(token, img_url, 0, 1000000, 700, 10000000)
+
+    assert response.status_code == 400
+
+def test_user_profile_upload_photo_v1_invalid_end_dimensions_3(clear_server, get_valid_token, upload_photo_factory):
+    token = get_valid_token['token']
+    img_url = 'http://cgi.cse.unsw.edu.au/~jas/home/pics/jas.jpg'
+    response = upload_photo_factory(token, img_url, 0, -800, 100, -700)
 
     assert response.status_code == 400
 

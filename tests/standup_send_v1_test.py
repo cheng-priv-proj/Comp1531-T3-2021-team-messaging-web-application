@@ -73,10 +73,10 @@ def test_standup_send_basic_functionality(clear_server, register_user, register_
 
     channel_id = register_channel(owner_token, 'channel1', True)
     now = datetime.utcnow().timestamp()
-    create_standup(owner_token, channel_id, 5).json()
+    create_standup(owner_token, channel_id, 2).json()
     send_standup_message(owner_token, channel_id, 'message1')
 
-    sleep(6)
+    sleep(4)
 
     messages = get_channel_messages(owner_token, channel_id, 0).json()
 
@@ -100,13 +100,13 @@ def test_standup_send_multiple_messages(clear_server, register_user, register_ch
     requests.post(url + 'channel/invite/v2', json={'token': owner_token, 'channel_id': channel_id, 'u_id': user_info['auth_user_id']}).json()
 
     now = datetime.utcnow().timestamp()
-    create_standup(owner_token, channel_id, 5).json()
+    create_standup(owner_token, channel_id, 2).json()
     send_standup_message(owner_token, channel_id, 'message1')
     send_standup_message(user_token, channel_id, 'message2')
     send_standup_message(owner_token, channel_id, 'message3')
     send_standup_message(user_token, channel_id, 'message4')
     
-    sleep(6)
+    sleep(4)
 
     messages = get_channel_messages(owner_token, channel_id, 0).json()
     assert messages['messages'][0] == {
@@ -124,10 +124,10 @@ def test_standup_send_empty_message(clear_server, register_user, register_channe
 
     channel_id = register_channel(owner_token, 'channel1', True)
     now = datetime.utcnow().timestamp()
-    create_standup(owner_token, channel_id, 5).json()
+    create_standup(owner_token, channel_id, 2).json()
     send_standup_message(owner_token, channel_id, '')
     
-    sleep(6)
+    sleep(4)
 
     messages = get_channel_messages(owner_token, channel_id, 0).json()
     assert messages['messages'][0] == {
@@ -145,7 +145,7 @@ def test_standup_send_normal_message_before_standup_over(clear_server, register_
 
     channel_id = register_channel(owner_token, 'channel1', True)
     now = datetime.utcnow().timestamp()
-    create_standup(owner_token, channel_id, 5).json()
+    create_standup(owner_token, channel_id, 2).json()
     send_standup_message(owner_token, channel_id, '')
     requests.post(url + 'message/send/v1', json = {'token': owner_token, 'channel_id': channel_id, 'message': 'message1'})
 
@@ -159,7 +159,7 @@ def test_standup_send_normal_message_before_standup_over(clear_server, register_
         'is_pinned': False
     }
 
-    sleep(6)
+    sleep(3)
 
     messages = get_channel_messages(owner_token, channel_id, 0).json()
     assert messages['messages'][0] == {
@@ -179,10 +179,10 @@ def test_standup_send_tags_in_messsage(clear_server, register_user, register_cha
 
     channel_id = register_channel(owner_token, 'channel1', True)
     requests.post(url + 'channel/invite/v2', json={'token': owner_token, 'channel_id': channel_id, 'u_id': user_info['auth_user_id']}).json()
-    create_standup(owner_token, channel_id, 5).json()
+    create_standup(owner_token, channel_id, 2).json()
     send_standup_message(owner_token, channel_id, '@userone')
 
-    sleep(6)
+    sleep(3)
 
     assert len(requests.get(url + 'notifications/get/v1', params = {'token': user_token}).json()['notifications']) == 1
 
@@ -207,7 +207,7 @@ def test_standup_send_invalid_message(clear_server, register_user, register_chan
     owner_token = extract_token(owner_info)
 
     channel_id = register_channel(owner_token, 'channel1', True)
-    create_standup(owner_token, channel_id, 5).json()
+    create_standup(owner_token, channel_id, 2).json()
     assert send_standup_message(owner_token, channel_id, '8'*1001).status_code == 400
 
 def test_standup_send_invalid_channel_id(clear_server, register_user, register_channel, extract_token, create_standup, send_standup_message):
@@ -223,7 +223,7 @@ def test_standup_send_not_authorized_user(clear_server, register_user, register_
     user_token = extract_token(user_info)
 
     channel_id = register_channel(owner_token, 'channel1', True)
-    create_standup(owner_token, channel_id, 5).json()
+    create_standup(owner_token, channel_id, 2).json()
     assert send_standup_message(user_token, channel_id, 'message1').status_code == 403
 
 
