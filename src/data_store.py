@@ -627,9 +627,9 @@ class Datastore:
         login_info = self.get_logins_from_email_dict()
         email = user['email']
 
-        login_info[email] = password
+        login_info[email]['password'] = password
 
-
+        print(self.get_users_from_u_id_dict().get(auth_user_id))
 
         self.update_pickle()
 
