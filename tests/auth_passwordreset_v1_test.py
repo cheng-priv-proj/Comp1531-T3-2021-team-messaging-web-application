@@ -67,7 +67,6 @@ def test_successful_password_reset(clear, register_user, get_most_recent_code):
         'password': 'new_password'
     }).status_code == 200
 
-@pytest.mark.skip()
 def test_invalid_reset_code(clear, register_user):
     # Create a user
     register_user(gmail)
@@ -78,7 +77,6 @@ def test_invalid_reset_code(clear, register_user):
         'new_password': 'new_password'
     }).status_code == 400
 
-@pytest.mark.skip()
 def test_password_too_short(clear, register_user, get_most_recent_code):
     # Create a user
     register_user(gmail)
