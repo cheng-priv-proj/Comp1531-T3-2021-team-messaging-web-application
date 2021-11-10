@@ -207,7 +207,7 @@ def user_profile_uploadphoto_v1(auth_user_id, img_url, x_start, y_start, x_end, 
     cropped = imageObject.crop((x_start, y_start, x_end, y_end))
     cropped.save('src/pickle_dump/' + str(auth_user_id) + '.jpg')
 
-    data_store.update_profile_img_url(auth_user_id, url + '/src/pickle_dump/' + str(auth_user_id) + '.jpg')
+    data_store.update_profile_img_url(auth_user_id, url + 'pickle_dump/' + str(auth_user_id) + '.jpg')
 
 
     return {}
@@ -229,7 +229,7 @@ def user_profile_getimg_v1(auth_user_id):
     
     image_url = data_store.get_profile_img_url_from_u_id(auth_user_id)
     
-    imageObject = Image.open('src/pickle_dump/' + image_url)
+    imageObject = Image.open('pickle_dump/' + image_url)
     if imageObject == None:
         raise InputError
     else:
@@ -249,7 +249,7 @@ def user_stats_v1(auth_user_id):
     '''
 
     check_type(auth_user_id, int)
-    return data_store.get_user_stats_from_u_id(auth_user_id)
+    return {'user_stats': data_store.get_user_stats_from_u_id(auth_user_id)}
 
 def users_stats_v1(auth_user_id):
     '''

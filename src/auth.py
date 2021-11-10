@@ -218,11 +218,11 @@ def auth_passwordreset_reset_v1(reset_code, new_password):
 
     if data_store.is_reset_code_invalid(reset_code) == True:
         raise InputError
-    
 
     u_id = data_store.get_u_id_from_reset_code(reset_code)
 
-    data_store.update_password(u_id, new_password)
+    encrypted_password = hash_str(new_password)
+    data_store.update_password(u_id, encrypted_password)
 
     data_store.remove_reset_code(reset_code)
 
