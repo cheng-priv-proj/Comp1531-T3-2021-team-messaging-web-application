@@ -209,8 +209,7 @@ def auth_passwordreset_reset_v1(reset_code, new_password):
     Return {} on success
     '''
 
-    if type(new_password) != str:
-        raise TypeError
+    check_type(new_password, str)
 
     print(new_password)
     if len(new_password) < 6:
