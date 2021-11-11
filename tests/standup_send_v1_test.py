@@ -1,6 +1,6 @@
 import pytest
 import requests
-from datetime import datetime
+from datetime import datetime, timezone
 from src.config import url
 from time import sleep
 
@@ -72,7 +72,7 @@ def test_standup_send_basic_functionality(clear_server, register_user, register_
     owner_token = extract_token(owner_info)
 
     channel_id = register_channel(owner_token, 'channel1', True)
-    now = datetime.utcnow().timestamp()
+    now = int(datetime.now(timezone.utc).timestamp())
     create_standup(owner_token, channel_id, 1).json()
     send_standup_message(owner_token, channel_id, 'message1')
 
@@ -99,7 +99,7 @@ def test_standup_send_multiple_messages(clear_server, register_user, register_ch
     channel_id = register_channel(owner_token, 'channel1', True)
     requests.post(url + 'channel/invite/v2', json={'token': owner_token, 'channel_id': channel_id, 'u_id': user_info['auth_user_id']}).json()
 
-    now = datetime.utcnow().timestamp()
+    now = int(datetime.now(timezone.utc).timestamp())
     create_standup(owner_token, channel_id, 1).json()
     send_standup_message(owner_token, channel_id, 'message1')
     send_standup_message(user_token, channel_id, 'message2')
@@ -123,7 +123,7 @@ def test_standup_send_empty_message(clear_server, register_user, register_channe
     owner_token = extract_token(owner_info)
 
     channel_id = register_channel(owner_token, 'channel1', True)
-    now = datetime.utcnow().timestamp()
+    now = int(datetime.now(timezone.utc).timestamp())
     create_standup(owner_token, channel_id, 1).json()
     send_standup_message(owner_token, channel_id, '')
     
@@ -144,7 +144,7 @@ def test_standup_send_normal_message_before_standup_over(clear_server, register_
     owner_token = extract_token(owner_info)
 
     channel_id = register_channel(owner_token, 'channel1', True)
-    now = datetime.utcnow().timestamp()
+    now = int(datetime.now(timezone.utc).timestamp())
     create_standup(owner_token, channel_id, 1).json()
     send_standup_message(owner_token, channel_id, '')
     requests.post(url + 'message/send/v1', json = {'token': owner_token, 'channel_id': channel_id, 'message': 'message1'})

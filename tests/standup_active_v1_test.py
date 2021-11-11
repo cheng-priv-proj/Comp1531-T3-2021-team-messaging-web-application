@@ -87,7 +87,7 @@ def test_standup_active_v1_active(clear_server, get_valid_token, register_channe
     token = get_valid_token['token']
     channel = register_channel(token, 'channel1', True)
     create_standup(token, channel, 1)
-    time_finish = datetime.utcnow().timestamp() + 1
+    time_finish = int(datetime.now(timezone.utc).timestamp()) + 1
     active = standup_active(token, channel).json()
     assert active == {
         'is_active': True,
