@@ -1,6 +1,6 @@
 import pytest
 import requests
-from datetime import datetime
+from datetime import datetime, timezone
 from src import config
 from src.config import url
 
