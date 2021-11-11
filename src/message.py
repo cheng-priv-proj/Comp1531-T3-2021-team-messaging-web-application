@@ -6,7 +6,7 @@ from src.other import check_type, check_and_insert_tag_notifications_in_message,
 from datetime import datetime
 
 import threading
-from datetime import datetime, time
+from datetime import datetime, time, timezone
 from time import sleep
 
 mutex = threading.RLock()
@@ -55,7 +55,7 @@ def message_send_v1(auth_user_id, channel_id, message):
         'message_id': message_id,
         'u_id': auth_user_id,
         'message': message,
-        'time_created': datetime.utcnow().timestamp(),
+        'time_created': int(datetime.now(timezone.utc).timestamp()),
         'reacts': [
             {  
                 'react_id' : 1,
@@ -118,7 +118,7 @@ def message_senddm_v1(auth_user_id, dm_id, message):
         'message_id': message_id,
         'u_id': auth_user_id,
         'message': message,
-        'time_created': datetime.utcnow().timestamp(),
+        'time_created': int(datetime.now(timezone.utc).timestamp()),
         'reacts': [
             {  
                 'react_id' : 1,
@@ -459,7 +459,7 @@ class DelayedMessage (threading.Thread):
         threading.Thread.__init__(self)
         self.u_id = u_id
         self.channel_or_dm_id = channel_or_dm_id
-        self.wait = timesent - datetime.utcnow().timestamp() 
+        self.wait = timesent - int(datetime.now(timezone.utc).timestamp()) 
         self.message = message
         
         mutex.acquire()
@@ -521,7 +521,7 @@ def message_sendlater_v1(auth_user_id, channel_id, message, time_sent):
     check_type(auth_user_id, int)
     check_type(channel_id, int)
     check_type(message, str)
-    check_type(time_sent, float)
+    check_type(time_sent, int)
 
     if data_store.is_invalid_channel_id(channel_id):
         raise InputError('channel_id does not refer to a valid channel')
@@ -532,7 +532,7 @@ def message_sendlater_v1(auth_user_id, channel_id, message, time_sent):
     if len(message) > 1000:
         raise InputError('length of message is over 1000 characters')
 
-    if time_sent - datetime.utcnow().timestamp() < 0:
+    if time_sent - int(datetime.now(timezone.utc).timestamp()) < 0:
         raise InputError('time_sent is a time in the past')
 
     delayed_message = DelayedMessage(auth_user_id, channel_id, time_sent, message)
@@ -567,7 +567,7 @@ def message_sendlaterdm_v1(auth_user_id, dm_id, message, time_sent):
     check_type(auth_user_id, int)
     check_type(dm_id, int)
     check_type(message, str)
-    check_type(time_sent, float)
+    check_type(time_sent, int)
 
     if data_store.is_invalid_dm_id(dm_id):
         raise InputError('dm_id does not refer to a valid dm')
@@ -578,7 +578,7 @@ def message_sendlaterdm_v1(auth_user_id, dm_id, message, time_sent):
     if len(message) > 1000:
         raise InputError('length of message is over 1000 characters')
 
-    if time_sent - datetime.utcnow().timestamp() < 0:
+    if time_sent - int(datetime.now(timezone.utc).timestamp()) < 0:
         raise InputError('time_sent is a time in the past')
 
     delayed_message = DelayedMessage(auth_user_id, dm_id, time_sent, message)
