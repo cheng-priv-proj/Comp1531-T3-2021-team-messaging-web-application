@@ -2,7 +2,7 @@ import pytest
 import requests
 from src.config import url
 from time import sleep
-from datetime import datetime
+from datetime import datetime, timezone
 
 @pytest.fixture
 def clear():
@@ -37,7 +37,7 @@ def dm_factory():
 def test_standard(register_users, dm_factory):
     dm_id = dm_factory(register_users[0]['token'], [])
 
-    now = datetime.utcnow().timestamp()
+    now = int(datetime.now(timezone.utc).timestamp())
     message_id = requests.post(url + 'message/sendlaterdm/v1', json={
         'token': register_users[0]['token'],
         'dm_id': dm_id,
@@ -84,7 +84,7 @@ def test_standard(register_users, dm_factory):
 def test_multiple(register_users, dm_factory):
     dm_id = dm_factory(register_users[0]['token'], [])
 
-    now = datetime.utcnow().timestamp()
+    now = int(datetime.now(timezone.utc).timestamp())
     message_id_1 = requests.post(url + 'message/sendlaterdm/v1', json={
         'token': register_users[0]['token'],
         'dm_id': dm_id,
@@ -163,7 +163,7 @@ def test_invalid_dm(register_users):
         'token': register_users[0]['token'],
         'dm_id': 123123,
         'message': 'hi there',
-        'time_sent': datetime.utcnow().timestamp() + 2
+        'time_sent': int(datetime.now(timezone.utc).timestamp()) + 2
     }).status_code == 400
 
 def test_msg_length(register_users, dm_factory):
@@ -173,7 +173,7 @@ def test_msg_length(register_users, dm_factory):
         'token': register_users[0]['token'],
         'dm_id': dm_id,
         'message': 'hi there' * 1000,
-        'time_sent': datetime.utcnow().timestamp() + 2
+        'time_sent': int(datetime.now(timezone.utc).timestamp()) + 2
     }).status_code == 400
 
 def test_time_in_past(register_users, dm_factory):
@@ -183,7 +183,7 @@ def test_time_in_past(register_users, dm_factory):
         'token': register_users[0]['token'],
         'dm_id': dm_id,
         'message': 'hi there',
-        'time_sent': datetime.utcnow().timestamp() - 2
+        'time_sent': int(datetime.now(timezone.utc).timestamp()) - 2
     }).status_code == 400
 
 def test_dm_valid_user_not_in_channel(register_users, dm_factory):
@@ -193,7 +193,7 @@ def test_dm_valid_user_not_in_channel(register_users, dm_factory):
         'token': register_users[1]['token'],
         'dm_id': dm_id,
         'message': 'hi there',
-        'time_sent': datetime.utcnow().timestamp() + 2
+        'time_sent': int(datetime.now(timezone.utc).timestamp()) + 2
     }).status_code == 403
 
 def test_token_invalid(register_users, dm_factory):
@@ -203,6 +203,6 @@ def test_token_invalid(register_users, dm_factory):
         'token': '123123',
         'dm_id': dm_id,
         'message': 'hi there',
-        'time_sent': datetime.utcnow().timestamp() + 2
+        'time_sent': int(datetime.now(timezone.utc).timestamp()) + 2
     }).status_code == 403
 

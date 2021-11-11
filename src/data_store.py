@@ -1,6 +1,6 @@
 import pickle
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from src.config import url
 
 ######### DATASTORE STRUCTURE ##################################################
@@ -647,17 +647,17 @@ class Datastore:
     def update_user_stats_channels_joined(self, u_id, change):
         user_stats_channels = self.get_user_stats_from_u_id(u_id)['channels_joined']
         user_stats_channels[0]['num_channels_joined'] += change
-        user_stats_channels[0]['time_stamp'] = datetime.utcnow().timestamp()
+        user_stats_channels[0]['time_stamp'] = int(datetime.now(timezone.utc).timestamp())
     
     def update_user_stats_dms_joined(self, u_id, change):
         user_stats_dms = self.__store['user_stats'][u_id]['dms_joined']
         user_stats_dms[0]['num_dms_joined'] += change
-        user_stats_dms[0]['time_stamp'] = datetime.utcnow().timestamp()
+        user_stats_dms[0]['time_stamp'] = int(datetime.now(timezone.utc).timestamp())
 
     def update_user_stats_messages_sent(self, u_id, change):
         user_stats_messages = self.__store['user_stats'][u_id]['messages_sent']
         user_stats_messages[0]['num_messages_sent'] += change
-        user_stats_messages[0]['time_stamp'] = datetime.utcnow().timestamp()
+        user_stats_messages[0]['time_stamp'] = int(datetime.now(timezone.utc).timestamp())
 
     def update_user_stats_involvement_rate(self, u_id):
         user_stats = self.__store['user_stats'][u_id]
@@ -681,18 +681,18 @@ class Datastore:
     def update_workspace_stats_channels_exist(self, change):
         workspace_stats_channels = self.__store['workspace_stats']['channels_exist']
         workspace_stats_channels[0]['num_channels_exist'] += change
-        workspace_stats_channels[0]['time_stamp'] = datetime.utcnow().timestamp()
+        workspace_stats_channels[0]['time_stamp'] = int(datetime.now(timezone.utc).timestamp())
 
     def update_workspace_stats_dms_exist(self, change):
         print('dm_change' ,change)
         workspace_stats_dms = self.__store['workspace_stats']['dms_exist']
         workspace_stats_dms[0]['num_dms_exist'] += change
-        workspace_stats_dms[0]['time_stamp'] = datetime.utcnow().timestamp()
+        workspace_stats_dms[0]['time_stamp'] = int(datetime.now(timezone.utc).timestamp())
 
     def update_workspace_stats_messages_exist(self, change):
         workspace_stats_messages = self.__store['workspace_stats']['messages_exist']
         workspace_stats_messages[0]['num_messages_exist'] += change
-        workspace_stats_messages[0]['time_stamp'] = datetime.utcnow().timestamp()
+        workspace_stats_messages[0]['time_stamp'] = int(datetime.now(timezone.utc).timestamp())
 
     def update_workspace_stats_utilization_rate(self):
         num_users_who_have_joined_a_channel_or_dm = len([user_stats for user_stats in self.get_user_stats_from_u_id_dict().values() if user_stats['channels_joined'][0]['num_channels_joined'] > 0 or user_stats['dms_joined'][0]['num_dms_joined'] > 0])
