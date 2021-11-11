@@ -2,6 +2,7 @@ import pytest
 import requests
 import imaplib
 import email
+import time
 
 from src.config import url
 
@@ -69,6 +70,8 @@ def test_secret_code_sent(clear, number_of_emails, register_user):
     requests.post(url + 'auth/passwordreset/request/v1', json = {
         'email': gmail
     })
+    
+    time.sleep(1)
     
     len_emails_after_request = number_of_emails()
     

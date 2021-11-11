@@ -6,7 +6,7 @@ from src.other import check_type
 from src.message import message_send_v1
 
 import threading
-from datetime import datetime, time
+from datetime import datetime, time, timezone
 from time import sleep
 
 ################# Standup Thread ###############################################
@@ -75,7 +75,7 @@ def standup_start_v1(auth_user_id, channel_id, length):
         raise InputError('active standup is currently running in the channel')
     
 
-    time_finish = datetime.utcnow().timestamp() + length
+    time_finish = int(datetime.now(timezone.utc).timestamp()) + length
 
     data_store.insert_standup(channel_id, time_finish)
 
