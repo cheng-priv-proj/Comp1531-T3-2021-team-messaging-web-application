@@ -42,7 +42,7 @@ def test_standard(register_users, dm_factory):
         'token': register_users[0]['token'],
         'dm_id': dm_id,
         'message': 'hi there',
-        'time_sent': now + 2
+        'time_sent': now + 1
     }).json().get('message_id')
 
     messages_dict = requests.get(url + 'dm/messages/v1', params = {
@@ -57,7 +57,7 @@ def test_standard(register_users, dm_factory):
         'end': -1
     }
 
-    sleep(3)
+    sleep(2)
 
     messages_dict = requests.get(url + 'dm/messages/v1', params = {
         'token': register_users[0]['token'],
@@ -103,7 +103,7 @@ def test_multiple(register_users, dm_factory):
         'token': register_users[0]['token'],
         'dm_id': dm_id,
         'message': 'hi there',
-        'time_sent': now + 5
+        'time_sent': now + 3
     }).json().get('message_id')
 
     messages_dict = requests.get(url + 'dm/messages/v1', params = {
@@ -118,7 +118,7 @@ def test_multiple(register_users, dm_factory):
         'end': -1
     }
 
-    sleep(7)
+    sleep(4)
 
     messages_dict = requests.get(url + 'dm/messages/v1', params = {
         'token': register_users[0]['token'],
@@ -132,7 +132,7 @@ def test_multiple(register_users, dm_factory):
                 'message_id': message_id_3,
                 'u_id': register_users[0]['auth_user_id'],
                 'message': 'hi there',
-                'time_created': pytest.approx(now + 5, rel=1),
+                'time_created': pytest.approx(now + 3, rel=1),
                 'reacts': [{'react_id': 1, 'u_ids': [], 'is_this_user_reacted': False}],
                 'is_pinned': False
             },
