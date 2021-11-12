@@ -4,6 +4,7 @@ import imaplib
 from email.header import decode_header
 import email
 
+from time import sleep
 from src.config import url
 
 gmail = 'comp1531receive@gmail.com'
@@ -39,7 +40,7 @@ def get_most_recent_code():
         assert status == 'OK'
         messages = int(messages[0])
         
-        status, msg = mail.fetch(str(messages - 1), "(RFC822)")
+        status, msg = mail.fetch(str(messages), "(RFC822)")
         assert status == 'OK'
         
         message = email.message_from_bytes(msg[0][1])

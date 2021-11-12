@@ -2,15 +2,11 @@ from src.data_store import data_store
 from src.config import url 
 
 from src.error import InputError
-from src.error import AccessError
-from src.other import check_type, check_email_valid
-import re
+from src.other import check_email_valid
 from PIL import Image
 import urllib.request
-import sys
 
-
-def user_profile_v1(auth_user_id, u_id):
+def user_profile_v1(auth_user_id: int, u_id: int) -> dict:
     '''
     For a valid user, returns information about their user_id, email, 
     first name, last name, and handle
@@ -28,16 +24,12 @@ def user_profile_v1(auth_user_id, u_id):
         Returns {user} on success
     '''
 
-    check_type(auth_user_id, int)
-    check_type(u_id, int)
-    
     if data_store.is_invalid_profile(u_id):
         raise InputError('u_id is invalid')
 
     return { 'user': data_store.get_user_from_u_id(u_id) }
 
-
-def users_all_v1(auth_id):
+def users_all_v1(auth_id: int) -> dict:
     '''
     Returns a list of all users and their associated details
 
@@ -50,14 +42,13 @@ def users_all_v1(auth_id):
     Return value:
         Returns {users} on success
     '''
-    check_type(auth_id, int)
 
     user_dict = data_store.get_users_from_u_id_dict()
     users = [user for user in user_dict.values() if not user['email'] == '']
     
     return { 'users': users }
 
-def user_setname_v1(auth_user_id, name_first, name_last):
+def user_setname_v1(auth_user_id: int, name_first: str, name_last: str) -> dict:
     '''
     Update the authorised user's first and last name
 
@@ -75,10 +66,6 @@ def user_setname_v1(auth_user_id, name_first, name_last):
         Returns {} on success
     '''
 
-    check_type(auth_user_id, int)
-    check_type(name_first, str)
-    check_type(name_last, str)
-
     if len(name_first) < 1 or len(name_first) > 50:
         raise InputError ('name_first is less than 1 character or more than 50')
     if len(name_last) < 1 or len(name_last) > 50:
@@ -88,7 +75,7 @@ def user_setname_v1(auth_user_id, name_first, name_last):
 
     return {}
 
-def user_setemail_v1(auth_id, email):
+def user_setemail_v1(auth_id: int, email: str) -> dict:
     '''
     Update the authorised user's email address
 
@@ -104,8 +91,6 @@ def user_setemail_v1(auth_id, email):
     Return value:
         Returns {} on success
     '''
-    check_type(auth_id, int)
-    check_type(email, str)
 
     check_email_valid(email)
 
@@ -116,7 +101,7 @@ def user_setemail_v1(auth_id, email):
 
     return {}
     
-def user_sethandle_v1(auth_id, handle_str):
+def user_sethandle_v1(auth_id: int, handle_str: str) -> dict:
     '''
     Update the authorised user's email address
 
@@ -132,9 +117,6 @@ def user_sethandle_v1(auth_id, handle_str):
     Return value:
         Returns {} on success
     '''
-
-    check_type(auth_id, int)
-    check_type(handle_str, str)
 
     if len(handle_str) < 3:
         raise InputError('Handle str shorter than 3 characters')
@@ -152,7 +134,7 @@ def user_sethandle_v1(auth_id, handle_str):
 
     return {}
 
-def user_profile_uploadphoto_v1(auth_user_id, img_url, x_start, y_start, x_end, y_end ):
+def user_profile_uploadphoto_v1(auth_user_id: int, img_url: str, x_start: int, y_start: int, x_end: int, y_end: int) -> dict:
     '''
     Given a URL of an image on the internet, crops the image within bounds
     (x_start, y_start) and (x_end, y_end). Position (0,0) is the top left.
@@ -200,8 +182,6 @@ def user_profile_uploadphoto_v1(auth_user_id, img_url, x_start, y_start, x_end, 
     if y_start < 0 or y_start > height or y_end < 0 or y_end > height:
         raise InputError
 
-
-
     urllib.request.urlretrieve(img_url, 'src/pickle_dump/' + str(auth_user_id) + '.jpg')
     imageObject = Image.open('src/pickle_dump/' + str(auth_user_id) + '.jpg')
     cropped = imageObject.crop((x_start, y_start, x_end, y_end))
@@ -211,7 +191,7 @@ def user_profile_uploadphoto_v1(auth_user_id, img_url, x_start, y_start, x_end, 
 
     return {}
 
-def user_stats_v1(auth_user_id):
+def user_stats_v1(auth_user_id: int) -> dict:
     '''
     Fetches the required statistics about this user's use of UNSW Streams.
 
@@ -225,10 +205,9 @@ def user_stats_v1(auth_user_id):
         Returns { user_stats } on success
     '''
 
-    check_type(auth_user_id, int)
     return {'user_stats': data_store.get_user_stats_from_u_id(auth_user_id)}
 
-def users_stats_v1(auth_user_id):
+def users_stats_v1() -> dict:
     '''
     Fetches the required statistics about the use of UNSW Streams.
 
@@ -240,8 +219,6 @@ def users_stats_v1(auth_user_id):
     Return value:
         Returns { workspace_stats } on success
     '''
-    check_type(auth_user_id, int)
-    print('testing2')
-    print(data_store.get_workspace_stats())
+
     return {'workspace_stats': data_store.get_workspace_stats()}
 

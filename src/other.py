@@ -5,7 +5,7 @@ from src.config import SECRET
 import jwt
 import hashlib
 
-def clear_v1():
+def clear_v1() -> dict:
     '''
     Resets the internal data of the application to its initial state, clearing the
     datastore
@@ -21,7 +21,7 @@ def clear_v1():
     return {}
 
 # helper function to generate handles for auth_register
-def handle_str_generation(firstname, lastname):
+def handle_str_generation(firstname: str, lastname: str) -> str:
     '''
     Generates a handle string given a first name and last name
 
@@ -35,15 +35,13 @@ def handle_str_generation(firstname, lastname):
         Returns an unique handle string
     '''
 
-    check_type(firstname, str)
-    check_type(lastname, str)
-
     base_handle_str = base_handle_str_generation(firstname, lastname)
     handle_str = handle_prevent_duplicates(base_handle_str)
+
     return handle_str
 
 # Returns a nonduplicate handle_str
-def handle_prevent_duplicates(base_handle_str):
+def handle_prevent_duplicates(base_handle_str: str) -> str:
     '''
     Given a handle string adds a number at the end to guarantee uniqueness
 
@@ -76,7 +74,7 @@ def handle_prevent_duplicates(base_handle_str):
     return base_handle_str
 
 # handle_str_generation helper function
-def base_handle_str_generation(firstname, lastname):
+def base_handle_str_generation(firstname: str, lastname: str) -> str:
     '''
     Given a first and last name returns a nonunique handle_str
 
@@ -100,26 +98,9 @@ def base_handle_str_generation(firstname, lastname):
 
     return base_handle
 
-# helper function to handle TypeError exceptions
-def check_type(var, var_type):
-    '''
-    Ensures that var is of var_type
-
-    Argument: 
-        var (arbitrary type), var_type (type)
-
-    Exceptions:
-        TypeError
-
-    Return value:
-        Returns nothing on success
-    '''
-    if type(var) != var_type:
-        raise TypeError 
-
 # helper function to handle token to auth_id conversion
 # raises an AccessError if token is invalid
-def token_to_auth_id(token):
+def token_to_auth_id(token: str) -> str:
     '''
     Returns the corresponding auth_user_id of a token.
 
@@ -140,14 +121,14 @@ def token_to_auth_id(token):
 
     return token_dict['auth_user_id']
 
-def hash_str(string):
+def hash_str(string: str) -> str:
     return hashlib.sha256(string.encode()).hexdigest()
 
-def check_email_valid(email):
+def check_email_valid(email: str) -> None:
     if not re.fullmatch(r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$', email):
         raise InputError ('incorrect email format')
 
-def check_and_insert_tag_notifications_in_message(message, channel_or_dm_id, auth_user_id):
+def check_and_insert_tag_notifications_in_message(message: str, channel_or_dm_id: int, auth_user_id: int) -> None:
     '''
     Checks a message for valid tags and inserts notification if exists
 
@@ -164,16 +145,14 @@ def check_and_insert_tag_notifications_in_message(message, channel_or_dm_id, aut
     if data_store.is_standup_active(channel_or_dm_id):
         return
 
-    print('entered')
     tags = [re.sub(r'\W+', '', tag) for tag in re.findall(r'@{1}[a-z0-9]+[^0-9a-zA-Z| ]?', message)]
     tags = [tags for tag in tags if data_store.is_duplicate_handle(tag) and data_store.is_user_member_of_channel_or_dm(channel_or_dm_id, data_store.get_u_id_from_handle_str(tag))]
     for tag in tags:
-        print(tag)
         tagger_handle_str = data_store.get_user_from_u_id(auth_user_id).get('handle_str')
         message = f'{tagger_handle_str} tagged you in {data_store.get_name_from_channel_or_dm_id(channel_or_dm_id)}: {message[0:20]}'
         data_store.insert_notification(data_store.get_u_id_from_handle_str(tag[0]), message, channel_or_dm_id)
 
-def insert_invite_channel_or_dm_notifications(channel_or_dm_id, auth_user_id, u_id):
+def insert_invite_channel_or_dm_notifications(channel_or_dm_id: int, auth_user_id: int, u_id: int) -> None:
     '''
     Inserts notification when you are invited to a dm or channeli
 
@@ -190,7 +169,7 @@ def insert_invite_channel_or_dm_notifications(channel_or_dm_id, auth_user_id, u_
     message = f"{user.get('handle_str')} added you to {data_store.get_name_from_channel_or_dm_id(channel_or_dm_id)}"
     data_store.insert_notification(u_id, message, channel_or_dm_id)
 
-def insert_react_message_notification(channel_or_dm_id, auth_user_id, u_id):
+def insert_react_message_notification(channel_or_dm_id: int, auth_user_id: int, u_id: int) -> None:
     '''
     Inserts notification when users react to your message
 
@@ -205,7 +184,7 @@ def insert_react_message_notification(channel_or_dm_id, auth_user_id, u_id):
     '''
     user = data_store.get_user_from_u_id(auth_user_id)
     message = f"{user.get('handle_str')} reacted to your message in {data_store.get_name_from_channel_or_dm_id(channel_or_dm_id)}"
-    print('notification react')
+
     data_store.insert_notification(u_id, message, channel_or_dm_id)
 
 stream_owner = 1

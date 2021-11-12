@@ -1,6 +1,3 @@
-from re import T
-import re
-import sys
 import signal
 from json import dumps
 from flask import Flask, request, send_file
@@ -832,11 +829,11 @@ def users_stats_endpt():
     Return value:
         Returns workspace stats
     '''
-    print('test')
+
     request_token = request.args.get('token')
-    auth_user_id = token_to_auth_id(request_token)
-    print('tests')
-    return users_stats_v1(auth_user_id)
+    token_to_auth_id(request_token)
+
+    return users_stats_v1()
 
 ################## Message #####################################################
 

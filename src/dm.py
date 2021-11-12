@@ -2,9 +2,9 @@ from src.data_store import data_store
 
 from src.error import InputError
 from src.error import AccessError
-from src.other import check_type, insert_invite_channel_or_dm_notifications
+from src.other import insert_invite_channel_or_dm_notifications
 
-def dm_create_v1(auth_id, u_ids):
+def dm_create_v1(auth_id: int, u_ids: list) -> dict:
     '''
     Creates a DM with owner auth_id and invites
     all members in u_ids to the DM. DM name is
@@ -24,14 +24,11 @@ def dm_create_v1(auth_id, u_ids):
         Returns dm_id on success
 
     '''
-    check_type(auth_id, int)
-    check_type(u_ids, list)
 
     user_info = data_store.get_users_from_u_id_dict()
 
     if any (data_store.is_invalid_user_id(u_id) for u_id in u_ids):
         raise InputError ('an u_id in u_ids does not refer to a valid user')
-    print('inputs',u_ids, auth_id)
     
     # Obtaining the handle_strs for all members in channel
     old_u_ids = [u_id for u_id in u_ids]
@@ -39,15 +36,14 @@ def dm_create_v1(auth_id, u_ids):
     handle_str_list = sorted([user_info.get(u_id).get('handle_str') for u_id in u_ids])
     user_list = [data_store.get_user_from_u_id(u_id) for u_id in u_ids]
 
-    # Creating the channel name and dm_id (ALL DM_ID ARE NEGATIVE AND START AT -1)
+    # Creating the channel name and dm_id (ALL DM_ID ARE NEGATIVE AND START AT -2)
     dm_name = ', '.join(handle_str_list)
     dm_id = (len(data_store.get_dms_from_dm_id_dict()) + 2) * -1
 
     data_store.insert_dm(auth_id, dm_id, user_list, dm_name)
 
     data_store.update_user_stats_dms_joined(auth_id, 1)
-    print('auth_id', auth_id)
-    print('old', old_u_ids)
+
     for u_id in old_u_ids:
         data_store.update_user_stats_dms_joined(u_id, 1)
         insert_invite_channel_or_dm_notifications(dm_id, auth_id, u_id)
@@ -56,7 +52,7 @@ def dm_create_v1(auth_id, u_ids):
 
     return { 'dm_id': dm_id }
 
-def dm_details_v1(auth_id, dm_id):
+def dm_details_v1(auth_id: int, dm_id: int) -> dict:
     '''
     Returns the details of a dm given a valid dm_id
 
@@ -74,8 +70,6 @@ def dm_details_v1(auth_id, dm_id):
         Returns {names, members} on success
 
     '''
-    check_type(auth_id, int)
-    check_type(dm_id, int)
 
     if data_store.is_invalid_dm_id(dm_id):
         raise InputError ('dm_id does not refer to valid DM')
@@ -87,7 +81,7 @@ def dm_details_v1(auth_id, dm_id):
 
         
 
-def dm_list_v1(auth_id):
+def dm_list_v1(auth_id: int) -> dict:
     '''
         Returns the list of DMs that the user is a member of.
 
@@ -101,8 +95,6 @@ def dm_list_v1(auth_id):
             Returns nothing on success
     '''
 
-    check_type(auth_id, int)
-
     dm_dict = data_store.get_dms_from_dm_id_dict().items()
 
     dms = [ {
@@ -115,7 +107,7 @@ def dm_list_v1(auth_id):
 
     return { 'dms': dms }
 
-def dm_messages_v1(auth_id, dm_id, start):
+def dm_messages_v1(auth_id: int, dm_id: int, start: int) -> dict:
     '''
     Returns a list of messages between index 'start' and up to 'start' + 50 from a
     given DM that the authorised user has access to. Additionally returns
@@ -141,10 +133,6 @@ def dm_messages_v1(auth_id, dm_id, start):
 
 
     '''
-    check_type(auth_id, int)
-    check_type(dm_id, int)
-    check_type(start, int)
-
 
     # check if auth and dm ids are valid and user is in dm
     if data_store.is_invalid_dm_id(dm_id):
@@ -173,7 +161,7 @@ def dm_messages_v1(auth_id, dm_id, start):
         'end' : end
         }
 
-def dm_leave_v1(auth_id, dm_id):
+def dm_leave_v1(auth_id: int, dm_id: int) -> dict:
     '''
     dm/leave/v1
     Given a DM ID, the user is removed as a member of this DM. 
@@ -193,8 +181,6 @@ def dm_leave_v1(auth_id, dm_id):
         Returns {} on success
 
     '''
-    check_type(auth_id, int)
-    check_type(dm_id, int)
 
     if data_store.is_invalid_dm_id(dm_id):
         raise InputError ('dm_id does not refer to valid DM')
@@ -210,7 +196,7 @@ def dm_leave_v1(auth_id, dm_id):
 
     return {}
 
-def dm_remove_v1(auth_id, dm_id):
+def dm_remove_v1(auth_id: int, dm_id: int) -> dict:
     '''
     Remove an existing DM, so all members are no longer in the DM. This can only be done by the original creator of the DM.
 
@@ -227,15 +213,13 @@ def dm_remove_v1(auth_id, dm_id):
     Return Value:
         Returs {} on success
     '''
-    check_type(auth_id, int)
-    check_type(dm_id, int)
 
     if data_store.is_invalid_dm_id(dm_id):
         raise InputError ('dm_id does not refer to valid DM')
     
     if not data_store.is_user_owner_of_channel_or_dm(dm_id, auth_id):
         raise AccessError ('dm_id is valid and the authorised user is not creator of the DM')
-    print(data_store.get_dm_members_from_dm_id(dm_id))
+
     for user in data_store.get_dm_members_from_dm_id(dm_id):
         data_store.update_user_stats_dms_joined(user['u_id'], -1)
 

@@ -2,9 +2,8 @@ from src.data_store import data_store
 
 from src.error import InputError
 from src.error import AccessError
-from src.other import check_type
 
-def notifications_get_v1(auth_user_id):
+def notifications_get_v1(auth_user_id: int) -> dict:
     '''
     Return the authorised user's most recent 20 notifications, ordered
     from most recent to least recent.
@@ -18,7 +17,5 @@ def notifications_get_v1(auth_user_id):
     Return value:
         Returns { notifications } on success
     '''
-
-    check_type(auth_user_id, int)
 
     return { 'notifications': data_store.get_notifications_from_u_id(auth_user_id)[:20] }
