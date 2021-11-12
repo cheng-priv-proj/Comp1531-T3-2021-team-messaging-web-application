@@ -44,7 +44,7 @@ def test_standard(register_users, channel_factory):
         'token': register_users[0]['token'],
         'channel_id': channel_id,
         'message': 'hi there',
-        'time_sent': now + 2
+        'time_sent': now + 1
     }).json()
     
     message_id = message_id.get('message_id')
@@ -61,7 +61,7 @@ def test_standard(register_users, channel_factory):
         'end': -1
     }
 
-    sleep(3)
+    sleep(2)
 
     messages_dict = requests.get(url + 'channel/messages/v2', params = {
         'token': register_users[0]['token'],
@@ -108,7 +108,7 @@ def test_multiple(register_users, channel_factory):
         'token': register_users[0]['token'],
         'channel_id': channel_id,
         'message': 'hi there',
-        'time_sent': now + 5
+        'time_sent': now + 3
     }).json().get('message_id')
 
     messages_dict = requests.get(url + 'channel/messages/v2', params = {
@@ -123,7 +123,7 @@ def test_multiple(register_users, channel_factory):
         'end': -1
     }
 
-    sleep(7)
+    sleep(4)
 
     messages_dict = requests.get(url + 'channel/messages/v2', params = {
         'token': register_users[0]['token'],
@@ -141,7 +141,7 @@ def test_multiple(register_users, channel_factory):
                 'message_id': message_id_3,
                 'u_id': register_users[0]['auth_user_id'],
                 'message': 'hi there',
-                'time_created': pytest.approx(now + 5, rel=1),
+                'time_created': pytest.approx(now + 3, rel=1),
                 'reacts': [{'react_id': 1, 'u_ids': [], 'is_this_user_reacted': False}],
                 'is_pinned': False
             },

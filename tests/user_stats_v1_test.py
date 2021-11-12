@@ -111,15 +111,30 @@ def test_user_stats_v1_joined_channels(clear_server, get_valid_token, channel_fa
     print(response)
 
     assert response == {'user_stats': {
-        'channels_joined': [{
+        'channels_joined': [
+        {
+            'num_channels_joined': 0,
+            'time_stamp': pytest.approx(pytest.approx(now, rel=2))
+        },
+        {
+            'num_channels_joined': 1,
+            'time_stamp': pytest.approx(pytest.approx(now, rel=2))
+        },
+        {
             'num_channels_joined': 2,
             'time_stamp': pytest.approx(pytest.approx(now, rel=2))
         }],
-        'dms_joined': [{
+        'dms_joined': [
+        {
             'num_dms_joined': 0,
             'time_stamp': pytest.approx(pytest.approx(now, rel=2))
         }],
-        'messages_sent': [{
+        'messages_sent': [
+        {
+            'num_messages_sent': 0,
+            'time_stamp': pytest.approx(pytest.approx(now, rel=2))
+        },
+        {
             'num_messages_sent': 1,
             'time_stamp': pytest.approx(pytest.approx(now, rel=2))
         }],
@@ -146,11 +161,29 @@ def test_user_stats_v1_joined_dms(clear_server, get_valid_token, dm_factory, sen
             'num_channels_joined': 0,
             'time_stamp': pytest.approx(pytest.approx(now, rel=2))
         }],
-        'dms_joined': [{
+        'dms_joined': [
+        {
+            'num_dms_joined': 0,
+            'time_stamp': pytest.approx(pytest.approx(now, rel=2))
+        },
+        {
+            'num_dms_joined': 1,
+            'time_stamp': pytest.approx(pytest.approx(now, rel=2))
+        },
+        {
             'num_dms_joined': 2,
             'time_stamp': pytest.approx(pytest.approx(now, rel=2))
         }],
-        'messages_sent': [{
+        'messages_sent': [
+        {
+            'num_messages_sent': 0,
+            'time_stamp': pytest.approx(pytest.approx(now, rel=2))
+        },
+        {
+            'num_messages_sent': 1,
+            'time_stamp': pytest.approx(pytest.approx(now, rel=2))
+        },
+        {
             'num_messages_sent': 2,
             'time_stamp': pytest.approx(pytest.approx(now, rel=2))
         }],
@@ -178,15 +211,46 @@ def test_user_stats_v1_joined_channels_and_dms(clear_server, get_valid_token, ch
     }).json()
 
     assert response == {'user_stats': {
-        'channels_joined': [{
+        'channels_joined': [
+        {
+            'num_channels_joined': 0,
+            'time_stamp': pytest.approx(now, rel=2)
+        },
+        {
+            'num_channels_joined': 1,
+            'time_stamp': pytest.approx(now, rel=2)
+        },
+        {
             'num_channels_joined': 2,
             'time_stamp': pytest.approx(now, rel=2)
         }],
-        'dms_joined': [{
+        'dms_joined': [
+        {
+            'num_dms_joined': 0,
+            'time_stamp': pytest.approx(now, rel=2)
+        },
+        {
+            'num_dms_joined': 1,
+            'time_stamp': pytest.approx(now, rel=2)
+        },
+        {
             'num_dms_joined': 2,
             'time_stamp': pytest.approx(now, rel=2)
         }],
-        'messages_sent': [{
+        'messages_sent': [
+        {
+            'num_messages_sent': 0,
+            'time_stamp': pytest.approx(now, rel=2)
+        },
+        {
+            'num_messages_sent': 1,
+            'time_stamp': pytest.approx(now, rel=2)
+        },
+        {
+            'num_messages_sent': 2,
+            'time_stamp': pytest.approx(now, rel=2)
+        },
+        {
             'num_messages_sent': 3,
             'time_stamp': pytest.approx(now, rel=2)
         }],

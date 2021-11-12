@@ -111,7 +111,16 @@ def test_users_stats_v1_joined_channels(clear_server, get_valid_token, channel_f
     print(response)
 
     assert response['workspace_stats'] == {
-        'channels_exist': [{
+        'channels_exist': [
+        {
+            'num_channels_exist': 0,
+            'time_stamp': pytest.approx(pytest.approx(now, rel=2))
+        },
+        {
+            'num_channels_exist': 1,
+            'time_stamp': pytest.approx(pytest.approx(now, rel=2))
+        },
+        {
             'num_channels_exist': 2,
             'time_stamp': pytest.approx(pytest.approx(now, rel=2))
         }],
@@ -119,7 +128,12 @@ def test_users_stats_v1_joined_channels(clear_server, get_valid_token, channel_f
             'num_dms_exist': 0,
             'time_stamp': pytest.approx(pytest.approx(now, rel=2))
         }],
-        'messages_exist': [{
+        'messages_exist': [
+        {
+            'num_messages_exist': 0,
+            'time_stamp': pytest.approx(pytest.approx(now, rel=2))
+        },
+        {
             'num_messages_exist': 1,
             'time_stamp': pytest.approx(pytest.approx(now, rel=2))
         }],
@@ -149,11 +163,29 @@ def test_users_stats_v1_joined_dms(clear_server, get_valid_token, dm_factory, se
             'num_channels_exist': 0,
             'time_stamp': pytest.approx(pytest.approx(now, rel=2))
         }],
-        'dms_exist': [{
+        'dms_exist': [
+        {
+            'num_dms_exist': 0,
+            'time_stamp': pytest.approx(pytest.approx(now, rel=2))
+        },
+        {
+            'num_dms_exist': 1,
+            'time_stamp': pytest.approx(pytest.approx(now, rel=2))
+        },
+        {
             'num_dms_exist': 2,
             'time_stamp': pytest.approx(pytest.approx(now, rel=2))
         }],
-        'messages_exist': [{
+        'messages_exist': [
+        {
+            'num_messages_exist': 0,
+            'time_stamp': pytest.approx(pytest.approx(now, rel=2))
+        },
+        {
+            'num_messages_exist': 1,
+            'time_stamp': pytest.approx(pytest.approx(now, rel=2))
+        },
+        {
             'num_messages_exist': 2,
             'time_stamp': pytest.approx(pytest.approx(now, rel=2))
         }],
@@ -181,15 +213,46 @@ def test_users_stats_v1_joined_channels_and_dms(clear_server, get_valid_token, c
     }).json()
     print(response['workspace_stats'])
     assert response['workspace_stats'] == {
-        'channels_exist': [{
+        'channels_exist': [
+        {
+            'num_channels_exist': 0,
+            'time_stamp': pytest.approx(pytest.approx(now, rel=2))
+        },
+        {
+            'num_channels_exist': 1,
+            'time_stamp': pytest.approx(pytest.approx(now, rel=2))
+        },
+        {
             'num_channels_exist': 2,
             'time_stamp': pytest.approx(pytest.approx(now, rel=2))
         }],
-        'dms_exist': [{
+        'dms_exist': [
+        {
+            'num_dms_exist': 0,
+            'time_stamp': pytest.approx(pytest.approx(now, rel=2))
+        },
+        {
+            'num_dms_exist': 1,
+            'time_stamp': pytest.approx(pytest.approx(now, rel=2))
+        },
+        {
             'num_dms_exist': 2,
             'time_stamp': pytest.approx(pytest.approx(now, rel=2))
         }],
-        'messages_exist': [{
+        'messages_exist': [
+        {
+            'num_messages_exist': 0,
+            'time_stamp': pytest.approx(pytest.approx(now, rel=2))
+        },
+        {
+            'num_messages_exist': 1,
+            'time_stamp': pytest.approx(pytest.approx(now, rel=2))
+        },
+        {
+            'num_messages_exist': 2,
+            'time_stamp': pytest.approx(pytest.approx(now, rel=2))
+        },
+        {
             'num_messages_exist': 3,
             'time_stamp': pytest.approx(pytest.approx(now, rel=2))
         }],
