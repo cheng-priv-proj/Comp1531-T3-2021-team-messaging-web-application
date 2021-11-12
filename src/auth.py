@@ -155,7 +155,7 @@ def auth_passwordreset_request_v1(email):
     check_type(email, str)
 
     if data_store.is_invalid_email(email):
-        return
+        return {}
 
     reset_code = email
 

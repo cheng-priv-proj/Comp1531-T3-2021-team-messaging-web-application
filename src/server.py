@@ -150,7 +150,7 @@ def passwordreset_request_endpt():
     insert something here
     '''
     email = request.get_json(force = True).get('email')
-
+    print(email)
     return auth_passwordreset_request_v1(email)
 
 # Auth password reset
