@@ -105,9 +105,9 @@ initial_object = {
     'perms' : {},
     'user_stats': {},
     'workspace_stats': { 
-                        'channels_exist': [{'num_channels_exist': 0, 'time_stamp': 0}], 
-                        'dms_exist': [{'num_dms_exist': 0, 'time_stamp': 0}], 
-                        'messages_exist': [{'num_messages_exist': 0, 'time_stamp': 0}], 
+                        'channels_exist': [{'num_channels_exist': 0, 'time_stamp': int(datetime.now(timezone.utc).timestamp())}], 
+                        'dms_exist': [{'num_dms_exist': 0, 'time_stamp': int(datetime.now(timezone.utc).timestamp())}], 
+                        'messages_exist': [{'num_messages_exist': 0, 'time_stamp': int(datetime.now(timezone.utc).timestamp())}], 
                         'utilization_rate': 0 
                         },
     'message_count': 0,
@@ -140,9 +140,9 @@ class Datastore:
                 'perms' : {},
                 'user_stats': {},
                 'workspace_stats': { 
-                                    'channels_exist': [{'num_channels_exist': 0, 'time_stamp': 0}], 
-                                    'dms_exist': [{'num_dms_exist': 0, 'time_stamp': 0}], 
-                                    'messages_exist': [{'num_messages_exist': 0, 'time_stamp': 0}], 
+                                    'channels_exist': [{'num_channels_exist': 0, 'time_stamp': int(datetime.now(timezone.utc).timestamp())}], 
+                                    'dms_exist': [{'num_dms_exist': 0, 'time_stamp': int(datetime.now(timezone.utc).timestamp())}], 
+                                    'messages_exist': [{'num_messages_exist': 0, 'time_stamp': int(datetime.now(timezone.utc).timestamp())}], 
                                     'utilization_rate': 0 
                                     },
                 'message_count': 0,
@@ -462,9 +462,9 @@ class Datastore:
             'profile_img_url': url + 'default.jpg'
         }
         self.get_user_stats_from_u_id_dict()[u_id] = {
-            'channels_joined': [{'num_channels_joined': 0, 'time_stamp': 0}], 
-            'dms_joined': [{'num_dms_joined': 0, 'time_stamp': 0}], 
-            'messages_sent': [{'num_messages_sent': 0, 'time_stamp': 0}], 
+            'channels_joined': [{'num_channels_joined': 0, 'time_stamp': int(datetime.now(timezone.utc).timestamp())}], 
+            'dms_joined': [{'num_dms_joined': 0, 'time_stamp': int(datetime.now(timezone.utc).timestamp())}], 
+            'messages_sent': [{'num_messages_sent': 0, 'time_stamp': int(datetime.now(timezone.utc).timestamp())}], 
             'involvement_rate': 0
         }
         self.get_notifications_from_u_id_dict()[u_id] = []
@@ -646,25 +646,31 @@ class Datastore:
 
     def update_user_stats_channels_joined(self, u_id, change):
         user_stats_channels = self.get_user_stats_from_u_id(u_id)['channels_joined']
-        user_stats_channels[0]['num_channels_joined'] += change
-        user_stats_channels[0]['time_stamp'] = int(datetime.now(timezone.utc).timestamp())
+        user_stats_channels.append({
+            'num_channels_joined': user_stats_channels[-1]['num_channels_joined'] + change,
+            'time_stamp': int(datetime.now(timezone.utc).timestamp())
+        })
     
     def update_user_stats_dms_joined(self, u_id, change):
         user_stats_dms = self.__store['user_stats'][u_id]['dms_joined']
-        user_stats_dms[0]['num_dms_joined'] += change
-        user_stats_dms[0]['time_stamp'] = int(datetime.now(timezone.utc).timestamp())
+        user_stats_dms.append({
+            'num_dms_joined': user_stats_dms[-1]['num_dms_joined'] + change,
+            'time_stamp': int(datetime.now(timezone.utc).timestamp())
+        })
 
     def update_user_stats_messages_sent(self, u_id, change):
         user_stats_messages = self.__store['user_stats'][u_id]['messages_sent']
-        user_stats_messages[0]['num_messages_sent'] += change
-        user_stats_messages[0]['time_stamp'] = int(datetime.now(timezone.utc).timestamp())
+        user_stats_messages.append({
+            'num_messages_sent': user_stats_messages[-1]['num_messages_sent'] + change,
+            'time_stamp': int(datetime.now(timezone.utc).timestamp())
+        })
 
     def update_user_stats_involvement_rate(self, u_id):
         user_stats = self.__store['user_stats'][u_id]
         workspace_stats = self.__store['workspace_stats']
 
-        user_sum = user_stats['messages_sent'][0]['num_messages_sent'] + user_stats['dms_joined'][0]['num_dms_joined'] + user_stats['channels_joined'][0]['num_channels_joined']
-        workspace_sum = workspace_stats['channels_exist'][0]['num_channels_exist'] + workspace_stats['dms_exist'][0]['num_dms_exist'] + workspace_stats['messages_exist'][0]['num_messages_exist']
+        user_sum = user_stats['messages_sent'][-1]['num_messages_sent'] + user_stats['dms_joined'][-1]['num_dms_joined'] + user_stats['channels_joined'][-1]['num_channels_joined']
+        workspace_sum = workspace_stats['channels_exist'][-1]['num_channels_exist'] + workspace_stats['dms_exist'][-1]['num_dms_exist'] + workspace_stats['messages_exist'][-1]['num_messages_exist']
 
         if workspace_sum == 0:
             user_stats['involvement_rate'] = 0
@@ -680,22 +686,28 @@ class Datastore:
 
     def update_workspace_stats_channels_exist(self, change):
         workspace_stats_channels = self.__store['workspace_stats']['channels_exist']
-        workspace_stats_channels[0]['num_channels_exist'] += change
-        workspace_stats_channels[0]['time_stamp'] = int(datetime.now(timezone.utc).timestamp())
+        workspace_stats_channels.append({
+            'num_channels_exist': workspace_stats_channels[-1]['num_channels_exist'] + change,
+            'time_stamp': int(datetime.now(timezone.utc).timestamp())
+        })
 
     def update_workspace_stats_dms_exist(self, change):
         print('dm_change' ,change)
         workspace_stats_dms = self.__store['workspace_stats']['dms_exist']
-        workspace_stats_dms[0]['num_dms_exist'] += change
-        workspace_stats_dms[0]['time_stamp'] = int(datetime.now(timezone.utc).timestamp())
+        workspace_stats_dms.append({
+            'num_dms_exist': workspace_stats_dms[-1]['num_dms_exist'] + change,
+            'time_stamp': int(datetime.now(timezone.utc).timestamp())
+        })
 
     def update_workspace_stats_messages_exist(self, change):
         workspace_stats_messages = self.__store['workspace_stats']['messages_exist']
-        workspace_stats_messages[0]['num_messages_exist'] += change
-        workspace_stats_messages[0]['time_stamp'] = int(datetime.now(timezone.utc).timestamp())
+        workspace_stats_messages.append({
+            'num_messages_exist': workspace_stats_messages[-1]['num_messages_exist'] + change,
+            'time_stamp': int(datetime.now(timezone.utc).timestamp())
+        })
 
     def update_workspace_stats_utilization_rate(self):
-        num_users_who_have_joined_a_channel_or_dm = len([user_stats for user_stats in self.get_user_stats_from_u_id_dict().values() if user_stats['channels_joined'][0]['num_channels_joined'] > 0 or user_stats['dms_joined'][0]['num_dms_joined'] > 0])
+        num_users_who_have_joined_a_channel_or_dm = len([user_stats for user_stats in self.get_user_stats_from_u_id_dict().values() if user_stats['channels_joined'][-1]['num_channels_joined'] > 0 or user_stats['dms_joined'][-1]['num_dms_joined'] > 0])
         total_users = len(self.get_user_stats_from_u_id_dict()) 
 
         self.__store['workspace_stats']['utilization_rate'] = num_users_who_have_joined_a_channel_or_dm / total_users
