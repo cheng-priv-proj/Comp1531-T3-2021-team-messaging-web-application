@@ -3,13 +3,18 @@ import requests
 from requests.api import request
 from src.config import url
 
-# Fixture to reset data store
 @pytest.fixture
 def clear():
+    '''
+    Fixture to reset data store
+    '''
     requests.delete(url + 'clear/v1')
 
 @pytest.fixture
 def register(clear):
+    '''
+    Fixture that registers two users.
+    '''
     owner_id = requests.post(url + 'auth/register/v2', json = {
         'email': 'owner@test.com', 
         'password': 'password', 

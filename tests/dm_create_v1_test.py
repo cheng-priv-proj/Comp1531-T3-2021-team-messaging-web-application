@@ -2,35 +2,45 @@ import pytest
 import requests
 from src import config
 
-# Fixture to reset data store
 @pytest.fixture
 def clear():
+    '''
+    Fixture to reset data store
+    '''
     requests.delete(config.url + 'clear/v1')
 
-# Extracts the dm_id from a dictionary
 @pytest.fixture 
 def extract_dm():
+    '''
+    Extracts the dm_id from a dictionary
+    '''
     def extract_dm_function(dm_id_dict):
         return dm_id_dict.get('dm_id')
     return extract_dm_function
 
-# Extract token from channel details
 @pytest.fixture
 def extract_token():
+    '''
+    Extract token from channel details
+    '''
     def extract_token_function(auth_details):
         return auth_details.get('token')
     return extract_token_function
 
-# Extract id from channel details
 @pytest.fixture
 def extract_id():
+    '''
+    Extract id from channel details
+    '''
     def extract_token_function(auth_details):
         return auth_details.get('auth_user_id')
     return extract_token_function
 
-# Fixture to register someone and returns a dictionary of {token, auth_user_id}
 @pytest.fixture
 def user1():
+    '''
+    Fixture to register someone and returns a dictionary of {token, auth_user_id}
+    '''
     response = requests.post(config.url + 'auth/register/v2', json={
         'email': 'user1@test.com', 
         'password': 'potato', 
@@ -41,6 +51,9 @@ def user1():
 
 @pytest.fixture
 def user2():
+    '''
+    Fixture to register someone and returns a dictionary of {token, auth_user_id}
+    '''
     response = requests.post(config.url + 'auth/register/v2', json={
         'email': 'user2@test.com', 
         'password': 'spotato', 
@@ -51,6 +64,9 @@ def user2():
 
 @pytest.fixture
 def user3():
+    '''
+    Fixture to register someone and returns a dictionary of {token, auth_user_id}
+    '''
     response = requests.post(config.url + 'auth/register/v2', json={
             'email': 'user3@test.com',
             'password': 'spotatoo', 
