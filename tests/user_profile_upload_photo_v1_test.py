@@ -9,11 +9,16 @@ from src import config
 
 @pytest.fixture
 def clear_server():
+    '''
+    Clears the datastore.
+    '''
     requests.delete(config.url + "clear/v1")
 
-# Generates new user
 @pytest.fixture
 def get_valid_token():
+    '''
+    Generates new user
+    '''
     response = requests.post(config.url + 'auth/register/v2', json={
         'email': 'example@email.com', 
         'password': 'potato', 
@@ -25,6 +30,9 @@ def get_valid_token():
 
 @pytest.fixture
 def upload_photo_factory():
+    '''
+    Fixture that calls upload_photo
+    '''
     def user_profile_upload_photo(token, img_url, x_start, y_start, x_end, y_end):
         response = requests.post(config.url + 'user/profile/uploadphoto/v1', json = {
         'token': token,
@@ -39,7 +47,13 @@ def upload_photo_factory():
 
 
 def test_user_profile_upload_photo_v1_invalid_token(clear_server, upload_photo_factory):
-    # generates a filler 300x300 jpeg
+    '''
+    Test case where token is not valid.
+
+    Expects: 
+        AccessError (403 error)
+    '''
+
     img_url = 'http://cgi.cse.unsw.edu.au/~jas/home/pics/jas.jpg'
 
     response = upload_photo_factory(-1, img_url, 0, 0, 200, 200)
@@ -48,6 +62,12 @@ def test_user_profile_upload_photo_v1_invalid_token(clear_server, upload_photo_f
     assert response.status_code == 403
 
 def test_user_profile_upload_photo_v1_invalid_img_url(clear_server, get_valid_token, upload_photo_factory):
+    '''
+    Test case where url is invalid.
+
+    Expects: 
+        InputError (400 error)
+    '''
     token = get_valid_token['token']
     img_url = ''
     response = upload_photo_factory(token, img_url, 0, 0, 200, 200)
@@ -55,6 +75,12 @@ def test_user_profile_upload_photo_v1_invalid_img_url(clear_server, get_valid_to
     assert response.status_code == 400
 
 def test_user_profile_upload_photo_v1_invalid_dimensions(clear_server, get_valid_token, upload_photo_factory):
+    '''
+    Test case where dimensions are invalid.
+
+    Expects: 
+        InputError (400 error)
+    '''
     token = get_valid_token['token']
     img_url = 'http://cgi.cse.unsw.edu.au/~jas/home/pics/jas.jpg'
     response = upload_photo_factory(token, img_url, 400, 400, 500, 500)
@@ -66,6 +92,12 @@ def test_user_profile_upload_photo_v1_invalid_dimensions(clear_server, get_valid
     assert response.status_code == 400
 
 def test_user_profile_upload_photo_v1_invalid_end_dimensions_2(clear_server, get_valid_token, upload_photo_factory):
+    '''
+    Test case where dimensions are invalid.
+
+    Expects: 
+        InputError (400 error)
+    '''
     token = get_valid_token['token']
     img_url = 'http://cgi.cse.unsw.edu.au/~jas/home/pics/jas.jpg'
     response = upload_photo_factory(token, img_url, 0, 0, -700, 100)
@@ -77,6 +109,12 @@ def test_user_profile_upload_photo_v1_invalid_end_dimensions_2(clear_server, get
     assert response.status_code == 400
 
 def test_user_profile_upload_photo_v1_invalid_end_dimensions_3(clear_server, get_valid_token, upload_photo_factory):
+    '''
+    Test case where dimensions are invalid.
+
+    Expects: 
+        InputError (400 error)
+    '''
     token = get_valid_token['token']
     img_url = 'http://cgi.cse.unsw.edu.au/~jas/home/pics/jas.jpg'
     response = upload_photo_factory(token, img_url, 0, -800, 100, -700)
@@ -88,6 +126,12 @@ def test_user_profile_upload_photo_v1_invalid_end_dimensions_3(clear_server, get
     assert response.status_code == 400
 
 def test_user_profile_upload_photo_v1_photo_not_jpeg(clear_server, get_valid_token, upload_photo_factory):
+    '''
+    Test case where the photo is invalid.
+
+    Expects: 
+        InputError (400 error)
+    '''
     token = get_valid_token['token']
     img_url = 'http://www.cse.unsw.edu.au/~richardb/index_files/RichardBuckland-200.png'
     response = upload_photo_factory(token, img_url, 0, 0, 200, 200)
@@ -96,6 +140,12 @@ def test_user_profile_upload_photo_v1_photo_not_jpeg(clear_server, get_valid_tok
 
 
 def test_standard_upload_photo(clear_server, get_valid_token, upload_photo_factory):
+    '''
+    Standard Test case.
+
+    Expects: 
+        Correct output from user_profile
+    '''
     token = get_valid_token['token']
     img_url = 'http://cgi.cse.unsw.edu.au/~jas/home/pics/jas.jpg'
     
