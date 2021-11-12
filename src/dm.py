@@ -239,8 +239,9 @@ def dm_remove_v1(auth_id, dm_id):
     for user in data_store.get_dm_members_from_dm_id(dm_id):
         data_store.update_user_stats_dms_joined(user['u_id'], -1)
 
-    data_store.remove_dm(dm_id)
+    data_store.update_workspace_stats_messages_exist(-len(data_store.get_messages_from_channel_or_dm_id(dm_id)))
     data_store.update_workspace_stats_dms_exist(-1)
+    data_store.remove_dm(dm_id)
 
     return {}
 

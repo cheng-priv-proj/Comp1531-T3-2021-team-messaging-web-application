@@ -279,8 +279,9 @@ class Datastore:
     # handle_str
 
     def get_u_id_from_handle_str(self, handle_str):
-        users = self.get_users_from_u_id_dict()
-        return [users[user]['u_id'] for user in users if users[user]['handle_str'] == handle_str][0]
+        users = list(self.get_users_from_u_id_dict().values())
+        print(users)
+        return next((user['u_id'] for user in users if user['handle_str'] == handle_str), None)
 
     # reset codes
 
@@ -668,12 +669,15 @@ class Datastore:
     def update_user_stats_involvement_rate(self, u_id):
         user_stats = self.__store['user_stats'][u_id]
         workspace_stats = self.__store['workspace_stats']
-
+        print('user')
+        print(user_stats['messages_sent'][-1]['num_messages_sent'], 'messages', user_stats['dms_joined'][-1]['num_dms_joined'], 'dms', user_stats['channels_joined'][-1]['num_channels_joined'], 'channels') 
+        print('workspace')
+        print(workspace_stats['messages_exist'][-1]['num_messages_exist'], 'messages', workspace_stats['dms_exist'][-1]['num_dms_exist'], 'dms', workspace_stats['channels_exist'][-1]['num_channels_exist'], 'channels') 
         user_sum = user_stats['messages_sent'][-1]['num_messages_sent'] + user_stats['dms_joined'][-1]['num_dms_joined'] + user_stats['channels_joined'][-1]['num_channels_joined']
         workspace_sum = workspace_stats['channels_exist'][-1]['num_channels_exist'] + workspace_stats['dms_exist'][-1]['num_dms_exist'] + workspace_stats['messages_exist'][-1]['num_messages_exist']
-
+        print(user_sum, workspace_sum, 'SUMS')
         if workspace_sum == 0:
-            user_stats['involvement_rate'] = 0
+            user_stats['involvement_rate'] = 0.0
         else:
             user_stats['involvement_rate'] = user_sum / workspace_sum
         
@@ -697,10 +701,11 @@ class Datastore:
         workspace_stats_dms.append({
             'num_dms_exist': workspace_stats_dms[-1]['num_dms_exist'] + change,
             'time_stamp': int(datetime.now(timezone.utc).timestamp())
-        })
+        })  
 
     def update_workspace_stats_messages_exist(self, change):
         workspace_stats_messages = self.__store['workspace_stats']['messages_exist']
+        print('entered')
         workspace_stats_messages.append({
             'num_messages_exist': workspace_stats_messages[-1]['num_messages_exist'] + change,
             'time_stamp': int(datetime.now(timezone.utc).timestamp())

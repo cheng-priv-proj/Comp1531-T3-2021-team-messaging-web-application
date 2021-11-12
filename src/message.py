@@ -169,7 +169,7 @@ def message_remove_v1(auth_user_id, message_id):
         raise AccessError ('user does not have proper permissions')
 
     data_store.remove_message(message_id)
-    data_store.update_workspace_stats_dms_exist(-1)
+    data_store.update_workspace_stats_messages_exist(-1)
 
     return {}
 
