@@ -8,17 +8,23 @@ from time import sleep
 def clear_server():
     requests.delete(url + "clear/v1")
 
-# Extracts the token from a given dictionary.
 @pytest.fixture
 def extract_token():
+    '''
+    Extracts the token from a given dictionary.
+    '''
     def extract_token_id_function(token_dict):
         return token_dict['token']
     return extract_token_id_function
 
-# Registers an user and returns their registration info, auth_id and token and handle_str
-# Assumes handle_str does not require additional processing past concatenation
 @pytest.fixture
 def register_user():
+    '''
+    Registers an user and returns their registration info, auth_id and token and handle_str
+    Assumes handle_str does not require additional processing past concatenation
+    
+    
+    '''
     def register_user_function(email, name_first, name_last):
         registration_info = {
             'email': email, 
@@ -31,30 +37,38 @@ def register_user():
         return {**owner_id_dict, **registration_info}
     return register_user_function
 
-# Creates a standup
 @pytest.fixture
 def create_standup():
+    '''
+    Creates a standup
+    '''
     def create_standup_function(token, channel_id, length):
         return requests.post(url + 'standup/start/v1', json = {'token': token, 'channel_id': channel_id, 'length': length})
     return create_standup_function
 
-# Sends a standup message
 @pytest.fixture
 def send_standup_message():
+    '''
+    Sends a standup message
+    '''
     def send_standup_message_function(token, channel_id, message):
         return requests.post(url + 'standup/send/v1', json = {'token': token, 'channel_id': channel_id, 'message': message})
     return send_standup_message_function
 
-# Gets a channels messages
 @pytest.fixture
 def get_channel_messages():
+    '''
+    Gets a channels messages
+    '''
     def get_channel_messages_function(token, channel_id, start):
         return requests.get(url + 'channel/messages/v2', params = {'token': token, 'channel_id': channel_id, 'start': start})
     return get_channel_messages_function
 
-# Creates a channel using the given details and returns the channel_id
 @pytest.fixture
 def register_channel():
+    '''
+    Creates a channel using the given details and returns the channel_id
+    '''
     def register_channel_function(token, name, is_public):
         channel_details = {
             'token': token,
@@ -68,6 +82,13 @@ def register_channel():
     return register_channel_function
 
 def test_standup_send_basic_functionality(clear_server, register_user, register_channel, extract_token, create_standup, send_standup_message, get_channel_messages):
+    '''
+    Standard test case.
+
+    Expects:
+        Correct output from channel/messages/v2.
+    '''
+
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     owner_token = extract_token(owner_info)
 
@@ -91,6 +112,12 @@ def test_standup_send_basic_functionality(clear_server, register_user, register_
 
 
 def test_standup_send_multiple_messages(clear_server, register_user, register_channel, extract_token, create_standup, send_standup_message, get_channel_messages):
+    '''
+    Standard test case with multiple messages.
+
+    Expects:
+        Correct output from channel/messages/v2.
+    '''
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     owner_token = extract_token(owner_info)
     user_info = register_user('user@gmail.com', 'user', 'one')
@@ -119,6 +146,13 @@ def test_standup_send_multiple_messages(clear_server, register_user, register_ch
     }
 
 def test_standup_send_empty_message(clear_server, register_user, register_channel, extract_token, create_standup, send_standup_message, get_channel_messages):
+    '''
+    test case with empty message.
+
+    Expects:
+        Correct output from channel/messages/v2.
+    '''
+
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     owner_token = extract_token(owner_info)
 
@@ -140,6 +174,13 @@ def test_standup_send_empty_message(clear_server, register_user, register_channe
     }
     
 def test_standup_send_normal_message_before_standup_over(clear_server, register_user, register_channel, extract_token, create_standup, send_standup_message, get_channel_messages):
+    '''
+    test case where a message is sent before the standup finishes.
+
+    Expects:
+        Correct output from channel/messages/v2.
+    '''
+
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     owner_token = extract_token(owner_info)
 
@@ -172,6 +213,12 @@ def test_standup_send_normal_message_before_standup_over(clear_server, register_
     }
 
 def test_standup_send_tags_in_messsage(clear_server, register_user, register_channel, extract_token, create_standup, send_standup_message, get_channel_messages):
+    '''
+    Standard test case where tagsa re in the message.
+
+    Expects:
+        Correct output from channel/messages/v2.
+    '''
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     owner_token = extract_token(owner_info)
     user_info = register_user('user@gmail.com', 'user', 'one')
@@ -187,6 +234,12 @@ def test_standup_send_tags_in_messsage(clear_server, register_user, register_cha
     assert len(requests.get(url + 'notifications/get/v1', params = {'token': user_token}).json()['notifications']) == 1
 
 def test_standup_send_returns_nothing(clear_server, register_user, register_channel, extract_token, create_standup, send_standup_message, get_channel_messages):
+    '''
+    testing that the standup can return nothing.
+
+    Expects:
+        Correct output from channel/messages/v2.
+    '''
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     owner_token = extract_token(owner_info)
 
@@ -196,6 +249,12 @@ def test_standup_send_returns_nothing(clear_server, register_user, register_chan
     assert send_standup_message(owner_token, channel_id, 'message1').json() == {} 
 
 def test_standup_send_no_active_standup(clear_server, register_user, register_channel, extract_token, create_standup, send_standup_message):
+    '''
+    test case where there is no active standup.
+
+    Expects:
+        Correct output from channel/messages/v2.
+    '''
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     owner_token = extract_token(owner_info)
 
@@ -203,6 +262,12 @@ def test_standup_send_no_active_standup(clear_server, register_user, register_ch
     assert send_standup_message(owner_token, channel_id, 'message1').status_code == 400
 
 def test_standup_send_invalid_message(clear_server, register_user, register_channel, extract_token, create_standup, send_standup_message):
+    '''
+    test case with an invalid  message.
+
+    Expects:
+        InputError(400).
+    '''
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     owner_token = extract_token(owner_info)
 
@@ -211,12 +276,24 @@ def test_standup_send_invalid_message(clear_server, register_user, register_chan
     assert send_standup_message(owner_token, channel_id, '8'*1001).status_code == 400
 
 def test_standup_send_invalid_channel_id(clear_server, register_user, register_channel, extract_token, create_standup, send_standup_message):
+    '''
+    test case with an invalid  channel.
+
+    Expects:
+        InputError(400).
+    '''
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     owner_token = extract_token(owner_info)
 
     assert send_standup_message(owner_token, 123123123123, 'message1').status_code == 400
 
 def test_standup_send_not_authorized_user(clear_server, register_user, register_channel, extract_token, create_standup, send_standup_message):
+    '''
+    test case with an invalid  user.
+
+    Expects:
+        AccessError(403).
+    '''
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     owner_token = extract_token(owner_info)
     user_info = register_user('user@gmail.com', 'user', 'one')

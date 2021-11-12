@@ -6,19 +6,26 @@ from time import sleep
 
 @pytest.fixture
 def clear_server():
+    '''
+    Clears the datastore.
+    '''
     requests.delete(url + "clear/v1")
 
-# Extracts the token from a given dictionary.
 @pytest.fixture
 def extract_token():
+    '''
+    Extracts the token from a given dictionary.
+    '''
     def extract_token_id_function(token_dict):
         return token_dict['token']
     return extract_token_id_function
 
-# Registers an user and returns their registration info, auth_id and token and handle_str
-# Assumes handle_str does not require additional processing past concatenation
 @pytest.fixture
 def register_user():
+    '''
+    Registers an user and returns their registration info, auth_id and token and handle_str
+    Assumes handle_str does not require additional processing past concatenation
+    '''
     def register_user_function(email, name_first, name_last):
         registration_info = {
             'email': email, 
@@ -31,16 +38,20 @@ def register_user():
         return {**owner_id_dict, **registration_info}
     return register_user_function
 
-# Creates a standup
 @pytest.fixture
 def create_standup():
+    '''
+    Creates a standup
+    '''
     def create_standup_function(token, channel_id, length):
         return requests.post(url + 'standup/start/v1', json = {'token': token, 'channel_id': channel_id, 'length': length})
     return create_standup_function
 
-# Creates a channel using the given details and returns the channel_id
 @pytest.fixture
 def register_channel():
+    '''
+    Creates a channel using the given details and returns the channel_id
+    '''
     def register_channel_function(token, name, is_public):
         channel_details = {
             'token': token,
@@ -54,6 +65,13 @@ def register_channel():
     return register_channel_function
 
 def test_create_standup_basic_functionality(clear_server, register_channel, register_user, create_standup, extract_token):
+    '''
+    Standard test case.
+
+    Expects:
+        Correct output from standup/info/v1.
+    '''
+
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     owner_token = extract_token(owner_info)
 
@@ -67,6 +85,12 @@ def test_create_standup_basic_functionality(clear_server, register_channel, regi
     sleep(5)
 
 def test_create_standup_no_second_standup(clear_server, register_channel, register_user, create_standup, extract_token):
+    '''
+    test case where there is a second standup.
+
+    Expects:
+        InputError(400).
+    '''
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     owner_token = extract_token(owner_info)
 
@@ -77,6 +101,12 @@ def test_create_standup_no_second_standup(clear_server, register_channel, regist
     assert error == 400
 
 def test_create_standup_invalid_channel_id(clear_server, register_user, create_standup, extract_token):
+    '''
+    test case with an invalid  channel_id.
+
+    Expects:
+        InputError(400).
+    '''
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     owner_token = extract_token(owner_info)
 
@@ -85,6 +115,12 @@ def test_create_standup_invalid_channel_id(clear_server, register_user, create_s
     assert error == 400
 
 def test_create_standup_negative_length(clear_server, register_channel, register_user, create_standup, extract_token):
+    '''
+    test case with an invalid input length.
+
+    Expects:
+        InputError(400).
+    '''
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     owner_token = extract_token(owner_info)
 
@@ -94,6 +130,12 @@ def test_create_standup_negative_length(clear_server, register_channel, register
     assert error == 400
 
 def test_create_standup_unauthorized_member(clear_server, register_channel, register_user, create_standup, extract_token):
+    '''
+    test case with an invalid member.
+
+    Expects:
+        AccessError(403).
+    '''
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     owner_token = extract_token(owner_info)
 
@@ -104,6 +146,12 @@ def test_create_standup_unauthorized_member(clear_server, register_channel, regi
     assert error == 403
 
 def test_create_priority_error(clear_server, register_channel, register_user, create_standup, extract_token):
+    '''
+    testing error priority.
+
+    Expects:
+        AccessError(403).
+    '''
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     owner_token = extract_token(owner_info)
 
@@ -115,6 +163,12 @@ def test_create_priority_error(clear_server, register_channel, register_user, cr
     assert error == 403
 
 def test_multiple_standups(clear_server, register_channel, register_user, create_standup, extract_token):
+    '''
+    Standard test case with multiple standups.
+
+    Expects:
+        Correct output.
+    '''
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     owner_token = extract_token(owner_info)
 

@@ -11,11 +11,16 @@ from datetime import datetime
 
 @pytest.fixture
 def clear_server():
+    '''
+    Clears the datastore
+    '''
     requests.delete(config.url + "clear/v1")
 
-# Generates new user
 @pytest.fixture
 def get_valid_token():
+    '''
+    Generates new user
+    '''
     response = requests.post(config.url + 'auth/register/v2', json={
         'email': 'example@email.com', 
         'password': 'potato', 
@@ -26,6 +31,9 @@ def get_valid_token():
 
 @pytest.fixture
 def channel_factory():
+    '''
+    Fixture that generates channels.
+    '''
     def create_channel(token, name):
         channel_details = {
             'token': token,
@@ -40,6 +48,9 @@ def channel_factory():
 
 @pytest.fixture
 def dm_factory():
+    '''
+    Fixture that generates dms.
+    '''
     def create_dm(owner_token, users):
         dm_id = requests.post(url + 'dm/create/v1', json = {
             'token': owner_token,
@@ -49,6 +60,9 @@ def dm_factory():
 
 @pytest.fixture
 def send_message_channel_factory():
+    '''
+    Fixture that sends messages.
+    '''
     def send_channel_message(token, channel_id, message):
         message_id = requests.post(url + 'message/send/v1', json = {
             'token': token,
@@ -59,6 +73,9 @@ def send_message_channel_factory():
         
 @pytest.fixture
 def send_message_dm_factory():
+    '''
+    Fixture that sends messages.
+    '''
     def send_dm(token, dm_id, message):
         message_id = requests.post(url + 'message/senddm/v1', json = {
             'token': token,
@@ -68,6 +85,12 @@ def send_message_dm_factory():
     return send_dm
 
 def test_search_v1_invalid_token(clear_server):
+    '''
+    Test case where token is invalid.
+
+    Expects:
+        AccessError (403).
+    '''
 
     response = requests.get(url + 'search/v1', params = {
         'token': -1,
@@ -77,6 +100,12 @@ def test_search_v1_invalid_token(clear_server):
     assert response.status_code == 403
 
 def test_search_v1_query_str_too_short(clear_server, get_valid_token):
+    '''
+    Test case where query str is too short.
+
+    Expects:
+        AccessError (400).
+    '''
     token = get_valid_token['token']
 
     response = requests.get(url + 'search/v1', params = {
@@ -87,6 +116,12 @@ def test_search_v1_query_str_too_short(clear_server, get_valid_token):
     assert response.status_code == 400
 
 def test_search_v1_query_str_too_long(clear_server, get_valid_token):
+    '''
+    Test case where query str is too long.
+
+    Expects:
+        AccessError (400).
+    '''
     token = get_valid_token['token']
 
     response = requests.get(url + 'search/v1', params = {
@@ -97,15 +132,19 @@ def test_search_v1_query_str_too_long(clear_server, get_valid_token):
     assert response.status_code == 400
 
 def test_search_v1_1_channel(clear_server, get_valid_token, channel_factory, send_message_channel_factory):
+    '''
+    Standard test case
+
+    Expects:
+        Correct output from search.
+    '''
+
     user = get_valid_token
     token = user['token']
     auth_id = user['auth_user_id']
-    print(auth_id)
     channel = channel_factory(token, 'channel1')
-    print(channel)
     message_id_dict = send_message_channel_factory(token, channel, 'hello')
     message_id = message_id_dict['message_id']
-    print(message_id)
 
     now = datetime.utcnow().timestamp()
 
@@ -124,6 +163,13 @@ def test_search_v1_1_channel(clear_server, get_valid_token, channel_factory, sen
     }]}
 
 def test_search_v1_2_channels(clear_server, get_valid_token, channel_factory, send_message_channel_factory):
+    '''
+    Standard test case
+
+    Expects:
+        Correct output from search.
+    '''
+
     user = get_valid_token
     token = user['token']
     auth_id = user['auth_user_id']
@@ -161,6 +207,13 @@ def test_search_v1_2_channels(clear_server, get_valid_token, channel_factory, se
 
 
 def test_search_v1_1_channel_1_dm(clear_server, get_valid_token, channel_factory, dm_factory, send_message_channel_factory, send_message_dm_factory):
+    '''
+    Standard test case
+
+    Expects:
+        Correct output from search.
+    '''
+
     user = get_valid_token
     token = user['token']
     auth_id = user['auth_user_id']
@@ -171,8 +224,6 @@ def test_search_v1_1_channel_1_dm(clear_server, get_valid_token, channel_factory
     message_id1 = message_id1["message_id"]
     message_id2 = send_message_dm_factory(token, dm, 'hello')
     message_id2 = message_id2["message_id"]
-    print(message_id1)
-    print(message_id2)
 
     now = datetime.utcnow().timestamp()
 
@@ -200,6 +251,13 @@ def test_search_v1_1_channel_1_dm(clear_server, get_valid_token, channel_factory
 
 
 def test_search_v1_2_dms(clear_server, get_valid_token, dm_factory, send_message_dm_factory):
+    '''
+    Standard test case
+
+    Expects:
+        Correct output from search.
+    '''
+
     user = get_valid_token
     token = user['token']
     auth_id = user['auth_user_id']
@@ -212,8 +270,6 @@ def test_search_v1_2_dms(clear_server, get_valid_token, dm_factory, send_message
     message_id1 = message_id1["message_id"]
     message_id2 = message_id2["message_id"]
 
-
-
     now = datetime.utcnow().timestamp()
 
     response = requests.get(url + 'search/v1', params = {
@@ -221,7 +277,6 @@ def test_search_v1_2_dms(clear_server, get_valid_token, dm_factory, send_message
         'query_str': 'hello'
     }).json()
 
-    print(response)
     assert response == {'messages' : [{
         'message_id': message_id1,
         'u_id': auth_id,
@@ -240,6 +295,12 @@ def test_search_v1_2_dms(clear_server, get_valid_token, dm_factory, send_message
     }]}
 
 def test_search_v1_query_str_not_found(clear_server, get_valid_token):
+    '''
+    Standard test case where the str cannot be found.
+
+    Expects:
+        Correct output from search.
+    '''
     user = get_valid_token
     token = user['token']
 
@@ -251,6 +312,13 @@ def test_search_v1_query_str_not_found(clear_server, get_valid_token):
     assert response == {'messages': []}
 
 def test_search_v1_query_str_not_found_2(clear_server, get_valid_token, channel_factory, dm_factory, send_message_dm_factory, send_message_channel_factory):
+    '''
+    Standard test case where str cannt be found.
+
+    Expects:
+        Correct output from search.
+    '''
+
     user = get_valid_token
     token = user['token']
     auth_id = user['auth_user_id']
