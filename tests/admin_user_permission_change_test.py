@@ -7,6 +7,9 @@ import requests
 
 @pytest.fixture
 def clear():
+    '''
+    Fixture for resetting the datastore
+    '''
     requests.delete(url + "clear/v1")
 
 

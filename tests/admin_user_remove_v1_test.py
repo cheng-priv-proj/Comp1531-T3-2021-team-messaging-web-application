@@ -8,10 +8,17 @@ from src.config import url
 
 @pytest.fixture
 def clear():
+    '''
+    Fixture for resetting the datastore
+    '''
     requests.delete(url + 'clear/v1')
 
 @pytest.fixture
 def register(clear):
+    '''
+    Fixture for generating the first user
+    '''
+    
     owner_info = requests.post(url + 'auth/register/v2', json={
         'email': 'owner@email.com',
         'password': 'password',
