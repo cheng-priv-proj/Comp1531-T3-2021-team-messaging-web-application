@@ -4,41 +4,54 @@ from datetime import datetime
 
 from src.config import url
 
-# Extracts the token from a given dictionary.
 @pytest.fixture
 def extract_token():
+    '''
+    Extracts the token from a given dictionary.
+    '''
     def extract_token_id_function(auth_user_id_dict):
         return auth_user_id_dict['token']
     return extract_token_id_function
 
-# Extracts the auth_user_id from a given dictionary.
 @pytest.fixture
 def extract_user():
+    '''
+    Extracts the auth_user_id from a given dictionary.
+    '''
     def extract_auth_user_id_function(auth_user_id_dict):
         return auth_user_id_dict['auth_user_id']
     return extract_auth_user_id_function
 
-# Extracts the channel from a given dictionary.
 @pytest.fixture
 def extract_channel():
+    '''
+    Extracts the channel from a given dictionary.
+    '''
     def extract_channel_id_function(channel_id_dict):
         return channel_id_dict['channel_id']
     return extract_channel_id_function
 
-# Extracts the message from a given dictionary
 @pytest.fixture
 def extract_message():
+    '''
+    Extracts the message from a given dictionary
+    '''
     def extract_message_id_function(message_id_dict):
         return message_id_dict['message_id']
     return extract_message_id_function
 
 @pytest.fixture
 def clear():
+    '''
+    Clears the datastore.
+    '''
     requests.delete(url + 'clear/v1')
 
-# Automatically create owner user id and channel id. Both are 1 by default.
 @pytest.fixture
 def register():
+    '''
+    Automatically create owner user id and channel id. Both are 1 by default.
+    '''
     owner_id_dict = requests.post(url + 'auth/register/v2', json = {
         'email': 'owner@test.com', 
         'password': 'password', 

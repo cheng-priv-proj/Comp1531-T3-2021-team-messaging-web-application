@@ -2,14 +2,6 @@ import pytest
 import requests
 from datetime import datetime
 
-# Wrote this at 4am
-# Potential Bugs
-#   - Haven't tested if channel id OR dm id are invalid
-#   - Not sure if optional messages are sent after the message
-#   - If message is empty string is it still sent?
-#   - Is optional message appended or another message?
-#   - Optional messages should also tag if it does have a tag but not tested yet
-
 from src.config import url
 
 # Clears storage 
