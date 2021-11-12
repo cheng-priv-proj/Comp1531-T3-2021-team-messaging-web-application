@@ -10,14 +10,19 @@ gmail = 'comp1531receive@gmail.com'
 password = 'EAGLE13A'
 gmail_host= 'imap.gmail.com'
 
-# Clears storage 
 @pytest.fixture
 def clear():
+    '''
+    Clears storage 
+    '''
     requests.delete(url + "clear/v1")
 
-# Create an owner and some users
 @pytest.fixture 
 def register_user():
+    '''
+    Create an owner with an email.
+    
+    '''
     def register_user_function(email):
         user_details = {
             'email': email,
@@ -32,6 +37,9 @@ def register_user():
 
 @pytest.fixture
 def get_most_recent_code():
+    '''
+    Gets the most recent code sent.
+    '''
     def new_email_function():
         mail = imaplib.IMAP4_SSL(gmail_host)
         mail.login(gmail, password)
@@ -50,6 +58,13 @@ def get_most_recent_code():
 
 
 def test_successful_password_reset(clear, register_user, get_most_recent_code):
+    '''
+    Tests the standard success case.
+
+    Expects:
+        no Errors (status_code == 200)
+    '''
+
     register_user(gmail)
     requests.post(url + 'auth/passwordreset/request/v1', json = {
         'email': gmail
@@ -68,7 +83,12 @@ def test_successful_password_reset(clear, register_user, get_most_recent_code):
     }).status_code == 200
 
 def test_invalid_reset_code(clear, register_user):
-    # Create a user
+    '''
+    Case where reset_code is not a valid reset code
+
+    Expects:
+        InputError(400)
+    '''
     register_user(gmail)
     invalid_reset_code = ''
 
@@ -78,7 +98,13 @@ def test_invalid_reset_code(clear, register_user):
     }).status_code == 400
 
 def test_password_too_short(clear, register_user, get_most_recent_code):
-    # Create a user
+    '''
+    Case where password is too short.
+
+    Expects:
+        InputError(400)
+    '''
+
     register_user(gmail)
 
     requests.post(url + 'auth/passwordreset/request/v1', json = {
