@@ -4,24 +4,6 @@ from datetime import datetime
 
 from src.config import url
 
-'''
-message/react/v1
-Given a message within a channel or DM the authorised user is part of, add a "react" to that particular message.
-
-POST
-
-Parameters:{ token, message_id, react_id }
-
-Return Type:{}
-
-
-InputError when any of:
-      
-        message_id is not a valid message within a channel or DM that the authorised user has joined
-        react_id is not a valid react ID - currently, the only valid react ID the frontend has is 1
-        the message already contains a react with ID react_id from the authorised user
-'''
-
 @pytest.fixture
 def extract_token():
     '''
