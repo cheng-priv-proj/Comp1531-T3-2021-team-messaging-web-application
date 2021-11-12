@@ -6,10 +6,16 @@ from datetime import datetime, timezone
 
 @pytest.fixture
 def clear():
+    '''
+    Clears the datastore.
+    '''
     requests.delete(url + 'clear/v1')
 
 @pytest.fixture
 def register_users(clear):
+    '''
+    Registers a valid user.
+    '''
     owner_id = requests.post(url + 'auth/register/v2', json = {
         'email': 'owner@test.com', 
         'password': 'password', 
@@ -27,6 +33,9 @@ def register_users(clear):
 
 @pytest.fixture
 def channel_factory():
+    '''
+    Ficture that creates channels.
+    '''
     def create_channel(owner_token):
         channel_id = requests.post(url + 'channels/create/v2', json = {
             'token': owner_token,
@@ -37,6 +46,12 @@ def channel_factory():
     return create_channel
 
 def test_standard(register_users, channel_factory):
+    '''
+    Standard valid test case.
+
+    Expects:
+        Correct output from channel/messages/v2
+    '''
     channel_id = channel_factory(register_users[0]['token'])
 
     now = int(datetime.now(timezone.utc).timestamp())
@@ -87,6 +102,12 @@ def test_standard(register_users, channel_factory):
     }
 
 def test_multiple(register_users, channel_factory):
+    '''
+    Standard valid test case with multiple messages.
+
+    Expects:
+        Correct output from channel/messages/v2
+    '''
     channel_id = channel_factory(register_users[0]['token'])
 
     now = int(datetime.now(timezone.utc).timestamp())
@@ -167,6 +188,12 @@ def test_multiple(register_users, channel_factory):
     }
 
 def test_invalid_channel(register_users):
+    '''
+    Test case where channel_id is invalid.
+
+    Expects:
+        InputError(400)
+    '''
     
     assert requests.post(url + 'message/sendlater/v1', json={
         'token': register_users[0]['token'],
@@ -176,6 +203,12 @@ def test_invalid_channel(register_users):
     }).status_code == 400
 
 def test_msg_length(register_users, channel_factory):
+    '''
+    Test case where message is too long.
+
+    Expects:
+        InputError(400)
+    '''
     channel_id = channel_factory(register_users[0]['token'])
 
     assert requests.post(url + 'message/sendlater/v1', json={
@@ -186,6 +219,12 @@ def test_msg_length(register_users, channel_factory):
     }).status_code == 400
 
 def test_time_in_past(register_users, channel_factory):
+    '''
+    Test case where time travel to the past in involved.
+
+    Expects:
+        InputError(400)
+    '''
     channel_id = channel_factory(register_users[0]['token'])
 
     assert requests.post(url + 'message/sendlater/v1', json={
@@ -196,6 +235,12 @@ def test_time_in_past(register_users, channel_factory):
     }).status_code == 400
 
 def test_channel_valid_user_not_in_channel(register_users, channel_factory):
+    '''
+    Test case where user is not in the channel.
+
+    Expects:
+        InputError(400)
+    '''
     channel_id = channel_factory(register_users[0]['token'])
 
     assert requests.post(url + 'message/sendlater/v1', json={
@@ -206,6 +251,12 @@ def test_channel_valid_user_not_in_channel(register_users, channel_factory):
     }).status_code == 403
 
 def test_token_invalid(clear, register_users, channel_factory):
+    '''
+    Test case where token is invalid.
+
+    Expects:
+        AccessError(403)
+    '''
     channel_id = channel_factory(register_users[0]['token'])
 
     assert requests.post(url + 'message/sendlater/v1', json={

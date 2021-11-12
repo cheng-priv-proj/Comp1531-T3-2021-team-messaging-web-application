@@ -10,16 +10,19 @@ gmail = 'comp1531receive@gmail.com'
 password = 'EAGLE13A'
 gmail_host= 'imap.gmail.com'
 
-# Clears storage 
 @pytest.fixture
 def clear():
+    '''
+    Clears storage 
+    '''
     requests.delete(url + "clear/v1")
 
-# Creates a channel using the given details and returns the channel_id
 @pytest.fixture
 def register_channel():
+    '''
+    Creates a channel using the given details and returns the channel_id
+    '''
     def register_channel_function(token, name, is_public):
-        print(token)
         channel_details = {
             'token': token,
             'name': name,
@@ -31,9 +34,11 @@ def register_channel():
         return channel_id
     return register_channel_function
 
-# Create an owner and some users
 @pytest.fixture 
 def register_user():
+    '''
+    Create an owner with the emil.
+    '''
     def register_user_function(email):
         user_details = {
             'email': email,
@@ -63,6 +68,12 @@ def number_of_emails():
 
 
 def test_secret_code_sent(clear, number_of_emails, register_user):
+    '''
+    Test that looks at if the secret code was sent.
+
+    Expects:
+        Correct amount of emails sent.
+    '''
     register_user(gmail)
     
     len_emails_before_request = number_of_emails()
@@ -78,11 +89,24 @@ def test_secret_code_sent(clear, number_of_emails, register_user):
     assert (len_emails_before_request + 1) == len_emails_after_request
 
 def test_invalid_email(clear, register_user):
+    '''
+    Test with an invalid email email as an input.
+
+    Expects:
+        no Errors (status_code == 200)
+    '''
+
     requests.post(url + 'auth/passwordreset/request/v1', json = {
         'email': 'notvalid@'
-    })
+    }).status_code == 200
 
 def test_logged_out(clear, register_channel, register_user):
+    '''
+    Test expecting an access error whan a user tries to access channel create during a password change.
+
+    Expects:
+        403 Error(AccessError)
+    '''
     token = register_user(gmail)
 
     register_channel(token, 'channel', True)

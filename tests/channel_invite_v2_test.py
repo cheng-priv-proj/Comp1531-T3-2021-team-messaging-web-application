@@ -8,14 +8,18 @@ import flask
 from src import config 
 
 
-# Test that resets json
 @pytest.fixture
 def clear_server():
+    '''
+    Test that resets json
+    '''
     requests.delete(config.url + "clear/v1")
 
-# Fixture to register someone and returns a dictionary of {token, auth_user_id}
 @pytest.fixture
 def get_user_1():
+    '''
+    Fixture to register someone and returns a dictionary of {token, auth_user_id}
+    '''
     response = requests.post(config.url + 'auth/register/v2', json={
         'email': 'owner@test.com', 
         'password': 'spotato', 
@@ -24,9 +28,11 @@ def get_user_1():
         })
     return response.json()
 
-# Fixture to register someone and returns a dictionary of {token, auth_user_id}
 @pytest.fixture
 def get_invitee():
+    '''
+    Fixture to register someone and returns a dictionary of {token, auth_user_id}
+    '''
     response = requests.post(config.url + 'auth/register/v2', json={
         'email': 'example@email.com', 
         'password': 'potato', 

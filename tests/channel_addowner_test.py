@@ -11,9 +11,11 @@ from src.other import clear_v1
 def clear():
     requests.delete(config.url + "clear/v1")
 
-# Generates new user
 @pytest.fixture
 def get_valid_token():
+    '''
+    Generates new user
+    '''
     response = requests.post(config.url + 'auth/register/v2', json={
         'email': 'example@email.com', 
         'password': 'potato', 
@@ -22,9 +24,11 @@ def get_valid_token():
     })
     return response.json()
     
-# Generates the first user
 @pytest.fixture
 def first_register():
+    '''
+    Generates the first user
+    '''
     user_details = {
         'email': 'globalowner@test.com',
         'password': 'password', 

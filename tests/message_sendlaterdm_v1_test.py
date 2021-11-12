@@ -6,10 +6,16 @@ from datetime import datetime, timezone
 
 @pytest.fixture
 def clear():
+    '''
+    Clears the datastore.
+    '''
     requests.delete(url + 'clear/v1')
 
 @pytest.fixture
 def register_users(clear):
+    '''
+    Registers a user.
+    '''
     owner_id = requests.post(url + 'auth/register/v2', json = {
         'email': 'owner@test.com', 
         'password': 'password', 
@@ -27,6 +33,9 @@ def register_users(clear):
 
 @pytest.fixture
 def dm_factory():
+    '''
+    Fixture that creates dms.
+    '''
     def create_dm(owner_token, users):
         dm_id = requests.post(url + 'dm/create/v1', json = {
             'token': owner_token,
@@ -35,6 +44,12 @@ def dm_factory():
     return create_dm
 
 def test_standard(register_users, dm_factory):
+    '''
+    Standard valid test case.
+
+    Expects:
+        Correct output from dm/messages/v1
+    '''
     dm_id = dm_factory(register_users[0]['token'], [])
 
     now = int(datetime.now(timezone.utc).timestamp())
@@ -82,6 +97,12 @@ def test_standard(register_users, dm_factory):
     }
 
 def test_multiple(register_users, dm_factory):
+    '''
+    Standard valid test case with multiple messages.
+
+    Expects:
+        Correct output from dm/messages/v1
+    '''
     dm_id = dm_factory(register_users[0]['token'], [])
 
     now = int(datetime.now(timezone.utc).timestamp())
@@ -158,6 +179,12 @@ def test_multiple(register_users, dm_factory):
     }
 
 def test_invalid_dm(register_users):
+    '''
+    Test case where dm_id is invalid.
+
+    Expects:
+        InputError(400)
+    '''
     
     assert requests.post(url + 'message/sendlaterdm/v1', json={
         'token': register_users[0]['token'],
@@ -167,6 +194,12 @@ def test_invalid_dm(register_users):
     }).status_code == 400
 
 def test_msg_length(register_users, dm_factory):
+    '''
+    Test case where message is too long.
+
+    Expects:
+        InputError(400)
+    '''
     dm_id = dm_factory(register_users[0]['token'], [])
 
     assert requests.post(url + 'message/sendlaterdm/v1', json={
@@ -177,6 +210,12 @@ def test_msg_length(register_users, dm_factory):
     }).status_code == 400
 
 def test_time_in_past(register_users, dm_factory):
+    '''
+    Test case where the progrma attempts to trvel back in  time.
+
+    Expects:
+        InputError(400)
+    '''
     dm_id = dm_factory(register_users[0]['token'], [])
     
     assert requests.post(url + 'message/sendlaterdm/v1', json={
@@ -187,6 +226,13 @@ def test_time_in_past(register_users, dm_factory):
     }).status_code == 400
 
 def test_dm_valid_user_not_in_channel(register_users, dm_factory):
+    '''
+    Test case where user is not a part of the dm.
+
+    Expects:
+        AccessError(403)
+    '''
+
     dm_id = dm_factory(register_users[0]['token'], [])
     
     assert requests.post(url + 'message/sendlaterdm/v1', json={
@@ -197,6 +243,12 @@ def test_dm_valid_user_not_in_channel(register_users, dm_factory):
     }).status_code == 403
 
 def test_token_invalid(register_users, dm_factory):
+    '''
+    Test case where the token is invalid.
+
+    Expects:
+        AccessError(403)
+    '''
     dm_id = dm_factory(register_users[0]['token'], [])
 
     assert requests.post(url + 'message/sendlaterdm/v1', json={

@@ -124,7 +124,6 @@ def test_standard(register):
         'dm_id': dm_id_dict.get('dm_id'),
         'start': 0
     }).json()
-    print(data)
     assert data == {
         'start': 0,
         'end': -1,

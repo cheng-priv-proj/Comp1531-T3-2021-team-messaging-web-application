@@ -3,57 +3,55 @@ import requests
 from datetime import datetime
 
 from src.config import url
-'''
-message/unreact/v1
-Given a message within a channel or DM the authorised user is part of, remove a "react" to that particular message.
 
-POST
-Parameters:{ token, message_id, react_id }
-
-Return Type:{}
-
-InputError when any of:
-      
-        message_id is not a valid message within a channel or DM that the authorised user has joined
-        react_id is not a valid react ID
-        the message does not contain a react with ID react_id from the authorised user
-'''
-
-# Extracts the token from a given dictionary.
 @pytest.fixture
 def extract_token():
+    '''
+    Extracts the token from a given dictionary.
+    '''
     def extract_token_id_function(auth_user_id_dict):
         return auth_user_id_dict['token']
     return extract_token_id_function
 
-# Extracts the auth_user_id from a given dictionary.
 @pytest.fixture
 def extract_user():
+    '''
+    Extracts the auth_user_id from a given dictionary.
+    '''
     def extract_auth_user_id_function(auth_user_id_dict):
         return auth_user_id_dict['auth_user_id']
     return extract_auth_user_id_function
 
-# Extracts the channel from a given dictionary.
 @pytest.fixture
 def extract_channel():
+    '''
+    Extracts the channel from a given dictionary.
+    '''
     def extract_channel_id_function(channel_id_dict):
         return channel_id_dict['channel_id']
     return extract_channel_id_function
 
-# Extracts the message from a given dictionary
 @pytest.fixture
 def extract_message():
+    '''
+    Extracts the message from a given dictionary
+    '''
     def extract_message_id_function(message_id_dict):
         return message_id_dict['message_id']
     return extract_message_id_function
 
 @pytest.fixture
 def clear():
+    '''
+    Clear the datastore.
+    '''
     requests.delete(url + 'clear/v1')
 
-# Automatically create owner user id and channel id. Both are 1 by default.
 @pytest.fixture
 def register():
+    '''
+    Automatically create owner user id and channel id. Both are 1 by default.
+    '''
     owner_id_dict = requests.post(url + 'auth/register/v2', json = {
         'email': 'owner@test.com', 
         'password': 'password', 
@@ -70,6 +68,9 @@ def register():
 
 @pytest.fixture
 def get_user_1():
+    '''
+    Registers a user
+    '''
     response = requests.post(url + 'auth/register/v2', json={
         'email': 'owner@test.com', 
         'password': 'spotato', 
@@ -80,6 +81,9 @@ def get_user_1():
 
 @pytest.fixture
 def get_user_2():
+    '''
+    REgisters another user.
+    '''
     response = requests.post(url + 'auth/register/v2', json={
         'email': 'user@test.com', 
         'password': 'spotato', 
@@ -90,6 +94,9 @@ def get_user_2():
 
 @pytest.fixture
 def auth_id_v2():
+    '''
+    Registers another user.
+    '''
     response = requests.post(url + 'auth/register/v2', json={
         'email': 'example@email.com', 
         'password': 'potato', 

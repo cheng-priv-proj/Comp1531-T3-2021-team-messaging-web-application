@@ -11,25 +11,24 @@ from src.other import clear_v1
 def clear_server():
     requests.delete(config.url + "clear/v1")
 
-# Fixture to register someone and returns a dictionary of {token, auth_user_id}
 @pytest.fixture
 def get_user_1():
-    print('fuck')
-    print('help')
-    print(data_store.data_store.get_users_from_u_id_dict())
-    print(data_store.data_store.get_logins_from_email_dict())
+    '''
+    Fixture to register someone and returns a dictionary of {token, auth_user_id}
+    '''
     response = requests.post(config.url + 'auth/register/v2', json={
         'email': 'owner@test.com', 
         'password': 'spotato', 
         'name_first': 'owner', 
         'name_last' : 'one'
         })
-    print(response.json())
     return response.json()
 
-# Fixture to register someone and returns a dictionary of {token, auth_user_id}
 @pytest.fixture
 def auth_id_v2(clear_server):
+    '''
+    Fixture to register someone and returns a dictionary of {token, auth_user_id}
+    '''
     response = requests.post(config.url + 'auth/register/v2', json={
         'email': 'example@email.com', 
         'password': 'potato', 

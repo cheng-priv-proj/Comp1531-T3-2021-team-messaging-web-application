@@ -8,13 +8,18 @@ from src import config
 from src.other import clear_v1
 from src.config import url
 
-# Create an owner and some users
 @pytest.fixture
 def clear_server():
+    '''
+    Clears the datastore.
+    '''
     requests.delete(config.url + "clear/v1")
 
 @pytest.fixture
 def register(clear_server):
+    '''
+    Fixture to register and returns a list of auth_user_id
+    '''
     owner_id = requests.post(url + 'auth/register/v2', json = {
         'email': 'owner@test.com', 
         'password': 'password', 
@@ -48,6 +53,9 @@ def register(clear_server):
 
 @pytest.fixture
 def dm_factory():
+    '''
+    Fixture to create dms.
+    '''
     def create_dm(owner_token, users):
         dm_id = requests.post(url + 'dm/create/v1', json = {
             'token': owner_token,

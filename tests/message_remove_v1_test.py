@@ -10,11 +10,16 @@ from src.other import clear_v1
 
 @pytest.fixture
 def clear_server():
+    '''
+    Clears the datastore.
+    '''
     requests.delete(config.url + "clear/v1")
 
-# Fixture to register someone and returns a dictionary of {token, auth_user_id}
 @pytest.fixture
 def get_user_1():
+    '''
+    Fixture to register someone and returns a dictionary of {token, auth_user_id}
+    '''
     response = requests.post(config.url + 'auth/register/v2', json={
         'email': 'owner@test.com', 
         'password': 'spotato', 
@@ -23,9 +28,11 @@ def get_user_1():
         })
     return response.json()
 
-# Fixture to register someone and returns a dictionary of {token, auth_user_id}
 @pytest.fixture
 def auth_id_v2():
+    '''
+    Fixture to register someone and returns a dictionary of {token, auth_user_id}
+    '''
     response = requests.post(config.url + 'auth/register/v2', json={
         'email': 'example@email.com', 
         'password': 'potato', 
