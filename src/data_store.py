@@ -435,6 +435,7 @@ class Datastore:
         return False
 
     def is_reset_code_invalid(self, reset_code):
+        print(self.get_u_id_from_reset_code_dict())
         if reset_code in self.get_u_id_from_reset_code_dict():
             return False
         return True

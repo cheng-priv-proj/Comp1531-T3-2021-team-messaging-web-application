@@ -29,15 +29,19 @@ Notification_message is a string of the following format for each trigger action
 '''
 
 
-# Fixture to reset json store before every test
 @pytest.fixture
 def clear():
+    '''
+    Fixture to reset json store before every test
+    '''
     requests.delete(config.url + "clear/v1")
 
 
-# Fixture to register someone and returns a dictionary of {token, auth_user_id}
 @pytest.fixture
 def get_user_1():
+    '''
+    Fixture to register someone and returns a dictionary of {token, auth_user_id}
+    '''
     response = requests.post(config.url + 'auth/register/v2', json={
         'email': 'owner@test.com', 
         'password': 'spotato', 
@@ -46,9 +50,11 @@ def get_user_1():
         })
     return response.json()
 
-# Fixture to register someone and returns a dictionary of {token, auth_user_id}
 @pytest.fixture
 def auth_id_v2():
+    '''
+    Fixture to register someone and returns a dictionary of {token, auth_user_id}
+    '''
     response = requests.post(config.url + 'auth/register/v2', json={
         'email': 'example@email.com', 
         'password': 'potato', 
@@ -58,6 +64,12 @@ def auth_id_v2():
     return response.json()
 
 def test_channel_notif_tagged_and_added(clear, get_user_1, auth_id_v2):
+    '''
+    Standard Test case.
+
+    Expects:
+        Correct output from notifications/get/v1.
+    '''
     channel_id_dict = requests.post(config.url + 'channels/create/v2', json={'token': get_user_1['token'], 'name': 'sta wars', 'is_public': True}).json()
     
     channel_id = channel_id_dict['channel_id']
@@ -83,6 +95,12 @@ def test_channel_notif_tagged_and_added(clear, get_user_1, auth_id_v2):
     }]
 
 def test_channel_notif_tagged_edited(clear, get_user_1, auth_id_v2):
+    '''
+    Standard Test case with an edited message.
+
+    Expects:
+        Correct output from notifications/get/v1.
+    '''
     channel_id_dict = requests.post(config.url + 'channels/create/v2', json={'token': get_user_1['token'], 'name': 'sta wars', 'is_public': True}).json()
     
     channel_id = channel_id_dict['channel_id']
@@ -114,6 +132,12 @@ def test_channel_notif_tagged_edited(clear, get_user_1, auth_id_v2):
     }]
 
 def test_channel_notif_tagged_invalid(clear, get_user_1, auth_id_v2):
+    '''
+    Test case where the tagged user is not valid.
+
+    Expects:
+        Correct output from notifications/get/v1.
+    '''
     channel_id_dict = requests.post(config.url + 'channels/create/v2', json={'token': get_user_1['token'], 'name': 'sta wars', 'is_public': True}).json()
     
     channel_id = channel_id_dict['channel_id']
@@ -128,8 +152,14 @@ def test_channel_notif_tagged_invalid(clear, get_user_1, auth_id_v2):
     assert notification_dictionary['notifications'] == []
 
 
-# testing that the correct notfications appear for a react to a message
 def test_channel_notif_reacted(clear, get_user_1, auth_id_v2):
+    '''
+    testing that the correct notfications appear for a react to a message
+    
+    Expects:
+        Correct output from notifications/get/v1.
+    '''
+
     channel_id_dict = requests.post(config.url + 'channels/create/v2', json={'token': get_user_1['token'], 'name': 'sta wars', 'is_public': True}).json()
     channel_id = channel_id_dict['channel_id']
 
@@ -152,6 +182,13 @@ def test_channel_notif_reacted(clear, get_user_1, auth_id_v2):
     }]
 
 def test_dm_notif_tagged_edited(clear, get_user_1, auth_id_v2):
+    '''
+    Test case when a user reacts to an edited message.
+
+    Expects:
+        Correct output from notifications/get/v1.
+    '''
+
     dm_dict = requests.post(config.url + 'dm/create/v1', json={
         'token': get_user_1['token'], 
         'u_ids': [auth_id_v2['auth_user_id']]
@@ -186,6 +223,13 @@ def test_dm_notif_tagged_edited(clear, get_user_1, auth_id_v2):
     }]
 
 def test_dm_notif_tagged_and_added(clear, get_user_1, auth_id_v2):
+    '''
+    Standard Test case where user is added and tagged.
+
+    Expects:
+        Correct output from notifications/get/v1.
+    '''
+
     dm_dict = requests.post(config.url + 'dm/create/v1', json={
         'token': get_user_1['token'], 
         'u_ids': [auth_id_v2['auth_user_id']]
@@ -212,7 +256,13 @@ def test_dm_notif_tagged_and_added(clear, get_user_1, auth_id_v2):
     }]
 
 def test_dm_notif_reacted(clear, get_user_1, auth_id_v2):
-    # Owner invites john smith with triggers a notification for john smith
+    '''
+    Owner invites john smith with triggers a notification for john smith
+
+    Expects:
+        Correct output from notifications/get/v1.
+    '''
+
     dm_dict = requests.post(config.url + 'dm/create/v1', json={
         'token': get_user_1['token'], 
         'u_ids': [auth_id_v2['auth_user_id']]
@@ -240,6 +290,12 @@ def test_dm_notif_reacted(clear, get_user_1, auth_id_v2):
     }]
 
 def test_notifications_many(clear, get_user_1, auth_id_v2):
+    '''
+    Standard Test case with many notification.
+
+    Expects:
+        Correct output from notifications/get/v1.
+    '''
     channel_id_dict = requests.post(config.url + 'channels/create/v2', json={'token': get_user_1['token'], 'name': 'sta wars', 'is_public': True}).json()
     print(channel_id_dict)
     channel_id = channel_id_dict['channel_id']

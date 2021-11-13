@@ -1,10 +1,9 @@
 from src.data_store import data_store
 from src.error import InputError
 from src.error import AccessError
-from src.other import check_type
 from src.other import insert_invite_channel_or_dm_notifications
 
-def channel_invite_v1(auth_user_id, channel_id, u_id):
+def channel_invite_v1(auth_user_id: int, channel_id, u_id: int) -> dict:
     '''
     Adds another user to a channel that the auth_user is a member of.
 
@@ -25,10 +24,6 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     Return value:
         Returns nothing on success
     '''
-
-    check_type(auth_user_id, int)
-    check_type(channel_id, int)
-    check_type(u_id, int)
 
     # Checking if channel_id is valid
     if data_store.is_invalid_channel_id(channel_id):
@@ -55,7 +50,7 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
 
     return {}
 
-def channel_details_v1(auth_user_id, channel_id):
+def channel_details_v1(auth_user_id: int, channel_id: int) -> dict:
     '''
     Returns the details of a given channel that an authorised user has access to.
 
@@ -73,25 +68,19 @@ def channel_details_v1(auth_user_id, channel_id):
         Returns {name, is_public, owner_members, all_members} on success
     '''
 
-    check_type(auth_user_id, int)
-    check_type(channel_id, int)
-
     if data_store.is_invalid_channel_id(channel_id):
         raise InputError (' channel_id is invalid')
 
     if not data_store.is_user_member_of_channel(channel_id, auth_user_id):
         raise AccessError ('u_id is not part of the channel')
 
-    channel = data_store.get_channel_from_channel_id(channel_id)
+    return data_store.get_channel_from_channel_id(channel_id)
 
-    return channel
-
-def channel_messages_v1(auth_user_id, channel_id, start):
+def channel_messages_v1(auth_user_id: int, channel_id: int, start: int) -> dict:
     '''
     Returns a list of messages between index 'start' and up to 'start' + 50 from a
     given channel that the authorised user has access to. Additionally returns
     'start', and 'end' = 'start' + 50
-    t
 
     Arguments:
         auth_user_id    (int)   - authorised user id
@@ -110,10 +99,6 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         Returns { messages, start, -1 } if the function has returned the least
         recent message
     '''
-
-    check_type(auth_user_id, int)
-    check_type(channel_id, int)
-    check_type(start, int)
 
     # Checking if the channel id exists
     if data_store.is_invalid_channel_id(channel_id):
@@ -144,7 +129,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         'end' : end
         }
 
-def channel_join_v1(auth_user_id, channel_id):
+def channel_join_v1(auth_user_id: int, channel_id: int) -> dict:
     '''
     Adds an authorised user to a channel
 
@@ -161,9 +146,6 @@ def channel_join_v1(auth_user_id, channel_id):
     Return value:
         Returns {} on success
     '''
-
-    check_type(auth_user_id, int)
-    check_type(channel_id, int)
     
     if data_store.is_invalid_channel_id(channel_id):
         raise InputError ('channel_id is invalid')
@@ -185,7 +167,7 @@ def channel_join_v1(auth_user_id, channel_id):
 
     return {}
 
-def channel_leave_v1(auth_user_id, channel_id):
+def channel_leave_v1(auth_user_id: int, channel_id: int) -> dict:
     '''
     Given a channel with ID channel_id that the authorised user is a member of,
     remove them as a member of the channel.
@@ -203,9 +185,6 @@ def channel_leave_v1(auth_user_id, channel_id):
     Return value:
         Returns {} on success
     '''
-
-    check_type(auth_user_id, int)
-    check_type(channel_id, int)
     
     if data_store.is_invalid_channel_id(channel_id):
         raise InputError('channel_id is invalid')
@@ -223,9 +202,10 @@ def channel_leave_v1(auth_user_id, channel_id):
         channel['owner_members'] = [owner for owner in members if owner.get('u_id') != auth_user_id]
     
     data_store.update_user_stats_channels_joined(auth_user_id, -1)
+
     return {}
 
-def channel_addowner_v1(auth_user_id, channel_id, u_id):
+def channel_addowner_v1(auth_user_id: int, channel_id: int, u_id: int) -> dict:
     '''
     Make user with user id u_id an owner of the channel.
 
@@ -244,9 +224,6 @@ def channel_addowner_v1(auth_user_id, channel_id, u_id):
     Returns:
         Returns {} on success
     '''
-    check_type(auth_user_id, int)
-    check_type(channel_id, int)
-    check_type(u_id, int)
     
     if data_store.is_invalid_channel_id(channel_id):
         raise InputError ('channel_id is invalid')
@@ -267,7 +244,7 @@ def channel_addowner_v1(auth_user_id, channel_id, u_id):
 
     return {}
 
-def channel_removeowner_v1(auth_user_id, channel_id, u_id):
+def channel_removeowner_v1(auth_user_id: int, channel_id: int, u_id: int) -> dict:
     '''
     Remove user with user id u_id as an owner of the channel.
 
@@ -284,12 +261,8 @@ def channel_removeowner_v1(auth_user_id, channel_id, u_id):
         InputError  - occurs when u_id refers to a user who is currently the only owner of the channel
 
     Returns:
-        Returns nothing on success
+        Returns {} on success
     '''
-
-    check_type(auth_user_id, int)
-    check_type(channel_id, int)
-    check_type(u_id, int)
     
     if data_store.is_invalid_channel_id(channel_id):
         raise InputError ('channel_id is invalid')

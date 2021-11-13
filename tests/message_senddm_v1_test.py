@@ -5,36 +5,46 @@ from datetime import datetime
 
 from src.config import url
 
-# Extracts the token from a given dictionary.
 @pytest.fixture
 def extract_token():
+    '''
+    Extracts the token from a given dictionary.
+    '''
     def extract_token_id_function(auth_user_id_dict):
         return auth_user_id_dict['token']
     return extract_token_id_function
 
-# Extracts the auth_user_id from a given dictionary.
 @pytest.fixture
 def extract_user():
+    '''
+    Extracts the auth_user_id from a given dictionary.
+    '''
     def extract_auth_user_id_function(auth_user_id_dict):
         return auth_user_id_dict['auth_user_id']
     return extract_auth_user_id_function
 
-# Extracts the dm from a given dictionary.
 @pytest.fixture
 def extract_dm():
+    '''
+    Extracts the dm from a given dictionary.
+    '''
     def extract_dm_id_function(dm_id_dict):
         return dm_id_dict['dm_id']
     return extract_dm_id_function
 
-# Extracts the message from a given dictionary
 @pytest.fixture
 def extract_message():
+    '''
+    Extracts the message from a given dictionary
+    '''
     def extract_message_id_function(message_id_dict):
         return message_id_dict['message_id']
     return extract_message_id_function
 
-# Creates the details required for sending message
 def create_message_details():
+    '''
+    Creates the details required for sending message
+    '''
     def create_message_details_function(owner_token, dm_id, textmessage):
         return {
             'token': owner_token,
@@ -45,11 +55,16 @@ def create_message_details():
 
 @pytest.fixture
 def clear():
+    '''
+    Clears the datastore.
+    '''
     requests.delete(url + 'clear/v1')
 
-# Automatically create owner user id and dm id. Both are 1 by default.
 @pytest.fixture
 def register():
+    '''
+    Automatically create owner user id and dm id. Both are 1 by default.
+    '''
     owner_id_dict = requests.post(url + 'auth/register/v2', json = {
         'email': 'owner@test.com', 
         'password': 'password', 
@@ -72,6 +87,12 @@ def register():
     return {**owner_id_dict, **dm_id_dict}
 
 def test_senddm_one_valid_message(clear, register, extract_token, extract_user, extract_dm, extract_message):
+    '''
+    Standard test case.
+
+    Expects:
+        Correct output from dm/messages/v1
+    '''
     dm_id = extract_dm(register)
     owner_token = extract_token(register)
     now = datetime.utcnow().timestamp()

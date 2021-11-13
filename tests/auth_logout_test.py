@@ -23,11 +23,16 @@ from src.data_store import data_store
 
 @pytest.fixture
 def clear_server():
+    '''
+    Resets the data store.
+    '''
     requests.delete(config.url + "clear/v1")
 
-# Fixture to register someone and returns a dictionary of {token, auth_user_id}
 @pytest.fixture
 def get_user_1():
+    '''
+    Fixture to register someone and returns a dictionary of {token, auth_user_id}
+    '''
     response = requests.post(config.url + 'auth/register/v2', json={
         'email': 'owner@test.com', 
         'password': 'spotato', 
@@ -36,9 +41,11 @@ def get_user_1():
         })
     return response.json()
 
-# Fixture to register someone and returns a dictionary of {token, auth_user_id}
 @pytest.fixture
 def auth_id_v2(clear_server):
+    '''
+    Fixture to register someone and returns a dictionary of {token, auth_user_id}
+    '''
     response = requests.post(config.url + 'auth/register/v2', json={
         'email': 'example@email.com', 
         'password': 'potato', 
@@ -46,8 +53,6 @@ def auth_id_v2(clear_server):
         'name_last' : 'smith'
         })
     return response.json()
-
-# spec says that the token will be active so there are no excpetional cases
 
 def test_standard_token_invalidation(clear_server, get_user_1):
     '''

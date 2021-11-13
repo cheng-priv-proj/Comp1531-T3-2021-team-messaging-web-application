@@ -3,23 +3,29 @@ import requests
 
 from src.config import url
 
-# Extracts the token from a given dictionary.
 @pytest.fixture
 def extract_token():
+    '''
+    Extracts the token from a given dictionary.
+    '''
     def extract_token_id_function(token_dict):
         return token_dict['token']
     return extract_token_id_function
 
-# Extracts the token from a given dictionary.
 @pytest.fixture
 def extract_user():
+    '''
+    Extracts the token from a given dictionary.
+    '''
     def extract_u_id_function(auth_user_id_dict):
         return auth_user_id_dict['auth_user_id']
     return extract_u_id_function
 
-# Call user profile
 @pytest.fixture
 def user_profile():
+    '''
+    Call user profile
+    '''
     def user_profile_function(token, u_id):
         return requests.get(url + 'user/profile/v1', params = {
             'token': token,
@@ -27,9 +33,11 @@ def user_profile():
          })
     return user_profile_function
 
-# Call user set handle
 @pytest.fixture
 def user_profile_sethandle():
+    '''
+    Call user set handle
+    '''
     def user_profile_sethandle_function(token, handle_str):
         return requests.put(url + 'user/profile/sethandle/v1', json = {
             'token': token,
@@ -39,12 +47,17 @@ def user_profile_sethandle():
 
 @pytest.fixture
 def clear():
+    '''
+    Clears the datastore
+    '''
     requests.delete(url + 'clear/v1')
 
-# Registers an user and returns their registration info, auth_id and token and handle_str
-# Assumes handle_str does not require additional processing past concatenation
 @pytest.fixture
 def register_user():
+    '''
+    Registers an user and returns their registration info, auth_id and token and handle_str
+    Assumes handle_str does not require additional processing past concatenation
+    '''
     def register_user_function(email, name_first, name_last):
         registration_info = {
             'email': email, 
@@ -58,6 +71,12 @@ def register_user():
     return register_user_function
 
 def test_user_profile_sethandle_basic_functionality(clear, register_user, user_profile_sethandle, user_profile, extract_user, extract_token):
+    '''
+    Standard valid test
+
+    Expects:
+        Correct output from user_profile
+    '''
     owner_info = register_user('owner@gmail.com', 'owner', 'one')
     user_profile_sethandle(extract_token(owner_info), 'owneronen')
 

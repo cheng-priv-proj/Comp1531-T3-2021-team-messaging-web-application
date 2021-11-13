@@ -2,24 +2,20 @@ import pytest
 import requests
 from datetime import datetime
 
-# Wrote this at 4am
-# Potential Bugs
-#   - Haven't tested if channel id OR dm id are invalid
-#   - Not sure if optional messages are sent after the message
-#   - If message is empty string is it still sent?
-#   - Is optional message appended or another message?
-#   - Optional messages should also tag if it does have a tag but not tested yet
-
 from src.config import url
 
-# Clears storage 
 @pytest.fixture
 def clear():
+    '''
+    Clears storage 
+    '''
     requests.delete(url + "clear/v1")
 
-# Create an owner and some users
 @pytest.fixture 
 def register_user():
+    '''
+    Create an owner and some users
+    '''
     def register_user_function(email):
         user_details = {
             'email': email,
@@ -32,29 +28,38 @@ def register_user():
         return details_dict
     return register_user_function
 
-# Extracts the token from a given dictionary.
 @pytest.fixture
 def extract_token():
+    '''
+    Extracts the token from a given dictionary.
+    '''
     def extract_token_id_function(auth_user_id_dict):
         return auth_user_id_dict['token']
     return extract_token_id_function
 
-# Extracts the auth_user_id from a given dictionary.
 @pytest.fixture
 def extract_user():
+    '''
+    Extracts the auth_user_id from a given dictionary.
+    '''
     def extract_auth_user_id_function(auth_user_id_dict):
         return auth_user_id_dict['auth_user_id']
     return extract_auth_user_id_function
 
-# Extracts the message from a given dictionary
 @pytest.fixture
 def extract_message():
+    '''
+    Extracts the message from a given dictionary
+    '''
     def extract_message_id_function(message_id_dict):
         return message_id_dict['message_id']
     return extract_message_id_function
 
 @pytest.fixture
 def register_dm():
+    '''
+    REgisters a dm
+    '''
     def create_dm(owner_token, users):
         dm_id = requests.post(url + 'dm/create/v1', json = {
             'token': owner_token,
@@ -62,9 +67,11 @@ def register_dm():
         return dm_id['dm_id']
     return create_dm
 
-# Creates a channel using the given details and returns the channel_id
 @pytest.fixture
 def register_channel():
+    '''
+    Creates a channel using the given details and returns the channel_id
+    '''
     def register_channel_function(token, name, is_public):
         channel_details = {
             'token': token,
@@ -78,6 +85,12 @@ def register_channel():
     return register_channel_function
 
 def test_dm_share(clear, extract_token, extract_user, extract_message, register_user, register_dm):
+    '''
+    Standard Test case for dm.
+
+    Expects:
+        Correct output from dm/messages/v1
+    '''
     owner_details = register_user('owner@email.com')
     owner_id = extract_user(owner_details)
     owner_token = extract_token(owner_details)
@@ -101,7 +114,6 @@ def test_dm_share(clear, extract_token, extract_user, extract_message, register_
         'dm_id': dm_id_sent_to 
     }).json()
     shared_message_id = shared_message_id_dict.get('shared_message_id')
-    print(owner_token)
     messages = requests.get(url + 'dm/messages/v1', params= {
         'token': owner_token,
         'dm_id': dm_id_sent_to, 
@@ -124,6 +136,12 @@ def test_dm_share(clear, extract_token, extract_user, extract_message, register_
     }
 
 def test_channel_share(clear, extract_token, extract_user, extract_message, register_user, register_channel):
+    '''
+    Standard Test case for channel.
+
+    Expects:
+        Correct output from channel/messages/v1
+    '''
     owner_details = register_user('owner@email.com')
     owner_id = extract_user(owner_details)
     owner_token = extract_token(owner_details)
@@ -170,6 +188,12 @@ def test_channel_share(clear, extract_token, extract_user, extract_message, regi
     }
 
 def test_extra_message(clear, extract_token, extract_user, extract_message, register_user, register_channel):
+    '''
+    Standard Test case with an extra message.
+
+    Expects:
+        Correct output from dm/messages/v1
+    '''
     owner_details = register_user('owner@email.com')
     owner_id = extract_user(owner_details)
     owner_token = extract_token(owner_details)
@@ -216,6 +240,12 @@ def test_extra_message(clear, extract_token, extract_user, extract_message, regi
     }
 
 def test_both_channel_id_and_dm_id_invalid(clear, extract_token, extract_message, register_user, register_channel):
+    '''
+    Test case where channelid/dmid is not valid.
+
+    Expects:
+        InputError(400)
+    '''
     owner_details = register_user('owner@email.com')
     owner_token = extract_token(owner_details)
 
@@ -238,6 +268,12 @@ def test_both_channel_id_and_dm_id_invalid(clear, extract_token, extract_message
     }).status_code == 400
 
 def test_neither_negative_one(clear, extract_token, extract_user, extract_message, register_user, register_channel, register_dm):
+    '''
+    Test case where neither message are negative 1.
+
+    Expects:
+        InputError(400)
+    '''
     owner_details = register_user('owner@email.com')
     owner_token = extract_token(owner_details)
 
@@ -259,6 +295,12 @@ def test_neither_negative_one(clear, extract_token, extract_user, extract_messag
     }).status_code == 400
 
 def test_invalid_og_message_id(clear, extract_token, extract_message, register_user, register_channel):
+    '''
+    Test case where messsage id is not valid.
+
+    Expects:
+        InputError(400)
+    '''
     owner_details = register_user('owner@email.com')
     owner_token = extract_token(owner_details)
 
@@ -281,6 +323,12 @@ def test_invalid_og_message_id(clear, extract_token, extract_message, register_u
     }).status_code == 400
 
 def test_length_of_messages_less_than_thousand(clear, extract_token, extract_message, register_user, register_channel):
+    '''
+    Test case where message is is not valid.
+
+    Expects:
+        InputError(400)
+    '''
     owner_details = register_user('owner@email.com')
     owner_token = extract_token(owner_details)
 
@@ -303,6 +351,12 @@ def test_length_of_messages_less_than_thousand(clear, extract_token, extract_mes
     
 
 def test_valid_id_but_not_in_channel(clear, extract_token, extract_message, register_user, register_channel):
+    '''
+    Test case where auth_user_id is not in the channel.
+
+    Expects:
+        AccessError(403)
+    '''
     owner_details = register_user('owner@email.com')
     owner_token = extract_token(owner_details)
 

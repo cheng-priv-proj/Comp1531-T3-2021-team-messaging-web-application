@@ -8,14 +8,20 @@ from src.auth import *
 from src.other import clear_v1
 
 
-# Fixture to reset json store before every test
+
 @pytest.fixture
 def clear_server():
+    '''
+    Fixture to reset json store before every test
+    '''
     requests.delete(config.url + "clear/v1")
 
-# Extracts the auth_user_id from a given dictionary.
+
 @pytest.fixture
 def extract_user_v2():
+    '''
+    Extracts the auth_user_id from a given dictionary.
+    '''
     def extract_user_id_function(auth_user_id_dict):
         return auth_user_id_dict['auth_user_id']
     return extract_user_id_function
@@ -26,9 +32,11 @@ def extract_user_v2_token():
         return auth_user_id_dict['token']
     return extract_user_id_token
 
-# Fixture that registers a valid user.
 @pytest.fixture
 def auth_id_v2(clear_server):
+    '''
+    Fixture that registers a valid user.
+    '''
     response = requests.post(config.url + 'auth/register/v2', json={
         'email': 'example@email.com', 
         'password': 'potato', 

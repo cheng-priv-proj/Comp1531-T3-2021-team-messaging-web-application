@@ -6,14 +6,19 @@ from src import config
 
 from src.other import clear_v1
 
-# Fixture to reset data store
 @pytest.fixture
 def clear_server():
+    '''
+    Fixture to reset data store
+    '''
     requests.delete(config.url + 'clear/v1')
     pass
 
 @pytest.fixture
 def get_valid_token():
+    '''
+    Fixture to register someone and returns a dictionary of {token, auth_user_id}
+    '''
     response = requests.post(config.url + 'auth/register/v2', json={
         'email': 'example@email.com', 
         'password': 'potato', 
@@ -24,6 +29,9 @@ def get_valid_token():
 
 @pytest.fixture
 def get_valid_token_2():
+    '''
+    Fixture to register someone and returns a dictionary of {token, auth_user_id}
+    '''
     response = requests.post(config.url + 'auth/register/v2', json={
         'email': 'owner@test.com', 
         'password': 'spotato', 

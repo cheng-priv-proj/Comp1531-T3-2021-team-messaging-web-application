@@ -7,14 +7,18 @@ from src import config
 import pytest
 from src.other import clear_v1
 
-# Clears the datastore.
 @pytest.fixture
 def clear():
+    '''
+    Clears the datastore.
+    '''
     requests.delete(config.url + "clear/v1")
 
-# Generates new user
 @pytest.fixture
 def get_valid_token():
+    '''
+    Generates new user.
+    '''
     response = requests.post(config.url + 'auth/register/v2', json={
         'email': 'example@email.com', 
         'password': 'potato', 
@@ -23,9 +27,11 @@ def get_valid_token():
     })
     return response.json()
     
-# Generates the first user
 @pytest.fixture
 def first_register():
+    '''
+    Generates the first user and creates a channel.
+    '''
     user_details = {
         'email': 'globalowner@test.com',
         'password': 'password', 

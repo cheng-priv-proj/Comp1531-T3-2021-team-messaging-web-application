@@ -2,10 +2,8 @@ from re import U
 from src.data_store import data_store
 from src.error import InputError
 from src.error import AccessError
-from src.other import check_type
 
-
-def admin_userpermission_change_v1(auth_user_id, u_id, permission_id):
+def admin_userpermission_change_v1(auth_user_id: int, u_id: int, permission_id: int) -> dict:
     '''
     admin/userpermission/change/v1
     Given a user by their user ID, set their permissions to new permissions described by permission_id.
@@ -28,10 +26,6 @@ def admin_userpermission_change_v1(auth_user_id, u_id, permission_id):
         Returns {} on successful change. 
     '''
 
-    check_type(auth_user_id, int)
-    check_type(u_id, int)
-    check_type(permission_id, int)
-
     if data_store.is_stream_owner(auth_user_id) == False:
         raise AccessError('Token(auth_id) is not a global owner')
 
@@ -51,7 +45,7 @@ def admin_userpermission_change_v1(auth_user_id, u_id, permission_id):
     return {}
 
 
-def admin_user_remove_v1(auth_user_id, u_id):
+def admin_user_remove_v1(auth_user_id: int, u_id: int) -> dict:
     '''
     admin/user/remove/v1
 
@@ -80,7 +74,7 @@ def admin_user_remove_v1(auth_user_id, u_id):
     if data_store.is_stream_owner(auth_user_id) == False:
         raise AccessError('Token(auth_id) is not a global owner')
     if data_store.is_invalid_user_id(u_id):
-        raise InputError (' u_id is invalid')
+        raise InputError ('u_id is invalid')
 
     owner_count = data_store.get_num_streams_owners()
     

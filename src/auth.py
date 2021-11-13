@@ -1,16 +1,17 @@
 from src.data_store import data_store
 from src.error import InputError
-from src.other import check_type, check_email_valid
+from src.other import check_email_valid
 from src.other import handle_str_generation
 from src.other import stream_owner, stream_member
 from src.other import hash_str
 from src.config import SECRET, EMAIL, PASSWORD
-import re
+
 import jwt
 import smtplib
+import secrets
 from email.message import EmailMessage
 
-def auth_login_v1(email, password):
+def auth_login_v1(email: str, password: str) -> dict:
     '''
     Given the email and password of a registered user, returns the corresponding
     auth_id.
@@ -26,9 +27,6 @@ def auth_login_v1(email, password):
     Return value:
         Returns {token, auth_user_id} on success
     '''
-
-    check_type(email, str)
-    check_type(password, str)
     
     if data_store.is_invalid_email(email):
         raise InputError ('email does not belong to a user')
@@ -38,7 +36,7 @@ def auth_login_v1(email, password):
     if hash_str(password) != login.get('password'):
         raise InputError ('password is not correct')
 
-    auth_user_id = login.get("auth_id")
+    auth_user_id = login.get('auth_id')
 
     token = jwt.encode({
                 'auth_user_id': auth_user_id,
@@ -50,7 +48,7 @@ def auth_login_v1(email, password):
 
     return { 'token': token,'auth_user_id': auth_user_id }
 
-def auth_register_v1(email, password, name_first, name_last):
+def auth_register_v1(email: str, password: str, name_first: str, name_last: str) -> dict:
     '''
     Updates data store with a new user's information
     Generates a u_id, auth_id and handle_str.
@@ -73,28 +71,22 @@ def auth_register_v1(email, password, name_first, name_last):
                     or more than 50
 
     Return value:
-        Returns {auth_user_id} on success
+        Returns { auth_user_id } on success
     '''
-
-    # checking for valid input types
-    check_type(email, str)
-    check_type(password, str)
-    check_type(name_first, str)
-    check_type(name_last, str)
 
     check_email_valid(email)
 
     # check for valid password, name_first and name_last lengths
     if len(password) < 6:
-        raise InputError ('password is less than 6 characters')
+        raise InputError('password is less than 6 characters')
     if len(name_first) < 1 or len(name_first) > 50:
-        raise InputError ('name_first is less than 1 character or more than 50')
+        raise InputError('name_first is less than 1 character or more than 50')
     if len(name_last) < 1 or len(name_last) > 50:
-        raise InputError ('name_last is less than 1 character or more than 50')
+        raise InputError('name_last is less than 1 character or more than 50')
     
     # check if email is already being used
     if data_store.is_duplicate_email(email):
-        raise InputError ('email is already being used by another user')
+        raise InputError('email is already being used by another user')
 
     # generate a unique auth_id
     auth_user_id = len(data_store.get_users_from_u_id_dict())
@@ -112,7 +104,7 @@ def auth_register_v1(email, password, name_first, name_last):
     return { 'auth_user_id': auth_user_id }
 
 
-def auth_logout_v1(token):
+def auth_logout_v1(token: str) -> dict:
     '''
     Given an active token, invalidates the token to log the user out.
 
@@ -130,7 +122,7 @@ def auth_logout_v1(token):
 
     return {}
 
-def auth_passwordreset_request_v1(email):
+def auth_passwordreset_request_v1(email: str) -> dict:
     '''
     Given an email address, if the user is a registered user, sends them an
     email containing a specific secret code, that when entered in
@@ -152,23 +144,24 @@ def auth_passwordreset_request_v1(email):
 
     Returns {} on success
     '''
-    check_type(email, str)
 
     if data_store.is_invalid_email(email):
         return
 
-    reset_code = email
+    # randomly generate a secret reset code
+    reset_code = str(secrets.randbelow(1000))
 
     email_msg = EmailMessage()
-    email_msg.set_content(email)
+    email_msg.set_content(reset_code)
 
-    email_msg['Subject'] = 'Did you recieve it? My message?'
+    email_msg['Subject'] = 'UNSW Streams Password Reset Code'
     email_msg['From'] = EMAIL
-    email_msg['To'] = reset_code
+    email_msg['To'] = email
 
-    # Send message via a SMTP server.
+    # send message via a SMTP server
     s = smtplib.SMTP("smtp.gmail.com", 587)
 
+    # gmail authentication
     s.ehlo()
     s.starttls()
     s.login(EMAIL, PASSWORD)
@@ -185,14 +178,13 @@ def auth_passwordreset_request_v1(email):
 
     tokens = [token for token in all_tokens if all_tokens[token] == auth_user_id]
 
+    # log out user
     for token in tokens:
         auth_logout_v1(token)
 
     return {}
 
-# Using this implementation, what happens if the user accidentally guesses another user's reset code?
-# Big security issue, and large bug
-def auth_passwordreset_reset_v1(reset_code, new_password):
+def auth_passwordreset_reset_v1(reset_code: str, new_password: str) -> dict:
     '''
     Given a reset code for a user, set that user's new password to the
     password provided.
@@ -209,19 +201,15 @@ def auth_passwordreset_reset_v1(reset_code, new_password):
     Return {} on success
     '''
 
-    check_type(new_password, str)
-
-    print(new_password)
     if len(new_password) < 6:
-        raise InputError
+        raise InputError('password entered is less than 6 characters long')
 
-    if data_store.is_reset_code_invalid(reset_code) == True:
-        raise InputError
+    if data_store.is_reset_code_invalid(reset_code):
+        raise InputError('reset_code is not a valid reset code')
 
     u_id = data_store.get_u_id_from_reset_code(reset_code)
 
-    encrypted_password = hash_str(new_password)
-    data_store.update_password(u_id, encrypted_password)
+    data_store.update_password(u_id, hash_str(new_password))
 
     data_store.remove_reset_code(reset_code)
 

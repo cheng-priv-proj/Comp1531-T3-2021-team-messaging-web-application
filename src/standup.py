@@ -2,30 +2,29 @@ from src.data_store import data_store
 
 from src.error import InputError
 from src.error import AccessError
-from src.other import check_type
 from src.message import message_send_v1
 
 import threading
-from datetime import datetime, time, timezone
+from datetime import datetime, timezone
 from time import sleep
 
 ################# Standup Thread ###############################################
 
 class Standup (threading.Thread):
-    def __init__(self, u_id, channel_id, length):
+    def __init__(self, u_id: int, channel_id: int, length: int) -> None:
         threading.Thread.__init__(self)
         self.u_id = u_id
         self.channel_id = channel_id
         self.length = length
 
-    def run(self):
+    def run(self) -> None:
         print('standup thread started for channel_id ', self.channel_id)
 
         send_message_buffer(self.u_id, self.channel_id, self.length)
 
         print('standup thread exiting for channel_id ', self.channel_id)
     
-def send_message_buffer(u_id, channel_id, length):
+def send_message_buffer(u_id: int, channel_id: int, length: int) -> None:
     sleep(length)
     
     standup = data_store.get_standup_from_channel_id(channel_id)
@@ -37,7 +36,7 @@ def send_message_buffer(u_id, channel_id, length):
 
 ################################################################################
 
-def standup_start_v1(auth_user_id, channel_id, length):
+def standup_start_v1(auth_user_id: int, channel_id: int, length: int) -> dict:
     '''
     For a given channel, start the standup period for the next 'length' seconds
 
@@ -57,10 +56,6 @@ def standup_start_v1(auth_user_id, channel_id, length):
     
     Returns { time_finish } on success        
     '''
-    
-    check_type(auth_user_id, int)
-    check_type(channel_id, int)
-    check_type(length, int)
 
     if data_store.is_invalid_channel_id(channel_id):
         raise InputError('channel_id does not refer to a valid channel')
@@ -73,7 +68,6 @@ def standup_start_v1(auth_user_id, channel_id, length):
 
     if data_store.is_standup_active(channel_id):
         raise InputError('active standup is currently running in the channel')
-    
 
     time_finish = int(datetime.now(timezone.utc).timestamp()) + length
 
@@ -84,7 +78,7 @@ def standup_start_v1(auth_user_id, channel_id, length):
 
     return { 'time_finish' : time_finish }
 
-def standup_active_v1(auth_user_id, channel_id):
+def standup_active_v1(auth_user_id: int, channel_id: int) -> dict:
     '''
     For a given channel, return whether a standup is active in it, and what time
     the standup finishes. If no standup is active, then time_finish returns
@@ -102,8 +96,6 @@ def standup_active_v1(auth_user_id, channel_id):
     
     Returns { is_active, time_finish } on success        
     '''
-    check_type(auth_user_id, int)
-    check_type(channel_id, int) 
     
     if data_store.is_invalid_channel_id(channel_id):
         raise InputError('channel_id does not refer to a valid channel')
@@ -119,7 +111,7 @@ def standup_active_v1(auth_user_id, channel_id):
         'time_finish': time_finish
     }
 
-def standup_send_v1(auth_user_id, channel_id, message):
+def standup_send_v1(auth_user_id: int, channel_id: int, message: str) -> dict:
     '''
     Sending a message to get buffered in the standup queue, assuming a standup
     is currently active. 
@@ -141,10 +133,6 @@ def standup_send_v1(auth_user_id, channel_id, message):
     
     Returns {} on success        
     '''
-
-    check_type(auth_user_id, int)
-    check_type(channel_id, int)
-    check_type(message, str)
 
     if data_store.is_invalid_channel_id(channel_id):
         raise InputError('channel_id does not refer to a valid channel')

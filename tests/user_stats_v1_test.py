@@ -12,9 +12,11 @@ from datetime import datetime
 def clear_server():
     requests.delete(config.url + "clear/v1")
 
-# Generates new user
 @pytest.fixture
 def get_valid_token():
+    '''
+    Generates new user
+    '''
     response = requests.post(config.url + 'auth/register/v2', json={
         'email': 'example@email.com', 
         'password': 'potato', 
@@ -25,6 +27,9 @@ def get_valid_token():
 
 @pytest.fixture
 def channel_factory():
+    '''
+    Creates channels
+    '''
     def create_channel(token, name):
         channel_details = {
             'token': token,
@@ -38,6 +43,9 @@ def channel_factory():
 
 @pytest.fixture
 def dm_factory():
+    '''
+    Creates dms
+    '''
     def create_dm(owner_token, users):
         dm_id = requests.post(url + 'dm/create/v1', json = {
             'token': owner_token,
@@ -47,6 +55,9 @@ def dm_factory():
 
 @pytest.fixture
 def send_message_channel_factory():
+    '''
+    Sends a message
+    '''
     def send_channel_message(token, channel_id, message):
         requests.post(url + 'message/send/v1', json = {
             'token': token,
@@ -56,6 +67,9 @@ def send_message_channel_factory():
         
 @pytest.fixture
 def send_message_dm_factory():
+    '''
+    Sends a dm
+    '''
     def send_dm(token, dm_id, message):
         requests.post(url + 'message/senddm/v1', json = {
             'token': token,
@@ -65,6 +79,12 @@ def send_message_dm_factory():
 
 
 def test_user_stats_v1_invalid_token(clear_server):
+    '''
+    Test case where token is invalid.
+
+    Expects: 
+        AccessError (403 error)
+    '''
 
     response = requests.get(url + 'user/stats/v1', json = {
         'token': -1
@@ -73,6 +93,13 @@ def test_user_stats_v1_invalid_token(clear_server):
     assert response.status_code == 403
 
 def test_user_stats_v1_nothing_joined(clear_server, get_valid_token):
+    '''
+    Standard test case with no one joined.
+
+    Expects:
+        Correct output from user_stats
+    
+    '''
     token = get_valid_token['token']
     now = datetime.utcnow().timestamp()
 
@@ -97,6 +124,13 @@ def test_user_stats_v1_nothing_joined(clear_server, get_valid_token):
     }}
 
 def test_user_stats_v1_joined_channels(clear_server, get_valid_token, channel_factory, send_message_channel_factory):
+    '''
+    Standard test case.
+
+    Expects:
+        Correct output from user_stats
+    
+    '''
     token = get_valid_token['token']
     channel1 = channel_factory(token, 'channel1')
     channel_factory(token, 'channel2')
@@ -108,7 +142,6 @@ def test_user_stats_v1_joined_channels(clear_server, get_valid_token, channel_fa
         'token': token
     }).json()
 
-    print(response)
 
     assert response == {'user_stats': {
         'channels_joined': [
@@ -143,6 +176,13 @@ def test_user_stats_v1_joined_channels(clear_server, get_valid_token, channel_fa
 
 
 def test_user_stats_v1_joined_dms(clear_server, get_valid_token, dm_factory, send_message_dm_factory):
+    '''
+    Standard test case with dms.
+
+    Expects:
+        Correct output from user_stats
+    
+    '''
     user = get_valid_token
     token = user['token']
     dm1 = dm_factory(token, [])
@@ -192,6 +232,13 @@ def test_user_stats_v1_joined_dms(clear_server, get_valid_token, dm_factory, sen
 
 
 def test_user_stats_v1_joined_channels_and_dms(clear_server, get_valid_token, channel_factory, send_message_dm_factory, send_message_channel_factory, dm_factory):
+    '''
+    Standard test case with dms and channels.
+
+    Expects:
+        Correct output from user_stats
+    
+    '''
     user = get_valid_token
     token = user['token']
 

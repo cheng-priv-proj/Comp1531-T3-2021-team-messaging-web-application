@@ -9,10 +9,16 @@ from src.other import clear_v1
 
 @pytest.fixture
 def clear():
+    '''
+    Clears the datastore.
+    '''
     requests.delete(config.url + "clear/v1")
 
 @pytest.fixture
 def get_valid_token():
+    '''
+    Fixture that registers one user and returns a token.
+    '''
     response = requests.post(config.url + 'auth/register/v2', json={
         'email': 'example@email.com', 
         'password': 'potato', 

@@ -5,23 +5,29 @@ import operator
 from src.config import url
 
 
-# Extracts the token from a given dictionary.
 @pytest.fixture
 def extract_token():
+    '''
+    Extracts the token from a given dictionary.
+    '''
     def extract_token_id_function(auth_user_id_dict):
         return auth_user_id_dict['token']
     return extract_token_id_function
 
-# Extracts the token from a given dictionary.
 @pytest.fixture
 def extract_user():
+    '''
+    Extracts the token from a given dictionary.
+    '''
     def extract_u_id_function(auth_user_id_dict):
         return auth_user_id_dict['auth_user_id']
     return extract_u_id_function
 
-# Call users all
 @pytest.fixture
 def users_all():
+    '''
+    Call users all
+    '''
     def users_all_function(token):
         return requests.get(url + 'users/all/v1', params = {
             'token': token
@@ -32,10 +38,12 @@ def users_all():
 def clear():
     requests.delete(url + 'clear/v1')
 
-# Registers an user and returns their registration info, auth_id and token and handle_str
-# Assumes handle_str does not require additional processing past concatenation
 @pytest.fixture
 def register_user_return_info():
+    '''
+    Registers an user and returns their registration info, auth_id and token and handle_str
+    Assumes handle_str does not require additional processing past concatenation
+    '''
     def register_user_function(email, name_first, name_last):
         registration_info = {
             'email': email, 
@@ -52,9 +60,11 @@ def register_user_return_info():
         return {**register_dict, **registration_info}
     return register_user_function
 
-# Removes token and password key value pairs
 @pytest.fixture
 def user_info_to_user_datatype():
+    '''
+    Removes token and password key value pairs
+    '''
     def user_info_to_user_datatype_function(user_info):
         user_info.pop('token')
         user_info.pop('password')
@@ -65,9 +75,11 @@ def user_info_to_user_datatype():
         return user_info
     return user_info_to_user_datatype_function
 
-# Sort users as it is not innately ordered
 @pytest.fixture
 def sort_users():
+    '''
+    Sort users as it is not innately ordered
+    '''
     def sort_users_function(users):
         return users
     return sort_users_function

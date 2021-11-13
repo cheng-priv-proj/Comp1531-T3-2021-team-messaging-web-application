@@ -8,13 +8,18 @@ import json
 import flask
 from src import config 
 
-# Clear the json.
 @pytest.fixture
 def clear_server():
+    '''
+    Clear the datastore.
+    '''
     requests.delete(config.url + "clear/v1")
 
 @pytest.fixture
 def get_user_1():
+    '''
+    Registers an owner user
+    '''
     response = requests.post(config.url + 'auth/register/v2', json={
         'email': 'owner@test.com', 
         'password': 'spotato', 
@@ -25,6 +30,9 @@ def get_user_1():
 
 @pytest.fixture
 def get_valid_token():
+    '''
+    Registers a second user.
+    '''
     response = requests.post(config.url + 'auth/register/v2', json={
         'email': 'example@email.com', 
         'password': 'potato', 

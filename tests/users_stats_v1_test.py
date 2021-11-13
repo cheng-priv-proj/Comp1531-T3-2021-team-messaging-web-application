@@ -12,9 +12,11 @@ from datetime import datetime
 def clear_server():
     requests.delete(config.url + "clear/v1")
 
-# Generates new user
 @pytest.fixture
 def get_valid_token():
+    '''
+    Generates new user
+    '''
     response = requests.post(config.url + 'auth/register/v2', json={
         'email': 'example@email.com', 
         'password': 'potato', 
@@ -25,6 +27,9 @@ def get_valid_token():
 
 @pytest.fixture
 def channel_factory():
+    '''
+    Generates channels
+    '''
     def create_channel(token, name):
         channel_details = {
             'token': token,
@@ -38,6 +43,9 @@ def channel_factory():
 
 @pytest.fixture
 def dm_factory():
+    '''
+    Creates dms
+    '''
     def create_dm(owner_token, users):
         dm_id = requests.post(url + 'dm/create/v1', json = {
             'token': owner_token,
@@ -47,6 +55,9 @@ def dm_factory():
 
 @pytest.fixture
 def send_message_channel_factory():
+    '''
+    Sends a message
+    '''
     def send_channel_message(token, channel_id, message):
         requests.post(url + 'message/send/v1', json = {
             'token': token,
@@ -56,6 +67,9 @@ def send_message_channel_factory():
         
 @pytest.fixture
 def send_message_dm_factory():
+    '''
+    Sends a dm messsage
+    '''
     def send_dm(token, dm_id, message):
         requests.post(url + 'message/senddm/v1', json = {
             'token': token,
@@ -65,6 +79,12 @@ def send_message_dm_factory():
 
 
 def test_users_stats_v1_invalid_token(clear_server):
+    '''
+    Test case where token is invalid.
+
+    Expects: 
+        InputError (400 error)
+    '''
 
     response = requests.get(url + 'users/stats/v1', json = {
         'token': -1
@@ -108,7 +128,6 @@ def test_users_stats_v1_joined_channels(clear_server, get_valid_token, channel_f
         'token': token
     }).json()
 
-    print(response)
 
     assert response['workspace_stats'] == {
         'channels_exist': [
@@ -156,7 +175,6 @@ def test_users_stats_v1_joined_dms(clear_server, get_valid_token, dm_factory, se
         'token': token
     }).json()
 
-    print(response)
 
     assert response['workspace_stats'] == {
         'channels_exist': [{
@@ -211,7 +229,6 @@ def test_users_stats_v1_joined_channels_and_dms(clear_server, get_valid_token, c
     response = requests.get(url + 'users/stats/v1', params = {
         'token': token
     }).json()
-    print(response['workspace_stats'])
     assert response['workspace_stats'] == {
         'channels_exist': [
         {

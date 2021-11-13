@@ -1,7 +1,7 @@
 from src.data_store import data_store
 from src.error import InputError
 from src.error import AccessError
-from src.other import check_type, check_and_insert_tag_notifications_in_message, insert_react_message_notification
+from src.other import check_and_insert_tag_notifications_in_message, insert_react_message_notification
 
 from datetime import datetime
 
@@ -11,7 +11,7 @@ from time import sleep
 
 mutex = threading.RLock()
 
-def message_send_v1(auth_user_id, channel_id, message):
+def message_send_v1(auth_user_id: int, channel_id: int, message: str) -> dict:
     '''
     Send a message from the authorised user to the channel specified by channel_id
 
@@ -31,10 +31,6 @@ def message_send_v1(auth_user_id, channel_id, message):
     Return value:
         Returns { message_id } on success
     '''
-
-    check_type(auth_user_id, int)
-    check_type(channel_id, int)
-    check_type(message, str)
 
     if data_store.is_invalid_channel_id(channel_id):
         raise InputError('invalid channel_id')
@@ -75,7 +71,7 @@ def message_send_v1(auth_user_id, channel_id, message):
     return { 'message_id': message_id}
 
 
-def message_senddm_v1(auth_user_id, dm_id, message):
+def message_senddm_v1(auth_user_id: int, dm_id: int, message: str) -> dict:
     '''
     Send a message from the authorised user to the dm specified by dm_id
 
@@ -94,10 +90,6 @@ def message_senddm_v1(auth_user_id, dm_id, message):
     Return value:
         Returns { message_id } on success
     '''
-
-    check_type(auth_user_id, int)
-    check_type(dm_id, int)
-    check_type(message, str)
 
     if data_store.is_invalid_dm_id(dm_id):
         raise InputError('invalid dm_id')
@@ -137,7 +129,7 @@ def message_senddm_v1(auth_user_id, dm_id, message):
 
     return { 'message_id' : message_id }
 
-def message_remove_v1(auth_user_id, message_id):
+def message_remove_v1(auth_user_id: int, message_id: int) -> dict:
     '''
     Given a message_id for a message, this message is removed from the channel/DM
 
@@ -153,8 +145,6 @@ def message_remove_v1(auth_user_id, message_id):
     Return Value:
         Returns {} on success
     '''
-    check_type(auth_user_id, int)
-    check_type(message_id, int)
 
     if data_store.is_invalid_message_id(message_id):
         raise InputError ('message_id does not refer to a valid message within a channel/DM')
@@ -173,7 +163,7 @@ def message_remove_v1(auth_user_id, message_id):
 
     return {}
 
-def message_edit_v1(auth_user_id, message_id, message):
+def message_edit_v1(auth_user_id: int, message_id: int, message: str) -> dict:
     '''
     Given a message, update its text with new text. 
     If the new message is an empty string, the message is deleted.
@@ -193,10 +183,6 @@ def message_edit_v1(auth_user_id, message_id, message):
     Return value:
         Returns {} on success
     '''
-
-    check_type(auth_user_id, int)
-    check_type(message_id, int)
-    check_type(message, str)
 
     if data_store.is_invalid_message_id(message_id):
         raise InputError
@@ -218,12 +204,12 @@ def message_edit_v1(auth_user_id, message_id, message):
     for original_message in messages:
         if original_message.get('message_id') == message_id:
             original_message['message'] = message
-    print(11111111213091203912803)
+
     check_and_insert_tag_notifications_in_message(message, id, auth_user_id)
 
     return {}
 
-def message_share_v1(auth_user_id, og_message_id, message, channel_id, dm_id):
+def message_share_v1(auth_user_id: int, og_message_id: int, message: str, channel_id: int, dm_id: int) -> dict:
     '''
     Given a message_id, shares that message to the given channel or dm with
     an optional additional message
@@ -252,12 +238,6 @@ def message_share_v1(auth_user_id, og_message_id, message, channel_id, dm_id):
         Returns { shared_message_id } on success
     '''
 
-    check_type(auth_user_id, int)
-    check_type(og_message_id, int)
-    check_type(message, str)
-    check_type(channel_id, int)
-    check_type(dm_id, int)
-
     if channel_id != -1 and dm_id != -1:
         raise InputError('neither channel_id nor dm_id are -1')
     
@@ -278,12 +258,12 @@ def message_share_v1(auth_user_id, og_message_id, message, channel_id, dm_id):
         raise InputError('og_message_id does not refer to a valid message within a channel/DM that the authorised user has joined')
 
     og_message = data_store.get_message_from_message_id(og_message_id).get('message')
-    print('hello?')
+
     shared_message_id = message_send_v1(auth_user_id, id, og_message + message) if dm_id == -1 else message_senddm_v1(auth_user_id, dm_id, og_message + message)
-    print(shared_message_id)
+
     return { 'shared_message_id': shared_message_id.get('message_id')}
 
-def message_react_v1(auth_user_id, message_id, react_id):
+def message_react_v1(auth_user_id: int, message_id: int, react_id: int) -> dict:
     '''
     Given a message_id, shares that message to the given channel or dm with
     an optional additional message
@@ -304,10 +284,6 @@ def message_react_v1(auth_user_id, message_id, react_id):
     Return value:
         Returns {} on success
     '''
-
-    check_type(auth_user_id, int)
-    check_type(message_id, int)
-    check_type(react_id, int)
     
     if data_store.is_invalid_message_id(message_id):
         raise InputError('Invalid message_id')
@@ -324,9 +300,10 @@ def message_react_v1(auth_user_id, message_id, react_id):
     
     data_store.add_react_to_message(react_id, auth_user_id, message_id)
     insert_react_message_notification(channel_dm_id, auth_user_id, data_store.get_message_from_message_id(message_id).get('u_id'))
+
     return {}
 
-def message_unreact_v1(auth_user_id, message_id, react_id):
+def message_unreact_v1(auth_user_id: int, message_id: int, react_id: int) -> str:
     '''
     Given a message within a channel or DM the authorised user is part of,
     remove a "react" to that particular message.
@@ -347,10 +324,6 @@ def message_unreact_v1(auth_user_id, message_id, react_id):
         Returns {} on success
     '''
     
-    check_type(auth_user_id, int)
-    check_type(message_id, int)
-    check_type(react_id, int)
-    
     if data_store.is_invalid_message_id(message_id):
         raise InputError('Invalid message_id')
 
@@ -368,7 +341,7 @@ def message_unreact_v1(auth_user_id, message_id, react_id):
 
     return {}
 
-def message_pin_v1(auth_user_id, message_id):
+def message_pin_v1(auth_user_id: int, message_id: int) -> dict:
     '''
     Given a message within a channel or DM, mark it as "pinned".
     
@@ -388,11 +361,6 @@ def message_pin_v1(auth_user_id, message_id):
         Returns {} on success
     '''
 
-    check_type(auth_user_id, int)
-    check_type(message_id, int)
-
-
-
     if data_store.is_invalid_message_id(message_id):
         raise InputError('Message_id does not refer to a valid message')
     
@@ -411,7 +379,7 @@ def message_pin_v1(auth_user_id, message_id):
 
     return {}
 
-def message_unpin_v1(auth_user_id, message_id):
+def message_unpin_v1(auth_user_id: int, message_id: int) -> dict:
     '''
     Given a message within a channel or DM, remove its mark as pinned.
     
@@ -430,8 +398,6 @@ def message_unpin_v1(auth_user_id, message_id):
     Return value:
         Returns {} on success
     '''
-    check_type(auth_user_id, int)
-    check_type(message_id, int)
 
     if data_store.is_invalid_message_id(message_id):
         raise InputError('Message_id does not refer to a valid message')
@@ -452,7 +418,7 @@ def message_unpin_v1(auth_user_id, message_id):
     return {}
 
 
-################# Standup Thread ###############################################
+################# Send Later Thread ############################################
 
 class DelayedMessage (threading.Thread):
     def __init__(self, u_id, channel_or_dm_id, timesent, message):
@@ -495,7 +461,7 @@ class DelayedMessage (threading.Thread):
 ################################################################################
 
 
-def message_sendlater_v1(auth_user_id, channel_id, message, time_sent):
+def message_sendlater_v1(auth_user_id: int, channel_id: int, message: str, time_sent: float) -> dict:
     '''
     Send a message from the authorised user to the channel specified by
     channel_id automatically at a specified time in the future.
@@ -518,10 +484,6 @@ def message_sendlater_v1(auth_user_id, channel_id, message, time_sent):
 
     Returns { message_id } on success
     '''
-    check_type(auth_user_id, int)
-    check_type(channel_id, int)
-    check_type(message, str)
-    check_type(time_sent, int)
 
     if data_store.is_invalid_channel_id(channel_id):
         raise InputError('channel_id does not refer to a valid channel')
@@ -541,7 +503,7 @@ def message_sendlater_v1(auth_user_id, channel_id, message, time_sent):
     
     return {'message_id': delayed_message.message_id}
 
-def message_sendlaterdm_v1(auth_user_id, dm_id, message, time_sent):
+def message_sendlaterdm_v1(auth_user_id: int, dm_id: int, message: str, time_sent: float) -> dict:
     '''
     Send a message from the authorised user to the DM specified by dm_id
     automatically at a specified time in the future.
@@ -564,10 +526,6 @@ def message_sendlaterdm_v1(auth_user_id, dm_id, message, time_sent):
 
     Returns { message_id } on success
     '''
-    check_type(auth_user_id, int)
-    check_type(dm_id, int)
-    check_type(message, str)
-    check_type(time_sent, int)
 
     if data_store.is_invalid_dm_id(dm_id):
         raise InputError('dm_id does not refer to a valid dm')

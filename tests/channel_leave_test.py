@@ -9,9 +9,11 @@ import requests
 def clear():
     requests.delete(url + "clear/v1")
 
-# Generates the first user
 @pytest.fixture
 def first_register():
+    '''
+    Generates the first user
+    '''
     user_details = {
         'email': 'globalowner@test.com',
         'password': 'password', 
@@ -31,9 +33,11 @@ def first_register():
     
     return {'token': token, 'channel_id': channel_id}
 
-# Creates a user using the given details and returns the channel_id
 @pytest.fixture 
 def register_user():
+    '''
+    Creates a user using the given details and returns the channel_id
+    '''
     def register_user_function(email):
         user_details = {
             'email': email,
@@ -47,9 +51,11 @@ def register_user():
         return token
     return register_user_function
 
-# Creates a channel using the given details and returns the channel_id
 @pytest.fixture
 def register_channel():
+    '''
+    Creates a channel using the given details and returns the channel_id
+    '''
     def register_channel_function(token, name, is_public):
         channel_details = {
             'token': token,

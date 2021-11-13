@@ -2,9 +2,8 @@ from src.data_store import data_store
 
 from src.error import InputError
 from src.error import AccessError
-from src.other import check_type
 
-def search_v1(auth_user_id, query_str):
+def search_v1(auth_user_id: int, query_str: str) -> dict:
     '''
     Given a query string, return a collection of messages in all of the
     channels/DMs that the user has joined that contain the query.
@@ -21,11 +20,9 @@ def search_v1(auth_user_id, query_str):
     Return value:
         Returns { messages } on success
     '''
-    print('query_str')
-    print(query_str)
+
     if len(query_str) > 1000 or len(query_str) < 1:
         raise InputError('length of query_str is less than 1 or over 1000 characters')
-
 
     returning_messages_list = []
 
@@ -38,8 +35,6 @@ def search_v1(auth_user_id, query_str):
                 for channel_id in channels_dict
                 if data_store.is_user_member_of_channel(channel_id, auth_user_id)
                ]
-
-    
 
     for element in channels:
         messages = data_store.get_messages_from_channel_or_dm_id(element['channel_id'])
@@ -62,6 +57,5 @@ def search_v1(auth_user_id, query_str):
         for message in messages:
             if query_str in message['message']:
                 returning_messages_list.append(message)
-
 
     return { 'messages': returning_messages_list}
