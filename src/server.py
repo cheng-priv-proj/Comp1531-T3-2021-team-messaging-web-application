@@ -60,6 +60,7 @@ def register_ep():
         name_last   (string)    - users last name
 
     Exceptions:
+        AccessError - occurs when token is invalid
         TypeError   - occurs when email, password, name_first or name_last
                     are not strings
         InputError  - occurs when email is not a valid email
@@ -106,6 +107,7 @@ def login_ep():
         password    (string)   - users password
 
     Exceptions:
+        AccessError - occurs when token is invalid
         TypeError  - occurs when email or password given are not strings
         InputError - occurs when email does not belong to a user
         InputError - occurs when password is not correct
@@ -144,7 +146,20 @@ def logout_endpt():
 @APP.route('/auth/passwordreset/request/v1', methods= ['POST'])
 def passwordreset_request_endpt():
     '''
-    insert something here
+    Given a reset code for a user, set that user's new password to the
+    password provided.
+    
+    Arguments:
+        reset_code      (str) - secret reset string
+        new_password    (str) - new password string
+
+    Exceptions:
+        AccessError - occurs when token is invalid
+        TypeError   - occurs when reset_code, new_password are not strs
+        InputError  - reset_code is not a valid reset code
+        InputError  - password entered is less than 6 characters long
+
+    Return {} on success
     '''
     email = request.get_json(force = True).get('email')
 
@@ -162,6 +177,7 @@ def passwordreset_reset_endpt():
         new_password    (str) - new password string
 
     Exceptions:
+        AccessError - occurs when token is invalid
         TypeError   - occurs when reset_code, new_password are not strs
         InputError  - reset_code is not a valid reset code
         InputError  - password entered is less than 6 characters long
@@ -194,6 +210,7 @@ def channel_create_ep():
         is_public       (bool)  - public/private status
 
     Exceptions:
+        AccessError - occurs when token is invalid
         TypeError   - occurs when auth_user_id is not an int
         TypeError   - occurs when name is not a string
         TypeError   - occurs when is_public is not a bool
@@ -228,6 +245,7 @@ def channel_invite_ep():
         u_id            (int)   - user id (invitee)
 
     Exceptions:
+        AccessError - occurs when token is invalid
         TypeError   - occurs when auth_user_id, channel_id, u_id are not ints
         AccessError - occurs when channel_id is valid but the authorised user is not
                     a member of the channel
@@ -265,6 +283,7 @@ def channel_messages_ep():
         start           (int)   - message index (most recent message has index 0)
 
     Exceptions:
+        AccessError - occurs when token is invalid
         TypeError   - occurs when auth_user_id, channel_id are not ints
         InputError  - occurs when channel_id is invalid
         InputError  - occurs when start is negative
@@ -295,6 +314,7 @@ def channel_leave_endpt():
         channel_id      (int)   - unique channel id
 
     Exceptions:
+        AccessError - occurs when token is invalid
         TypeError   - occurs when token is not a str
         TypeError   - occurs when channel_id is not a int
         AccessError - occurs when token is invalid
@@ -323,6 +343,7 @@ def channel_list_endpt():
         token           (str)   - unique user token
 
     Exceptions:
+        AccessError - occurs when token is invalid
         TypeError   - occurs when converted auth_user_id is not an int
 
     Return value:
@@ -343,6 +364,7 @@ def list_all_endpt():
         token           (str)   - unique user token
 
     Exceptions:
+        AccessError - occurs when token is invalid
         TypeError   - occurs when auth_user_id is not an int
 
     Return value:
@@ -381,6 +403,7 @@ def channel_join_endpt():
         channel_id      (int)   - unique channel id
 
     Exceptions:
+        AccessError - occurs when token is invalid
         TypeError   - occurs when auth_user_id, channel_id are not ints
         InputError  - occurs when channel_id is invalid
         AccessError - occurs when channel is not public
@@ -411,6 +434,7 @@ def channel_details_endpt():
         channel_id      (int)   - unique channel id
 
     Exceptions:
+        AccessError - occurs when token is invalid
         TypeError   - occurs when auth_user_id, channel_id are not ints
         InputError  - occurs when channel_id is invalid
         AccessError - occurs when channel_id is valid but the authorised user is
@@ -534,7 +558,7 @@ def channel_removeowner_endpt():
         u_id            (int)   - unique user id
 
     Exceptions:
-        AccessError - occurs when auth_user_id is invalid
+        AccessError - occurs when token is invalid
         InputError  - occurs when channel_id is invalid
         AccessError - occurs when channel_id is valid and the authorised user does not have owner permissions in the channel
         InputError  - occurs when u_id does not refer to a valid user
@@ -588,6 +612,7 @@ def users_all_ep():
         token           (str)   - valid token
     
     Exceptions:
+        AccessError - occurs when token is invalid
         TypeError   - occurs when auth_user_id is not int
 
     Return value:
@@ -610,6 +635,7 @@ def user_profile_setname_ep():
         name_last       (str)   - string
 
     Exceptions:
+        AccessError - occurs when token is invalid
         TypeError   - occurs when auth_user_id is not an int
         TypeError   - occurs when name_first, name_last are not str
         AccessError - occurs when auth_user_id is invalid
@@ -643,7 +669,7 @@ def dm_leave_endpt():
 
     Exceptions:
         TypeError   - occurs when auth_user_id, dm_id are not ints
-        InputError   - dm_id does not refer to a valid DM
+        InputError  - dm_id does not refer to a valid DM
         AccessError - dm_id is valid and the authorised user is not a member of the DM
 
     Return values:
@@ -716,7 +742,7 @@ def user_profile_setemail_ep():
         email           (str)   - string
 
     Exceptions:
-        TypeError   - occurs when auth_user_id is not an int
+        TypeError   - occurs when valid_token is not valid
         TypeError   - occurs when name_first, name_last are not str
         AccessError - occurs when auth_user_id is invalid
         InputError  - occurs when email is not valid
@@ -763,9 +789,32 @@ def user_profile_sethandle_ep():
 @APP.route('/user/profile/uploadphoto/v1', methods=['POST'])
 def user_profile_uploadphoto_endpt():
     '''
-    put smth here
+    Given a URL of an image on the internet, crops the image within bounds
+    (x_start, y_start) and (x_end, y_end). Position (0,0) is the top left.
 
+    Arguments:
+        token           (str)   - valid token
+        img_url         (str)   - url of the image
+        x_start         (int)   - lower x bound
+        y_start         (int)   - lower y bound
+        x_end           (int)   - upper x bound
+        y_end           (int)   - upper y bound
 
+    Exceptions:
+
+        TypeError   - occurs when auth_user_id, x_start, x_end, y_end
+                      are not ints
+        TypeError   - occurs when img_url is not a str
+        InputError  - occurs when handle is invalid
+        InputError  - occurs when img_url returns an HTTP status other than 200
+        InputError  - occurs when any of x_start, y_start, x_end, y_end are not
+                      within the dimensions of the image at the URL
+        InputError  - occurs when x_end is less than x_start or y_end is less
+                      than y_start
+        InputError  - occurs when image uploaded is not a JPG
+
+    Return value:
+        Returns {} on success
     '''
     request_data = request.get_json(force = True)
     token = request_data['token']
@@ -786,7 +835,7 @@ def user_profileimgurl_endpt(auth_user_id):
     Gets the profile image of a user
     
     Arguments:
-        token       (string)    - unique user token
+        token       (str)- unique user token
 
     Exceptions:
         AccessError - Occurs when token is invalid
@@ -1257,7 +1306,24 @@ def search_endpt():
 @APP.route('/standup/start/v1', methods=['POST'])
 def standup_start_endpt():
     '''
-    put smth here
+    For a given channel, start the standup period for the next 'length' seconds
+
+    Arguments:
+        token           (int)   - valid token
+        channel_id      (int)   - unique channel id
+        length          (int)   - length of standup in seconds
+    
+    Exceptions:
+        AccessError - occurs when token is invalid
+        TypeError   - occurs when auth_user_id, channel_id, length are not ints
+        InputError  - occurs when channel_id does not refer to a valid channel
+        InputError  - occurs when length is a negative integer
+        InputError  - occurs when an active standup is currently running in the
+                      channel
+        AccessError - occurs when channel_id is valid and the authorised user is
+                      not a member of the channel
+    
+    Returns { time_finish } on success        
     '''
     request_data = request.get_json()
 
@@ -1270,8 +1336,24 @@ def standup_start_endpt():
 @APP.route('/standup/active/v1', methods=['GET'])
 def standup_active_endpt():
     '''
-    put smth here
+    For a given channel, return whether a standup is active in it, and what time
+    the standup finishes. If no standup is active, then time_finish returns
+    None.
+
+    Arguments:
+        token           (int)   - valid token
+        channel_id      (int)   - unique channel id
+    
+    Exceptions:
+        AccessError - occurs when token is invalid
+        TypeError   - occurs when auth_user_id, channel_id are not ints
+        InputError  - occurs when channel_id does not refer to a valid channel
+        AccessError - occurs when channel_id is valid and the authorised user is
+                      not a member of the channel
+    
+    Returns { is_active, time_finish } on success        
     '''
+    
     token = request.args.get('token')
     auth_user_id = token_to_auth_id(token)
     channel_id = int(request.args.get('channel_id'))
@@ -1280,8 +1362,28 @@ def standup_active_endpt():
 @APP.route('/standup/send/v1', methods=['POST'])
 def standup_send_endpt():
     '''
-    put smth here
+    Sending a message to get buffered in the standup queue, assuming a standup
+    is currently active. 
+
+    Arguments:
+        token           (int)   - valid token
+        channel_id      (int)   - unique channel id
+        message         (str)   - message string
+    
+    Exceptions:
+        AccessError - occurs when token is invalid
+        TypeError   - occurs when auth_user_id, channel_id are not ints
+        TypeError   - occurs when message is not a str
+        InputError  - occurs when channel_id does not refer to a valid channel
+        InputError  - occurs when length of message is over 1000 characters
+        InputError  - occurs when an active standup is not currently running in
+                      the channel
+        AccessError - occurs when channel_id is valid and the authorised user is
+                      not a member of the channel
+    
+    Returns {} on success        
     '''
+
     request_data = request.get_json()
 
     auth_id = token_to_auth_id(request_data.get('token'))
@@ -1294,6 +1396,12 @@ def standup_send_endpt():
 def get_profile_pic():
     '''
     Return the user's profile picture.
+
+    Arguments:
+        token          (int)   - valid token
+    
+    Exceptions:
+        AccessError - occurs when token is invalid
     '''
     token = request.args.get('token')
     auth_user_id = token_to_auth_id(token)
