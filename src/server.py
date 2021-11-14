@@ -188,8 +188,6 @@ def passwordreset_reset_endpt():
 
     reset_code = register_details.get('reset_code')
     new_password = register_details.get('new_password')
-    print('reset code is:', reset_code,'pass is:', new_password)
-
 
     auth_passwordreset_reset_v1(str(reset_code), str(new_password))
 
@@ -819,7 +817,7 @@ def user_profile_uploadphoto_endpt():
     request_data = request.get_json(force = True)
     token = request_data['token']
     auth_user_id = token_to_auth_id(token)
-    print(auth_user_id)
+
     img_url = request_data['img_url']
     x_start = request_data['x_start']
     x_end = request_data['x_end']
@@ -1114,8 +1112,6 @@ def message_unreact_endpt():
 def message_pin_endpt():
     request_data = request.get_json()
     token = request_data['token']
-    print(token)
-    print(request_data)
     auth_user_id = token_to_auth_id(token)
     message_id = request_data.get('message_id')
 
@@ -1282,7 +1278,6 @@ def notifications_get_endpt():
     '''
     token = request.args.get('token')
     auth_id = token_to_auth_id(token)
-    print(111111)
     return notifications_get_v1(auth_id)
 
 ################## SEARCH ######################################################
