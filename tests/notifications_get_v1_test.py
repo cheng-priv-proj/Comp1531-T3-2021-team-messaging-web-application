@@ -326,7 +326,7 @@ def test_notifications_many(clear, get_user_1, auth_id_v2):
         'message': 'Hello there @johnsmith'})
 
     notification_dictionary = requests.get(config.url + 'notifications/get/v1', params = {'token': auth_id_v2['token']}).json()
-    for notification in notification_dictionary['notifications']:
+
     assert notification_dictionary['notifications'] == [{
         'channel_id': -1,
         'dm_id' : dm_id,
