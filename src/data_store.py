@@ -435,7 +435,6 @@ class Datastore:
         return False
 
     def is_reset_code_invalid(self, reset_code):
-        print(self.get_u_id_from_reset_code_dict())
         if reset_code in self.get_u_id_from_reset_code_dict():
             return False
         return True
@@ -516,12 +515,10 @@ class Datastore:
 
         channel_id = -1
         dm_id = -1
-        print('inserted notification')
         if channel_or_dm_id < 0:
             dm_id = channel_or_dm_id
         else:
             channel_id = channel_or_dm_id
-        print(notification_message)
         notifications.insert(0, {
                                 'channel_id': channel_id,
                                 'dm_id': dm_id,
@@ -630,8 +627,6 @@ class Datastore:
 
         login_info[email]['password'] = password
 
-        print(self.get_users_from_u_id_dict().get(auth_user_id))
-
         self.update_pickle()
 
     def update_name(self, auth_user_id, name_first, name_last):
@@ -681,10 +676,6 @@ class Datastore:
         if user_stats['involvement_rate'] > 1:
             user_stats['involvement_rate'] = 1
 
-        print('user_sum', user_sum)
-        print('workspace_sum', workspace_sum)
-        print('involvment', user_stats['involvement_rate'])
-
     def update_workspace_stats_channels_exist(self, change):
         workspace_stats_channels = self.__store['workspace_stats']['channels_exist']
         workspace_stats_channels.append({
@@ -693,7 +684,6 @@ class Datastore:
         })
 
     def update_workspace_stats_dms_exist(self, change):
-        print('dm_change' ,change)
         workspace_stats_dms = self.__store['workspace_stats']['dms_exist']
         workspace_stats_dms.append({
             'num_dms_exist': workspace_stats_dms[-1]['num_dms_exist'] + change,
@@ -791,13 +781,10 @@ class Datastore:
             if react['react_id'] == react_id:
                 react['u_ids'].remove(auth_user_id)
                 react['is_this_user_reacted'] = False
-        print(message)
     
     def update_reacted_or_not(self, auth_user_id, channel_dm_id):
         for message in self.get_messages_from_channel_or_dm_id(channel_dm_id):
-            print(message)
             for react in message['reacts']:
-                print(react)
                 if auth_user_id not in react['u_ids']:
                     react['is_this_user_reacted'] = False
                 else:

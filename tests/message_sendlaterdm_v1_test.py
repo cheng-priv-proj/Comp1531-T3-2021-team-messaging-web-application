@@ -79,8 +79,6 @@ def test_standard(register_users, dm_factory):
         'dm_id': dm_id,
         'start': 0
     }).json()
-    print(message_id)
-    print(messages_dict)
     assert messages_dict == {
         'messages': [
             {

@@ -86,7 +86,6 @@ def test_send_one_valid_message(clear, register, extract_token, extract_user, ex
         'token': owner_token,
         'channel_id': channel_id, 
         'start': 0 }).json()
-    print(messages)
     assert messages == {
         'messages': [
             {
@@ -136,7 +135,6 @@ def test_send_multiple_valid_messages(clear, register, extract_token, extract_us
         'token': owner_token,
         'channel_id': channel_id, 
         'start': 0 }).json()
-    print(messages)
     assert messages == {
         'messages': [
             {

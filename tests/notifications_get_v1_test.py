@@ -174,7 +174,6 @@ def test_channel_notif_reacted(clear, get_user_1, auth_id_v2):
     requests.post(config.url + "message/react/v1", json = {'token': auth_id_v2['token'], 'message_id': message_id, 'react_id': 1})
     
     notification_dictionary = requests.get(config.url + 'notifications/get/v1', params = {'token': get_user_1['token']}).json()
-    print(notification_dictionary)
     assert notification_dictionary['notifications'] == [{
         'channel_id': channel_id,
         'dm_id' : -1,
@@ -210,7 +209,6 @@ def test_dm_notif_tagged_edited(clear, get_user_1, auth_id_v2):
     })
     
     notification_dictionary = requests.get(config.url + 'notifications/get/v1', params = {'token': auth_id_v2['token']}).json()
-    print(notification_dictionary)
     assert notification_dictionary['notifications'] == [{
         'channel_id': -1,
         'dm_id' : dm_id,
@@ -243,7 +241,6 @@ def test_dm_notif_tagged_and_added(clear, get_user_1, auth_id_v2):
         'message': 'Hello there @johnsmith'})
     
     notification_dictionary = requests.get(config.url + 'notifications/get/v1', params = {'token': auth_id_v2['token']}).json()
-    print(notification_dictionary)
     assert notification_dictionary['notifications'] == [{
         'channel_id': -1,
         'dm_id' : dm_id,
@@ -281,8 +278,6 @@ def test_dm_notif_reacted(clear, get_user_1, auth_id_v2):
 
     # check ownerone notifications
     notification_dictionary = requests.get(config.url + 'notifications/get/v1', params = {'token': get_user_1['token']}).json()
-    print(notification_dictionary)
-    print(f'dm_id {dm_id}')
     assert notification_dictionary['notifications'] == [{
         'channel_id': -1,
         'dm_id' : dm_id,
@@ -297,7 +292,6 @@ def test_notifications_many(clear, get_user_1, auth_id_v2):
         Correct output from notifications/get/v1.
     '''
     channel_id_dict = requests.post(config.url + 'channels/create/v2', json={'token': get_user_1['token'], 'name': 'sta wars', 'is_public': True}).json()
-    print(channel_id_dict)
     channel_id = channel_id_dict['channel_id']
 
     requests.post(config.url + 'channel/invite/v2', json={'token': get_user_1['token'], 'channel_id': channel_id, 'u_id': auth_id_v2['auth_user_id']})
@@ -333,8 +327,6 @@ def test_notifications_many(clear, get_user_1, auth_id_v2):
 
     notification_dictionary = requests.get(config.url + 'notifications/get/v1', params = {'token': auth_id_v2['token']}).json()
     for notification in notification_dictionary['notifications']:
-        print(notification['notification_message'])
-    print(len(notification_dictionary['notifications']))
     assert notification_dictionary['notifications'] == [{
         'channel_id': -1,
         'dm_id' : dm_id,

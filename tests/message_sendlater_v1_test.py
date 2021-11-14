@@ -84,8 +84,6 @@ def test_standard(register_users, channel_factory):
         'start': 0
     }).json()
 
-    print(messages_dict)
-
     assert messages_dict == {
         'messages': [
             {
@@ -152,10 +150,6 @@ def test_multiple(register_users, channel_factory):
         'start': 0
     }).json()
 
-    print(message_id_3)
-    print(message_id_1)
-    print(message_id_2)
-    print(messages_dict)
     assert messages_dict == {
         'messages': [
             {
